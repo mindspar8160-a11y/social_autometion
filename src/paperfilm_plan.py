@@ -464,7 +464,7 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
         f"CRITICAL STORYTELLING RULES:\n"
         f"1. YE KOI TRAILER NAHI HAI! KABHI BHI disjointed cinematic teaser dialogues mat likho. Asli katha sunao.\n"
     )
-    if geo:
+    if geo and part_num == 1:
         part_ctx += (
             f"2. PEHLA SCENE (SCENE 1) STRICTLY KIND 'map' HOGA (THE MAP HOOK)!\n"
             f"   - 'state': '{geo['state']}'\n"
@@ -478,8 +478,11 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
         )
     else:
         part_ctx += (
-            f"2. Scene 1 kind 'title' hoga: seedha kahani ka mukhya vishay/patra/mandir ka naam Devanagari me bolo.\n"
-            f"   Scene 1 Stamp: 'भाग {part_num}'\n"
+            f"2. Scene 1 kind 'card' ya 'title' hoga (PART {part_num} ME MAP NAHI BANANA, SEEDHA ACTION AUR KAHANI SHURU KARO)!\n"
+            f"   - Scene 1 Narration me pichhle part ka recap bridge aur naya sankat seedha aana chahiye:\n"
+            f"     '{part.get('recap_bridge', '')} {part.get('hook_line', '')}'\n"
+            f"   - 3D Pop-Up Paper stage par nayak, hathiyar aur ghatna samne aayegi!\n"
+            f"   - Scene 1 Stamp: 'भाग {part_num}'\n"
         )
 
     if not is_final:
@@ -515,7 +518,14 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
             
             # Enforce series branding on scenes and metadata
             scenes = plan["scenes"]
-            if geo and len(scenes) > 0:
+            if part_num > 1:
+                # Part 2+ should NOT have any map scenes
+                for sc in scenes:
+                    if sc.get("kind") == "map":
+                        sc["kind"] = "card"
+                        sc["text"] = re.sub(r"\s*→\s*", " ", sc.get("text", "")).strip()
+
+            if geo and part_num == 1 and len(scenes) > 0:
                 scenes[0]["kind"] = "map"
                 scenes[0]["state"] = geo["state"]
                 if geo.get("district"):
@@ -532,20 +542,33 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                 
                 st_kw = geo["state"]
                 pl_kw = geo["name"].split()[0]
-                # Ensure state and place are in scene 0 narration for map zoom synchronization
+                # Ensure state and place are in scene 0 narration for map zoom synchronization (NO DUPLICATES)
                 narr = scenes[0].get("narration", "")
-                if st_kw.lower() not in narr.lower() and "maharashtra" not in narr.lower() and "rajasthan" not in narr.lower() and "gujarat" not in narr.lower():
-                    scenes[0]["narration"] = f"{st_kw} ke {pl_kw} mein, " + narr
-                    scenes[0]["tts_text"] = f"{geo['state']} के {geo['name']} में, " + scenes[0].get("tts_text", narr)
+                tts_n = scenes[0].get("tts_text", narr)
+                has_st = st_kw.lower() in narr.lower() or st_hi.lower() in tts_n.lower() or st_kw.lower() in tts_n.lower()
+                has_pl = pl_kw.lower() in narr.lower() or geo["name"].lower() in tts_n.lower() or pl_kw.lower() in tts_n.lower()
                 
-                scenes[0]["hit_word"] = st_kw
-                scenes[0]["hit2_word"] = pl_kw
+                if not (has_st and has_pl):
+                    scenes[0]["narration"] = f"{st_kw} ke {pl_kw} mein, " + narr
+                    scenes[0]["tts_text"] = f"{st_hi} के {geo['name']} में, " + tts_n
+                
+                scenes[0]["hit_word"] = st_hi if st_hi in scenes[0].get("tts_text", "") else st_kw
+                scenes[0]["hit2_word"] = pl_kw if pl_kw in scenes[0].get("tts_text", "") else geo["name"].split()[0]
                 
                 # If there was another map scene later, change it to card so there's only 1 map
                 for later_sc in scenes[1:]:
                     if later_sc.get("kind") == "map":
                         later_sc["kind"] = "card"
                         later_sc["text"] = re.sub(r"\s*→\s*", " ", later_sc.get("text", "")).strip()
+
+            # Clean any repeated consecutive phrases in scene 0 narration / tts_text
+            if len(scenes) > 0:
+                for k in ["narration", "tts_text"]:
+                    val = scenes[0].get(k, "")
+                    if val and "," in val:
+                        chunks = [c.strip() for c in val.split(",") if c.strip()]
+                        if len(chunks) >= 2 and chunks[0].lower() == chunks[1].lower():
+                            scenes[0][k] = ", ".join(chunks[1:])
 
             scenes[0]["stamp"] = f"भाग {part_num}"
             if not is_final:

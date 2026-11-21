@@ -190,7 +190,7 @@ def run_myth_pipeline(a, voice_cfg, custom_script=None):
     subprocess.run([
         npx, "remotion", "render", "src/index.ts", "MythShort", str(rendered_mp4),
         f"--props={(work / 'myth_props.json').resolve().as_posix()}",
-        "--concurrency=2",
+        "--concurrency=1",
         "--gl=angle"
     ], cwd=ROOT / "remotion", check=True)
 
@@ -268,16 +268,29 @@ def run_myth_pipeline(a, voice_cfg, custom_script=None):
 
 
 def _run_logged(cmd, cwd, tail_lines=14):
-    """Run a command, stream its output to the Actions log, and on failure raise an error that contains the last lines."""
+    """Run a command, stream output safely without pipe deadlocks, and raise on failure."""
+    import sys
     proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             text=True, encoding="utf-8", errors="replace")
     tail = []
-    for line in proc.stdout:
-        print(line, end="")
-        if line.strip():
-            tail.append(line.strip())
-            tail = tail[-tail_lines:]
-    if proc.wait() != 0:
+    buf = ""
+    while True:
+        chunk = proc.stdout.read(256)
+        if not chunk and proc.poll() is not None:
+            break
+        if chunk:
+            sys.stdout.write(chunk)
+            sys.stdout.flush()
+            buf += chunk
+            if "\n" in buf:
+                lines = buf.split("\n")
+                buf = lines[-1]
+                for l in lines[:-1]:
+                    if l.strip():
+                        tail.append(l.strip())
+                        tail = tail[-tail_lines:]
+    proc.wait()
+    if proc.returncode != 0:
         raise RuntimeError("render failed (exit %s): %s" % (proc.returncode, " || ".join(tail)[-700:]))
 
 
@@ -302,6 +315,29 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
         topic = {"title": short_title, "summary": custom_script}
         print(f"📖 Myth Topic (Custom Script): {topic['title']}")
         plan = paperfilm_plan.make_plan(topic, custom_script=custom_script, seed=seed)
+    elif getattr(a, "topic", None):
+        import series_manager
+        state = series_manager.load_series_state()
+        topic_obj = next((t for t in state["active_topics"] if t["topic_id"] == a.topic), None)
+        if not topic_obj:
+            raise ValueError(f"Topic {a.topic} not found in active topics")
+        part_num = getattr(a, "part", None) or topic_obj.get("current_part", 1)
+        part = next((p for p in topic_obj["parts"] if p["part_num"] == part_num), None)
+        if not part:
+            raise ValueError(f"Part {part_num} not found in topic {a.topic}")
+        slot_info = {
+            "topic_index": 0,
+            "topic_id": topic_obj["topic_id"],
+            "topic_title": topic_obj["topic_title"],
+            "current_part": part_num,
+            "total_parts": topic_obj["total_parts"],
+            "active_pool_count": len(state["active_topics"]),
+            "is_final_part": part_num >= topic_obj["total_parts"]
+        }
+        topic = {"title": topic_obj["topic_title"], "topic": topic_obj["topic_id"], "summary": topic_obj.get("story_synopsis", "")}
+        print(f"📖 Targeted Series Slot: {topic_obj['topic_title']} | Part {part_num}/{slot_info['total_parts']}")
+        print(f"🎬 Episode Title: {part['part_title']}")
+        plan = paperfilm_plan.make_series_part_plan(topic_obj, part, slot_info, seed=seed)
     else:
         # 3-Topic Multi-Part Series Rotation Engine
         import series_manager
@@ -337,7 +373,7 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
     _run_logged([
         npx, "remotion", "render", "src/cinematic/entry.tsx", "PaperFilm", str(rendered_mp4),
         f"--props={(work / 'pf_props.json').resolve().as_posix()}",
-        "--concurrency=2"
+        "--concurrency=1"
     ], cwd=ROOT / "remotion")
 
     # final: video (+ its whoosh/thump sfx track) + voice/BGM, ~16 MB for Telegram
@@ -479,7 +515,7 @@ def run_cinematic_pipeline(a, voice_cfg, custom_script=None):
     _run_logged([
         npx, "remotion", "render", "src/cinematic/entry.tsx", "CinematicArc", str(rendered_mp4),
         f"--props={(work / 'ca_props.json').resolve().as_posix()}",
-        "--concurrency=2"
+        "--concurrency=1"
     ], cwd=ROOT / "remotion")
 
     final = out / "final.mp4"
@@ -561,6 +597,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--book")
     ap.add_argument("--script", help="Custom user script or arbitrary topic")
+    ap.add_argument("--topic", help="Target topic ID from active_series.json (e.g. baji_prabhu_pawankhind)")
+    ap.add_argument("--part", type=int, help="Target part number (e.g. 2 or 3)")
     ap.add_argument("--mode", choices=["book", "myth"], default="myth", help="Pipeline mode: 'myth' (default) or 'book'")
     ap.add_argument("--myth", action="store_true", help="Shortcut for --mode myth")
     ap.add_argument("--engine", choices=["paperfilm", "myth", "cinematic", "random"], default=os.environ.get("MYTH_ENGINE", "paperfilm"),
@@ -742,7 +780,7 @@ def main():
     subprocess.run([
         npx, "remotion", "render", "src/index.ts", "Main", str(silent),
         f"--props={(work / 'plan.json').resolve().as_posix()}",
-        "--concurrency=2"
+        "--concurrency=1"
     ], cwd=ROOT / "remotion", check=True)
 
     # 5. Final Video Assembly
