@@ -573,6 +573,13 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
             scenes[0]["stamp"] = f"भाग {part_num}"
             if not is_final:
                 scenes[-1]["stamp"] = "अगला भाग"
+                last_narr = scenes[-1].get("narration", "").rstrip(".!| ")
+                last_tts = scenes[-1].get("tts_text", last_narr).rstrip(".!|। ")
+                cliff_hinglish = "Lekin aage kya hua? Dekhiye agle episode mein!"
+                cliff_hindi = "लेकिन आगे क्या हुआ? देखिए अगले एपिसोड में!"
+                if "agle" not in last_narr.lower() and "अगले" not in last_tts:
+                    scenes[-1]["narration"] = f"{last_narr}... {cliff_hinglish}"
+                    scenes[-1]["tts_text"] = f"{last_tts}... {cliff_hindi}"
             else:
                 scenes[-1]["stamp"] = "कथा सम्पूर्ण"
 
