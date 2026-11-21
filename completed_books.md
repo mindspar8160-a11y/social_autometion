@@ -69,3 +69,4 @@
 | 63 | 2026-11-20 | 2026-11-20_172820_pf_parshuram_avatar | Unknown | Productivity & Wisdom | https://youtu.be/xhgJ9md7x1A |
 | 64 | 2026-11-21 | 2026-11-21_081327_pf_shakti_peeth_tarapith | Unknown | Productivity & Wisdom | https://youtu.be/mUmOWHb5n04 |
 | 65 | 2026-11-21 | 2026-11-21_154930_pf_shakti_peeth_shondesh_narmada | Unknown | Productivity & Wisdom | https://youtu.be/URkaGF2pgp4 |
+| 66 | 2026-11-21 | 2026-11-21_190905_pf_shakti_peeth_shondesh_narmada | Unknown | Productivity & Wisdom | https://youtu.be/nAYgrVcMwbc |
