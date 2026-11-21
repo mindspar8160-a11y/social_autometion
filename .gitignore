@@ -33,3 +33,22 @@ models/
 
 # keep the voice reference clips (used by local XTTS-v2)
 !data/voice_references/*.wav
+
+# test and scratch files
+test_*
+cinematic_demo/
+cinematic_engine/
+data/movie_frames/
+data/remaining_settings_samples/
+data/sanatan_sample/
+data/setting_d_nuances/
+data/*.jpg
+data/*.txt
+remotion/test_*.jpg
+*.jsonl
+raju_success_calls.json
+step*.*
+render_and_notify.py
+check_run_result.py
+scratch_step.py
+
