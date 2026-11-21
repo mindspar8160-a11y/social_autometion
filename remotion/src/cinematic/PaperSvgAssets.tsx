@@ -293,3 +293,88 @@ export const PaperDwarkadhishCutout: React.FC<{ progress: number; width?: number
     </div>
   );
 };
+
+/* ------------------------------------------------------------------ 5. PAPER ARMY / SENA CUTOUT */
+export const PaperArmyCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 720, height = 500 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.9, 1]);
+
+  // A troop/sena formation of warriors with spears, shields, swords and fluttering saffron flags
+  const warriors = [
+    { x: -220, y: 40, scale: 0.75, weapon: "spear" },
+    { x: -140, y: 15, scale: 0.85, weapon: "sword" },
+    { x: -60, y: 30, scale: 0.8, weapon: "spear" },
+    { x: 30, y: -10, scale: 0.95, weapon: "sword" }, // Commander / Nayak
+    { x: 120, y: 20, scale: 0.85, weapon: "spear" },
+    { x: 200, y: 45, scale: 0.78, weapon: "sword" },
+    { x: 270, y: 10, scale: 0.72, weapon: "flag" },
+  ];
+
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "flex-end", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="-360 -240 720 480" style={{ overflow: "visible" }}>
+        {/* Layer 0: Physical Paper Shadow */}
+        <g transform="translate(10, 14)" fill={SHADOW} opacity={0.5}>
+          {/* Ground ridge */}
+          <path d="M-350,210 Q-150,180 0,200 Q180,180 350,210 L350,230 L-350,230 Z" />
+          {/* Warriors shadow silhouettes */}
+          {warriors.map((w, i) => (
+            <g key={i} transform={`translate(${w.x}, ${w.y}) scale(${w.scale})`}>
+              <circle cx={0} cy={-50} r={28} />
+              <path d="M-30,-20 L30,-20 L38,130 L-38,130 Z" />
+              {w.weapon === "spear" && <line x1={-35} y1={-140} x2={25} y2={130} stroke={SHADOW} strokeWidth={8} />}
+              {w.weapon === "flag" && <path d="M0,-160 L70,-130 L0,-100 Z" />}
+            </g>
+          ))}
+        </g>
+
+        {/* Layer 1: Handcrafted Paper Cutout Ground Ridge */}
+        <path d="M-350,210 Q-150,180 0,200 Q180,180 350,210 L350,230 L-350,230 Z" fill={PALETTE[3]} stroke={CREAM} strokeWidth={4} />
+
+        {/* Layer 2: The Warriors / Sena Formation */}
+        {warriors.map((w, i) => (
+          <g key={i} transform={`translate(${w.x}, ${w.y}) scale(${w.scale})`}>
+            {/* Dhoti / Trousers */}
+            <path d="M-28,40 L28,40 L36,130 L-36,130 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+            <line x1={0} y1={55} x2={0} y2={130} stroke={CREAM} strokeWidth={2.5} />
+
+            {/* Torso / Armor in Terracotta & Ink Paper */}
+            <path d="M-32,-20 L32,-20 L28,45 L-28,45 Z" fill={i === 3 ? RED_DARK : INK} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+            {/* Belt */}
+            <rect x={-30} y={35} width={60} height={12} rx={3} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+
+            {/* Shield (Dhal) */}
+            <ellipse cx={-24} cy={30} rx={22} ry={22} fill={PALETTE[0]} stroke={CREAM} strokeWidth={3} />
+            <circle cx={-24} cy={30} r={7} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+
+            {/* Weapon */}
+            {w.weapon === "spear" && (
+              <g>
+                <line x1={-35} y1={-140} x2={25} y2={130} stroke={INK} strokeWidth={6} />
+                <polygon points="-35,-165 -45,-135 -25,-135" fill={GOLD} stroke={CREAM} strokeWidth={2.5} />
+              </g>
+            )}
+            {w.weapon === "sword" && (
+              <g transform="translate(20, 20) rotate(-25)">
+                <line x1={0} y1={-70} x2={0} y2={30} stroke={CREAM} strokeWidth={5} />
+                <rect x={-10} y={15} width={20} height={6} rx={2} fill={GOLD} />
+              </g>
+            )}
+            {w.weapon === "flag" && (
+              <g>
+                <line x1={0} y1={-170} x2={0} y2={130} stroke={INK} strokeWidth={5} />
+                <path d="M0,-170 Q45,-155 80,-165 L60,-130 Q35,-140 0,-130 Z" fill={RED} stroke={CREAM} strokeWidth={3} />
+              </g>
+            )}
+
+            {/* Head & Pagdi (Turban) */}
+            <circle cx={0} cy={-50} r={24} fill="#e5b083" stroke={CREAM} strokeWidth={3} />
+            {/* Saffron Turban */}
+            <ellipse cx={0} cy={-64} rx={28} ry={15} fill={RED} stroke={CREAM} strokeWidth={3} />
+            <rect x={-20} y={-66} width={40} height={8} rx={3} fill={GOLD} />
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+};

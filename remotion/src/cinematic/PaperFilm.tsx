@@ -2,9 +2,7 @@ import React, {useMemo, useState, useEffect} from "react";
 import {AbsoluteFill, Audio, Easing, Img, Sequence, delayRender, continueRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from "remotion";
 import type {PFAccent, PFProps, PFScene} from "./types";
 import {MapItem, mapTimes} from "./MapItem";
-import {PaperTempleCutout, PaperCityCutout, PaperCharDhamCutout, PaperDwarkadhishCutout} from "./PaperSvgAssets";
-import {PaperStage} from "./PaperStage";
-import {PaperScene} from "./paper/library/PaperScene";
+import {PaperTempleCutout, PaperCityCutout, PaperCharDhamCutout, PaperDwarkadhishCutout, PaperArmyCutout} from "./PaperSvgAssets";
 
 /* ------------------------------------------------------------------ fonts */
 const FONTS: [string, string, string][] = [
@@ -131,8 +129,8 @@ const MapRoute: React.FC<{s: PFScene; lf: number; fps: number; text: React.CSSPr
   );
 };
 
-/* ---------------------------------------- full-screen scenes: map / cutout / story stage */
-export const isFull = (s: PFScene) => !!s.paper_spec || s.kind === "map" || s.kind === "cutout" || s.kind === "card" || s.kind === "title" || s.kind === "quote" || (s.kind === "photo" && !!s.image);
+/* ---------------------------------------- full-screen scenes: map / photo */
+export const isFull = (s: PFScene) => s.kind === "map" || (s.kind === "photo" && !!s.image);
 
 const FullScene: React.FC<{s: PFScene; i: number; lf: number; fps: number; width: number; height: number}> = ({s, i, lf, fps, width, height}) => {
   const accent = s.accent || ACCENT_CYCLE[i % 4];
@@ -164,39 +162,7 @@ const FullScene: React.FC<{s: PFScene; i: number; lf: number; fps: number; width
       </AbsoluteFill>
     );
   }
-
-  if (s.paper_spec) {
-    return (
-      <AbsoluteFill>
-        <PaperScene spec={s.paper_spec} durationInFrames={Math.max(15, Math.round(s.durationSec * fps))} localFrame={lf} />
-        {s.text && (
-          <div style={{position: "absolute", left: 40, right: 40, top: 90, display: "flex", justifyContent: "center", zIndex: 100}}>
-            <div style={{
-              background: CREAM,
-              padding: "10px 32px",
-              borderRadius: 14,
-              boxShadow: "0 10px 24px rgba(40,25,10,.35)",
-              border: "3px solid #e4d8be",
-              textAlign: "center",
-              transform: "rotate(-0.5deg)"
-            }}>
-              <div style={{...t(52, DISPLAY), color: a.main}}>{s.text}</div>
-              {s.sub && <div style={{...t(32, BODY), color: "#544", marginTop: 4}}>{s.sub}</div>}
-            </div>
-          </div>
-        )}
-        {s.stamp && <div style={{position: "absolute", right: 60, top: 290, zIndex: 101}}><Stamp solid text={s.stamp} start={Math.round((s.words[s.hit ?? 0]?.s ?? 0.3) * fps)} f={lf} fps={fps} /></div>}
-      </AbsoluteFill>
-    );
-  }
-
-  // 2D Layered Paper Cutout Stage (User Reference Art: Sun, Flying Birds, Pop-Up Mountains, Temple, Character)
-  return (
-    <AbsoluteFill>
-      <PaperStage s={s} lf={lf} fps={fps} w={width} h={height} />
-      {s.stamp && <div style={{position: "absolute", right: 60, top: 290}}><Stamp solid text={s.stamp} start={Math.round((s.words[s.hit ?? 0]?.s ?? 0.3) * fps)} f={lf} fps={fps} /></div>}
-    </AbsoluteFill>
-  );
+  return null;
 };
 
 /* ------------------------------------------------------------- scene item */
@@ -212,16 +178,30 @@ const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: numb
   const itemStart = (k: number) => Math.round((s.words[Math.floor((k * s.words.length) / Math.max(1, shownItems.length))]?.s ?? 0) * fps);
 
   const hay = `${s.text} ${s.sub || ""} ${s.narration || ""}`.toLowerCase();
-  const isDeity = hay.includes("द्वारकाधीश") || hay.includes("dwarkadhish") || hay.includes("कृष्ण") || hay.includes("krishna") || hay.includes("शिव") || hay.includes("shiva") || hay.includes("महादेव") || hay.includes("राम") || hay.includes("rama") || hay.includes("हनुमान") || hay.includes("hanuman") || hay.includes("भगवान");
-  const isCharDham = !isDeity && (hay.includes("धाम") || hay.includes("dham") || hay.includes("सप्त") || hay.includes("मान्यता") || hay.includes("चार धाम") || hay.includes("तीर्थ") || hay.includes("ज्योतिर्लिंग"));
-  const isCity = !isDeity && !isCharDham && (hay.includes("नगरी") || hay.includes("नगर") || hay.includes("समुद्र") || hay.includes("किला") || hay.includes("साम्राज्य") || hay.includes("राजधानी"));
-  const isTemple = !isDeity && !isCharDham && !isCity && (hay.includes("द्वारका") || hay.includes("सोमनाथ") || hay.includes("काशी") || hay.includes("उज्जैन") || hay.includes("मंदिर") || hay.includes("temple") || hay.includes("शिखर"));
+  const isArmy = hay.includes("सेना") || hay.includes("sena") || hay.includes("सैन्य") || hay.includes("युद्ध") || hay.includes("लड़ाई") || hay.includes("फौज") || hay.includes("फ़ौज") || hay.includes("mawla") || hay.includes("मावळा") || hay.includes("सैनिक") || hay.includes("battle") || hay.includes("war") || hay.includes("सैनिकों");
+  const isDeity = !isArmy && (hay.includes("द्वारकाधीश") || hay.includes("dwarkadhish") || hay.includes("कृष्ण") || hay.includes("krishna") || hay.includes("शिव") || hay.includes("shiva") || hay.includes("महादेव") || hay.includes("राम") || hay.includes("rama") || hay.includes("हनुमान") || hay.includes("hanuman") || hay.includes("भगवान"));
+  const isCharDham = !isArmy && !isDeity && (hay.includes("धाम") || hay.includes("dham") || hay.includes("सप्त") || hay.includes("मान्यता") || hay.includes("चार धाम") || hay.includes("तीर्थ") || hay.includes("ज्योतिर्लिंग"));
+  const isCity = !isArmy && !isDeity && !isCharDham && (hay.includes("नगरी") || hay.includes("नगर") || hay.includes("समुद्र") || hay.includes("किला") || hay.includes("साम्राज्य") || hay.includes("राजधानी"));
+  const isTemple = !isArmy && !isDeity && !isCharDham && !isCity && (hay.includes("द्वारका") || hay.includes("सोमनाथ") || hay.includes("काशी") || hay.includes("उज्जैन") || hay.includes("मंदिर") || hay.includes("temple") || hay.includes("शिखर"));
 
   if (s.kind === "map") {
     return (
       <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt * 0.6}>
         <MapItem s={s} lf={lf} fps={fps} accent={a.main} accentDark={a.dark} />
         <MapRoute s={s} lf={lf} fps={fps} text={text(60)} body={text(40, BODY)} />
+        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
+      </Sheet>
+    );
+  }
+  if (isArmy) {
+    return (
+      <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
+        <Tape rot={-2} />
+        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
+          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
+        </div>
+        <PaperArmyCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
+        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
         {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
       </Sheet>
     );
@@ -429,7 +409,7 @@ export const PaperFilm: React.FC<PFProps> = ({scenes, seed = 7, captions = true,
 
   const hitOf = (s: PFScene) => Math.round((s.words[s.hit ?? Math.floor(s.words.length * 0.35)]?.s ?? 0.4) * fps);
   const tx = width / 2 + shx, ty = height * 0.46 + shy;
-  const fullOp = isFull(sc) ? 1 : 0;
+  const fullOp = isFull(sc) ? (cur === 0 ? clamp((len - lf) / 8) : clamp(lf / 8) * clamp((len - lf) / 8)) : 0;
 
   return (
     <AbsoluteFill style={{background: KRAFT, overflow: "hidden"}}>
