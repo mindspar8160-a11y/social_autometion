@@ -2,7 +2,7 @@ import React, {useMemo, useState, useEffect} from "react";
 import {AbsoluteFill, Audio, Easing, Img, Sequence, delayRender, continueRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from "remotion";
 import type {PFAccent, PFProps, PFScene} from "./types";
 import {MapItem, mapTimes} from "./MapItem";
-import {PaperTempleCutout, PaperCityCutout, PaperCharDhamCutout, PaperDwarkadhishCutout, PaperArmyCutout} from "./PaperSvgAssets";
+import {PaperTempleCutout, PaperCityCutout, PaperCharDhamCutout, PaperDwarkadhishCutout, PaperArmyCutout, PaperCowsCutout, PaperWeaponsCutout, PaperVachanCutout} from "./PaperSvgAssets";
 
 /* ------------------------------------------------------------------ fonts */
 const FONTS: [string, string, string][] = [
@@ -178,17 +178,59 @@ const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: numb
   const itemStart = (k: number) => Math.round((s.words[Math.floor((k * s.words.length) / Math.max(1, shownItems.length))]?.s ?? 0) * fps);
 
   const hay = `${s.text} ${s.sub || ""} ${s.narration || ""}`.toLowerCase();
-  const isArmy = hay.includes("सेना") || hay.includes("sena") || hay.includes("सैन्य") || hay.includes("युद्ध") || hay.includes("लड़ाई") || hay.includes("फौज") || hay.includes("फ़ौज") || hay.includes("mawla") || hay.includes("मावळा") || hay.includes("सैनिक") || hay.includes("battle") || hay.includes("war") || hay.includes("सैनिकों");
-  const isDeity = !isArmy && (hay.includes("द्वारकाधीश") || hay.includes("dwarkadhish") || hay.includes("कृष्ण") || hay.includes("krishna") || hay.includes("शिव") || hay.includes("shiva") || hay.includes("महादेव") || hay.includes("राम") || hay.includes("rama") || hay.includes("हनुमान") || hay.includes("hanuman") || hay.includes("भगवान"));
-  const isCharDham = !isArmy && !isDeity && (hay.includes("धाम") || hay.includes("dham") || hay.includes("सप्त") || hay.includes("मान्यता") || hay.includes("चार धाम") || hay.includes("तीर्थ") || hay.includes("ज्योतिर्लिंग"));
-  const isCity = !isArmy && !isDeity && !isCharDham && (hay.includes("नगरी") || hay.includes("नगर") || hay.includes("समुद्र") || hay.includes("किला") || hay.includes("साम्राज्य") || hay.includes("राजधानी"));
-  const isTemple = !isArmy && !isDeity && !isCharDham && !isCity && (hay.includes("द्वारका") || hay.includes("सोमनाथ") || hay.includes("काशी") || hay.includes("उज्जैन") || hay.includes("मंदिर") || hay.includes("temple") || hay.includes("शिखर"));
+  const isCow = hay.includes("गाय") || hay.includes("गायों") || hay.includes("गौ") || hay.includes("gau") || hay.includes("cow") || hay.includes("गोमाता") || hay.includes("कामधेनु") || hay.includes("बछड़ा") || hay.includes("बछड़े");
+  const isVachan = !isCow && (hay.includes("वचन") || hay.includes("vachan") || hay.includes("शपथ") || hay.includes("संकल्प") || hay.includes("आशीर्वाद") || hay.includes("वरदान") || hay.includes("प्रण") || hay.includes("प्रतिज्ञा") || hay.includes("निर्णय"));
+  const isWeapon = !isCow && !isVachan && (hay.includes("तलवार") || hay.includes("talwar") || hay.includes("sword") || hay.includes("धनुष") || hay.includes("बाण") || hay.includes("तीर") || hay.includes("हथियार") || hay.includes("शस्त्र") || hay.includes("चाकू") || hay.includes("ढाल") || hay.includes("वार") || hay.includes("शस्त्रों"));
+  const isArmy = !isCow && !isVachan && !isWeapon && (hay.includes("सेना") || hay.includes("sena") || hay.includes("सैन्य") || hay.includes("युद्ध") || hay.includes("लड़ाई") || hay.includes("फौज") || hay.includes("फ़ौज") || hay.includes("mawla") || hay.includes("मावळा") || hay.includes("सैनिक") || hay.includes("battle") || hay.includes("war") || hay.includes("सैनिकों"));
+  const isDeity = !isCow && !isVachan && !isWeapon && !isArmy && (hay.includes("द्वारकाधीश") || hay.includes("dwarkadhish") || hay.includes("कृष्ण") || hay.includes("krishna") || hay.includes("शिव") || hay.includes("shiva") || hay.includes("महादेव") || hay.includes("राम") || hay.includes("rama") || hay.includes("हनुमान") || hay.includes("hanuman") || hay.includes("भगवान"));
+  const isCharDham = !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && (hay.includes("धाम") || hay.includes("dham") || hay.includes("सप्त") || hay.includes("मान्यता") || hay.includes("चार धाम") || hay.includes("तीर्थ") || hay.includes("ज्योतिर्लिंग"));
+  const isCity = !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && !isCharDham && (hay.includes("नगरी") || hay.includes("नगर") || hay.includes("समुद्र") || hay.includes("किला") || hay.includes("साम्राज्य") || hay.includes("राजधानी"));
+  const isTemple = !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && !isCharDham && !isCity && (hay.includes("द्वारका") || hay.includes("सोमनाथ") || hay.includes("काशी") || hay.includes("उज्जैन") || hay.includes("मंदिर") || hay.includes("temple") || hay.includes("शिखर"));
 
   if (s.kind === "map") {
     return (
       <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt * 0.6}>
         <MapItem s={s} lf={lf} fps={fps} accent={a.main} accentDark={a.dark} />
         <MapRoute s={s} lf={lf} fps={fps} text={text(60)} body={text(40, BODY)} />
+        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
+      </Sheet>
+    );
+  }
+  if (isCow) {
+    return (
+      <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
+        <Tape rot={-2} />
+        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
+          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
+        </div>
+        <PaperCowsCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
+        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
+        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
+      </Sheet>
+    );
+  }
+  if (isVachan) {
+    return (
+      <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
+        <Tape rot={2} />
+        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
+          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
+        </div>
+        <PaperVachanCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
+        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
+        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
+      </Sheet>
+    );
+  }
+  if (isWeapon) {
+    return (
+      <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
+        <Tape rot={-3} />
+        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
+          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
+        </div>
+        <PaperWeaponsCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
+        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
         {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
       </Sheet>
     );

@@ -378,3 +378,324 @@ export const PaperArmyCutout: React.FC<{ progress: number; width?: number; heigh
     </div>
   );
 };
+
+/* ------------------------------------------------------------------ 6. PAPER COWS CUTOUT (Gau Mata & Calf) */
+export const PaperCowsCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 720, height = 500 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.9, 1]);
+
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "flex-end", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="-360 -240 720 480" style={{ overflow: "visible" }}>
+        {/* Layer 0: Physical Paper Shadow */}
+        <g transform="translate(10, 14)" fill={SHADOW} opacity={0.5}>
+          <path d="M-340,190 Q-120,160 0,175 Q150,160 340,195 L340,225 L-340,225 Z" />
+          <path d="M-180,60 Q-160,20 -100,20 Q-70,-20 -20,-10 Q20,-10 60,30 Q120,30 160,70 Q170,120 150,170 L130,170 L120,110 L80,110 L70,170 L40,170 L50,100 L-40,100 L-50,170 L-80,170 L-70,110 L-120,110 L-130,170 L-160,170 Q-190,130 -180,60 Z" />
+          <path d="M120,110 Q140,80 180,80 Q220,90 240,120 L240,180 L220,180 L210,140 L190,140 L180,180 L160,180 L170,140 L140,140 L130,180 L110,180 Z" />
+        </g>
+
+        {/* Layer 1: Handcrafted Ground Mound & Grass */}
+        <path d="M-340,190 Q-120,160 0,175 Q150,160 340,195 L340,225 L-340,225 Z" fill={PALETTE[3]} stroke={CREAM} strokeWidth={4} />
+        {[-220, -100, 40, 200, 280].map((gx, i) => (
+          <path key={i} d={`M${gx},180 L${gx - 8},155 L${gx},162 L${gx + 8},150 L${gx + 4},180 Z`} fill="#4d7c43" stroke={CREAM} strokeWidth={2} />
+        ))}
+
+        {/* Layer 2: Main Sacred Cow (Gau Mata) */}
+        <g transform="translate(-40, 20)">
+          {/* Tail with tuft */}
+          <path d="M-150,50 Q-190,90 -170,150" stroke={INK} strokeWidth={5} fill="none" />
+          <ellipse cx={-170} cy={155} rx={9} ry={16} fill={INK} stroke={CREAM} strokeWidth={2} />
+
+          {/* Back Legs */}
+          <path d="M-125,70 L-135,160 L-115,160 L-105,75 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3} />
+          <path d="M-150,65 L-160,160 L-140,160 L-130,70 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+          <rect x={-162} y={150} width={24} height={12} rx={2} fill={INK} />
+          <rect x={-137} y={150} width={24} height={12} rx={2} fill={INK} />
+
+          {/* Front Legs */}
+          <path d="M75,65 L65,160 L85,160 L95,70 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3} />
+          <path d="M45,65 L35,160 L55,160 L65,70 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+          <rect x={33} y={150} width={24} height={12} rx={2} fill={INK} />
+          <rect x={63} y={150} width={24} height={12} rx={2} fill={INK} />
+
+          {/* Cow Body */}
+          <path d="M-140,65 Q-150,30 -90,25 Q-60,-15 -10,-10 Q40,-10 70,30 Q110,35 130,55 Q135,80 120,95 Q80,105 0,100 Q-80,102 -130,85 Z" fill={CREAM} stroke="#e4d8be" strokeWidth={4} strokeLinejoin="round" />
+
+          {/* Desi Cow Hump (Kakud) */}
+          <ellipse cx={-25} cy={-12} rx={34} ry={22} fill={CREAM} stroke="#e4d8be" strokeWidth={3} />
+
+          {/* Decorative Embroidered Cloth (Jhool) on Back */}
+          <path d="M-75,30 Q-15,22 45,30 L35,82 Q-15,88 -65,82 Z" fill={RED} stroke={GOLD} strokeWidth={3} />
+          <path d="M-55,42 Q-15,36 25,42 L20,72 Q-15,76 -50,72 Z" fill={GOLD} stroke={CREAM} strokeWidth={2} />
+          <circle cx={-15} cy={56} r={7} fill={CREAM} />
+
+          {/* Dewlap (Gal-kambal) */}
+          <path d="M80,55 Q105,85 115,115 Q125,85 110,65 Z" fill={CREAM} stroke="#e4d8be" strokeWidth={3} />
+
+          {/* Head & Neck */}
+          <path d="M85,45 Q120,25 150,35 Q175,55 160,85 Q135,90 100,75 Z" fill={CREAM} stroke="#e4d8be" strokeWidth={3.5} strokeLinejoin="round" />
+
+          {/* Muzzle / Nose */}
+          <ellipse cx={160} cy={70} rx={18} ry={14} fill="#e5b083" stroke={CREAM} strokeWidth={2} />
+          <circle cx={162} cy={67} r={3} fill={INK} />
+
+          {/* Eye */}
+          <ellipse cx={136} cy={48} rx={6} ry={4} fill={INK} />
+          <circle cx={137} cy={46} r={1.5} fill={CREAM} />
+
+          {/* Ears */}
+          <ellipse cx={105} cy={40} rx={16} ry={9} transform="rotate(-20 105 40)" fill={CREAM} stroke="#e4d8be" strokeWidth={2.5} />
+
+          {/* Curved Horns with gold caps */}
+          <path d="M120,32 Q125,-25 105,-55 Q115,-30 132,28 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3} />
+          <path d="M136,32 Q150,-22 172,-48 Q152,-22 144,30 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3} />
+          <polygon points="105,-55 102,-42 112,-44" fill={GOLD} stroke={CREAM} strokeWidth={1.5} />
+          <polygon points="172,-48 162,-38 172,-36" fill={GOLD} stroke={CREAM} strokeWidth={1.5} />
+
+          {/* Brass Bell Necklace around Neck */}
+          <path d="M95,50 Q118,75 125,92" stroke={RED} strokeWidth={4} fill="none" />
+          <circle cx={122} cy={95} r={8} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+          <circle cx={122} cy={97} r={2} fill={INK} />
+        </g>
+
+        {/* Layer 3: Sacred Calf (बछड़ा) playing beside mother */}
+        <g transform="translate(160, 70)">
+          <path d="M-40,40 Q-50,20 -10,15 Q20,15 45,35 Q60,55 50,75 Q20,80 -30,70 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={3} strokeLinejoin="round" />
+          <rect x={-32} y={65} width={10} height={45} rx={2} fill={PALETTE[1]} stroke={CREAM} strokeWidth={2} />
+          <rect x={-15} y={65} width={10} height={45} rx={2} fill={PALETTE[0]} stroke={CREAM} strokeWidth={2} />
+          <rect x={15} y={65} width={10} height={45} rx={2} fill={PALETTE[1]} stroke={CREAM} strokeWidth={2} />
+          <rect x={32} y={65} width={10} height={45} rx={2} fill={PALETTE[0]} stroke={CREAM} strokeWidth={2} />
+          <circle cx={48} cy={30} r={18} fill={PALETTE[0]} stroke={CREAM} strokeWidth={2.5} />
+          <ellipse cx={58} cy={35} rx={9} ry={7} fill="#e5b083" />
+          <ellipse cx={48} cy={27} rx={3.5} ry={2.5} fill={INK} />
+          <ellipse cx={38} cy={18} rx={9} ry={5} transform="rotate(-30 38 18)" fill={PALETTE[0]} stroke={CREAM} strokeWidth={1.5} />
+          <path d="M38,36 Q45,46 50,48" stroke={RED} strokeWidth={3} fill="none" />
+          <circle cx={50} cy={50} r={4} fill={GOLD} />
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ 7. PAPER WEAPONS CUTOUT (Crossed Talwars & Shield) */
+export const PaperWeaponsCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 720, height = 500 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.88, 1]);
+
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "flex-end", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="-360 -240 720 480" style={{ overflow: "visible" }}>
+        {/* Layer 0: Physical Paper Shadow */}
+        <g transform="translate(10, 14)" fill={SHADOW} opacity={0.52}>
+          {/* Crossed swords shadow */}
+          <g transform="rotate(45)"><rect x={-14} y={-190} width={28} height={380} rx={6} /></g>
+          <g transform="rotate(-45)"><rect x={-14} y={-190} width={28} height={380} rx={6} /></g>
+          {/* Bow shadow */}
+          <path d="M-220,120 Q-270,0 -220,-120 L-200,-110 Q-245,0 -200,110 Z" />
+          {/* Center Shield shadow */}
+          <circle cx={0} cy={0} r={115} />
+        </g>
+
+        {/* Layer 1: The Bow (Dhanush) on the left */}
+        <g transform="translate(-10, 0)">
+          <path d="M-220,140 Q-280,0 -220,-140" stroke={PALETTE[4]} strokeWidth={18} fill="none" strokeLinecap="round" />
+          <path d="M-220,140 Q-280,0 -220,-140" stroke={CREAM} strokeWidth={4} fill="none" />
+          {/* Golden grips on bow */}
+          <rect x={-265} y={-20} width={22} height={40} rx={4} fill={GOLD} stroke={CREAM} strokeWidth={2.5} />
+          {/* Bowstring (Pratyancha) */}
+          <line x1={-220} y1={-140} x2={-220} y2={140} stroke={INK} strokeWidth={3} />
+        </g>
+
+        {/* Layer 2: Sword 1 (Bottom Left to Top Right) */}
+        <g transform="rotate(42)">
+          {/* Curved steel blade */}
+          <path d="M-10,-180 Q-15,-90 -8,110 L8,110 Q15,-90 0,-195 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+          <line x1={0} y1={-180} x2={0} y2={110} stroke="#d5c8a4" strokeWidth={2.5} />
+          {/* Hilt Crossguard (Dastana) */}
+          <rect x={-36} y={105} width={72} height={14} rx={4} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          {/* Handle */}
+          <rect x={-10} y={119} width={20} height={42} rx={3} fill={RED_DARK} stroke={CREAM} strokeWidth={2.5} />
+          {/* Pommel Disc (Khanda Muth) */}
+          <circle cx={0} cy={166} r={16} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          <polygon points="0,178 -6,166 6,166" fill={CREAM} />
+        </g>
+
+        {/* Layer 3: Sword 2 (Bottom Right to Top Left) */}
+        <g transform="rotate(-42)">
+          {/* Curved steel blade */}
+          <path d="M-10,-180 Q-15,-90 -8,110 L8,110 Q15,-90 0,-195 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+          <line x1={0} y1={-180} x2={0} y2={110} stroke="#d5c8a4" strokeWidth={2.5} />
+          {/* Hilt Crossguard */}
+          <rect x={-36} y={105} width={72} height={14} rx={4} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          {/* Handle */}
+          <rect x={-10} y={119} width={20} height={42} rx={3} fill={RED_DARK} stroke={CREAM} strokeWidth={2.5} />
+          {/* Pommel Disc */}
+          <circle cx={0} cy={166} r={16} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          <polygon points="0,178 -6,166 6,166" fill={CREAM} />
+        </g>
+
+        {/* Layer 4: Golden Arrow (Teer / Baan) traversing diagonally */}
+        <g transform="translate(15, -10) rotate(-28)">
+          <line x1={0} y1={-190} x2={0} y2={180} stroke={INK} strokeWidth={5} />
+          {/* Arrowhead */}
+          <polygon points="0,-220 -15,-185 15,-185" fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          {/* Feathers / Fletching */}
+          <path d="M0,140 L-18,175 L0,165 L18,175 Z" fill={RED} stroke={CREAM} strokeWidth={2} />
+        </g>
+
+        {/* Layer 5: Ornate Royal Rajput Shield (Dhal) in Center */}
+        <g>
+          {/* Outer Rim in Deep Terracotta Paper */}
+          <circle cx={0} cy={0} r={105} fill={INK} stroke={CREAM} strokeWidth={5} />
+          <circle cx={0} cy={0} r={92} fill={PALETTE[1]} stroke={GOLD} strokeWidth={4} />
+          <circle cx={0} cy={0} r={76} fill={RED_DARK} stroke={CREAM} strokeWidth={3} />
+
+          {/* Central Sunburst Motif (Surya) */}
+          <circle cx={0} cy={0} r={28} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          <circle cx={0} cy={0} r={14} fill={RED} />
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((ang, i) => (
+            <g key={i} transform={`rotate(${ang})`}>
+              <polygon points="0,-48 -7,-32 7,-32" fill={GOLD} stroke={CREAM} strokeWidth={1.5} />
+            </g>
+          ))}
+
+          {/* 4 Traditional Golden Bosses (Dhal Ke Chaar Kante) */}
+          {[-45, 45].map((bx) =>
+            [-45, 45].map((by) => (
+              <g key={`${bx}-${by}`} transform={`translate(${bx}, ${by})`}>
+                <circle cx={0} cy={0} r={14} fill={GOLD} stroke={CREAM} strokeWidth={2.5} />
+                <circle cx={0} cy={0} r={6} fill={INK} />
+              </g>
+            ))
+          )}
+        </g>
+
+        {/* Saffron Battle Ribbons */}
+        <path d="M-60,95 Q-110,140 -160,130 L-130,165 Q-85,150 -45,105 Z" fill={RED} stroke={CREAM} strokeWidth={2} />
+        <path d="M60,95 Q110,140 160,130 L130,165 Q85,150 45,105 Z" fill={RED} stroke={CREAM} strokeWidth={2} />
+      </svg>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ 8. PAPER VACHAN CUTOUT (Two Characters: Solemn Vow & Blessing) */
+export const PaperVachanCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 720, height = 500 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.9, 1]);
+
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "flex-end", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="-360 -240 720 480" style={{ overflow: "visible" }}>
+        {/* Layer 0: Physical Paper Shadow */}
+        <g transform="translate(10, 14)" fill={SHADOW} opacity={0.5}>
+          {/* Ground ridge */}
+          <path d="M-340,190 Q0,165 340,190 L340,225 L-340,225 Z" />
+          {/* Left Character (Nayak / Vow Taker) */}
+          <g transform="translate(-150, 40)">
+            <circle cx={0} cy={-100} r={26} />
+            <path d="M-35,-65 L35,-65 L45,130 L-45,130 Z" />
+            <path d="M20,-40 L100,-20 L90,0 L20,-15 Z" />
+          </g>
+          {/* Right Character (Mata / Guru Giving Blessing) */}
+          <g transform="translate(150, 20)">
+            <circle cx={0} cy={-110} r={26} />
+            <path d="M-40,-75 L40,-75 L50,150 L-50,150 Z" />
+            <path d="M-20,-50 L-95,-80 L-85,-100 L-10,-65 Z" />
+          </g>
+          {/* Center Diya / Sacred Aura */}
+          <ellipse cx={0} cy={60} rx={45} ry={18} />
+        </g>
+
+        {/* Layer 1: Ground Mound */}
+        <path d="M-340,190 Q0,165 340,190 L340,225 L-340,225 Z" fill={PALETTE[3]} stroke={CREAM} strokeWidth={4} />
+
+        {/* Layer 2: Sacred Vow Centerpiece (Divine Diya & Vow Rays) */}
+        <g transform="translate(0, 60)">
+          {/* Diya Base */}
+          <ellipse cx={0} cy={40} rx={42} ry={14} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          <path d="M-35,40 Q0,15 35,40 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={2} />
+          {/* Golden Flame (Jyoti) */}
+          <ellipse cx={0} cy={16} rx={14} ry={24} fill="#ffeaa7" stroke={GOLD} strokeWidth={2.5} />
+          <ellipse cx={0} cy={20} rx={7} ry={14} fill={RED} />
+
+          {/* Divine Golden Rays radiating upward between both characters */}
+          {[-40, -20, 0, 20, 40].map((rayAng, i) => (
+            <line
+              key={i}
+              x1={0}
+              y1={0}
+              x2={Math.sin((rayAng * Math.PI) / 180) * 120}
+              y2={-Math.cos((rayAng * Math.PI) / 180) * 120}
+              stroke={GOLD}
+              strokeWidth={3}
+              strokeDasharray="8 6"
+              opacity={0.7}
+            />
+          ))}
+        </g>
+
+        {/* Layer 3: Left Character - The Nayak / Warrior Taking the Vow (वचन लेते हुए) */}
+        <g transform="translate(-150, 40)">
+          {/* Dhoti / Robes */}
+          <path d="M-32,35 L32,35 L40,145 L-40,145 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+          <line x1={0} y1={50} x2={0} y2={145} stroke={CREAM} strokeWidth={2.5} />
+
+          {/* Angarkha / Kurta */}
+          <path d="M-36,-65 L36,-65 L32,45 L-32,45 Z" fill={RED_DARK} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+          {/* Saffron Kamarband (Waist Sash) */}
+          <rect x={-34} y={32} width={68} height={14} rx={3} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+          <path d="M-10,46 L-15,95 L0,95 L5,46 Z" fill={GOLD} stroke={CREAM} strokeWidth={2} />
+
+          {/* Sword at waist */}
+          <g transform="translate(-25, 40) rotate(35)">
+            <line x1={0} y1={-25} x2={0} y2={65} stroke={CREAM} strokeWidth={4} />
+            <rect x={-8} y={-10} width={16} height={5} rx={1} fill={GOLD} />
+          </g>
+
+          {/* Right Arm extended forward with open palm taking the vow (संकल्प मुद्रा) */}
+          <path d="M15,-45 L85,-15 L78,6 L10,-28 Z" fill={RED_DARK} stroke={CREAM} strokeWidth={3} strokeLinejoin="round" />
+          {/* Open Hand in Vow gesture touching near the sacred flame */}
+          <ellipse cx={88} cy={-5} rx={10} ry={7} fill="#e5b083" stroke={CREAM} strokeWidth={2} />
+
+          {/* Head & Pagdi */}
+          <circle cx={0} cy={-100} r={24} fill="#e5b083" stroke={CREAM} strokeWidth={3} />
+          {/* Rajput Saffron Pagdi with gold plume */}
+          <ellipse cx={0} cy={-115} rx={28} ry={16} fill={RED} stroke={CREAM} strokeWidth={3} />
+          <polygon points="0,-132 -6,-115 6,-115" fill={GOLD} stroke={CREAM} strokeWidth={2} />
+          {/* Peaceful & determined face */}
+          <ellipse cx={10} cy={-100} rx={3.5} ry={2.5} fill={INK} />
+        </g>
+
+        {/* Layer 4: Right Character - The Mata / Guru Giving Blessing (आशीर्वाद देते हुए) */}
+        <g transform="translate(150, 20)">
+          {/* Traditional Saree / Saffron Robes */}
+          <path d="M-38,-40 L38,-40 L48,165 L-48,165 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+          {/* Saree Pleats & Borders */}
+          <line x1={-10} y1={-20} x2={-15} y2={165} stroke={RED} strokeWidth={3} />
+          <line x1={12} y1={-20} x2={18} y2={165} stroke={RED} strokeWidth={3} />
+          <rect x={-46} y={150} width={92} height={12} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+
+          {/* Saree Pallu draped gracefully over head and shoulders */}
+          <path d="M-35,-125 Q0,-145 35,-125 Q45,-70 38,-30 L-38,-30 Q-45,-70 -35,-125 Z" fill={GOLD} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+
+          {/* Face */}
+          <circle cx={0} cy={-105} r={22} fill="#e5b083" stroke={CREAM} strokeWidth={2.5} />
+          {/* Red Bindi */}
+          <circle cx={-8} cy={-112} r={3} fill={RED} />
+          {/* Eye in benevolent gaze */}
+          <ellipse cx={-8} cy={-104} rx={3.5} ry={2} fill={INK} />
+
+          {/* Right Arm raised high in Abhaya Mudra (आशीर्वाद / अभय मुद्रा) */}
+          <path d="M-15,-55 L-85,-90 L-76,-108 L-6,-72 Z" fill={GOLD} stroke={CREAM} strokeWidth={3} strokeLinejoin="round" />
+          {/* Raised Blessing Palm */}
+          <g transform="translate(-86, -108)">
+            <ellipse cx={0} cy={0} rx={12} ry={9} transform="rotate(-15)" fill="#e5b083" stroke={CREAM} strokeWidth={2} />
+            {/* Sacred Lotus symbol on palm */}
+            <circle cx={0} cy={0} r={3} fill={RED} />
+          </g>
+        </g>
+      </svg>
+    </div>
+  );
+};
+
