@@ -1,7 +1,14 @@
 name: Hourly Studio Reels
 on:
   schedule:
-    - cron: "17 0,6,12,18 * * *"   # din me 4 video (har 6 ghante), off-peak minute
+    # 4 Peak Viral Slots in India (IST = UTC + 5:30):
+    # 1. 08:30 AM IST (03:00 UTC) - Morning Commute & Puja Peak
+    # 2. 01:00 PM IST (07:30 UTC) - Afternoon Lunch Break Peak
+    # 3. 05:30 PM IST (12:00 UTC) - Evening Prime Time Peak
+    # 4. 08:30 PM IST (15:00 UTC) - Dinner / Night Relax Peak
+    # Raat (10:00 PM se 08:00 AM IST) video generate/upload band rahega.
+    - cron: "0 3,12,15 * * *"
+    - cron: "30 7 * * *"
   workflow_dispatch:             # manual trigger button anytime
     inputs:
       force:
@@ -36,19 +43,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ── Guard: skip if a video was created < 45 min ago (scheduled runs only) ──
-      - name: Guard against double runs
+      # ── Guard: Night Sleep Guard (10 PM - 8 AM IST) & 45-min double-run guard ──
+      - name: Guard against night hours and double runs
         id: guard
         run: |
           if [ "${{ inputs.force }}" = "true" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "⚡ Manual trigger detected. Bypassing 45-min guard."
-          elif [ -f data/pending_video.json ]; then
-            TS=$(python3 -c "import json; print(json.load(open('data/pending_video.json')).get('timestamp',0))")
-            NOW=$(date +%s)
-            DIFF=$(( NOW - TS ))
-            if [ "$DIFF" -lt 2700 ]; then
-              echo "⏭️ Video created ${DIFF}s ago (< 45 min). Skipping."
+            echo "⚡ Manual trigger detected. Bypassing night & double-run guard."
+          else
+            NOW_UTC=$(date -u +%s)
+            NOW_IST=$(( NOW_UTC + 19800 ))
+            IST_HOUR=$(date -u -d "@$NOW_IST" +%H)
+            IST_HOUR=$((10#$IST_HOUR))
+            if [ "$IST_HOUR" -ge 22 ] || [ "$IST_HOUR" -lt 8 ]; then
+              echo "🌙 Raat ka samay hai (${IST_HOUR}:00 IST). Audience offline hoti hai. Video generation & upload BAND."
               echo "skip=true" >> "$GITHUB_OUTPUT"
+            elif [ -f data/pending_video.json ]; then
+              TS=$(python3 -c "import json; print(json.load(open('data/pending_video.json')).get('timestamp',0))")
+              DIFF=$(( NOW_UTC - TS ))
+              if [ "$DIFF" -lt 2700 ]; then
+                echo "⏭️ Video created ${DIFF}s ago (< 45 min). Skipping."
+                echo "skip=true" >> "$GITHUB_OUTPUT"
+              fi
             fi
           fi
 

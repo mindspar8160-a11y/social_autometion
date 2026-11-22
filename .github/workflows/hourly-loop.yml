@@ -1,11 +1,12 @@
-name: Hour Loop (6 Videos Daily)
+name: Peak Viral Hours Loop (Daytime Only)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "5 */6 * * *"
+    # Subah 08:30 AM IST (03:00 UTC) par din ka pehla loop shuru hota hai
+    - cron: "0 3 * * *"
 
 concurrency:
-  group: four-hour-loop
+  group: peak-hour-loop
   cancel-in-progress: false
 
 permissions:
@@ -19,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Trigger daily.yml every 4 hours
+      - name: Trigger daily.yml at Viral Peak Hours (Daytime Only)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -29,13 +30,37 @@ jobs:
             exit 0
           fi
 
-          echo "daily.yml trigger at $(date -u)"
+          # ── Night Guard Check (IST = UTC + 5:30) ──
+          NOW_UTC=$(date -u +%s)
+          NOW_IST=$(( NOW_UTC + 19800 ))
+          IST_HOUR=$(date -u -d "@$NOW_IST" +%H)
+          IST_HOUR=$((10#$IST_HOUR))
+
+          if [ "$IST_HOUR" -ge 22 ] || [ "$IST_HOUR" -lt 8 ]; then
+            echo "🌙 Raat ka waqt hai ($IST_HOUR:00 IST). Audience offline hoti hai. Video generation & upload BAND."
+            exit 0
+          fi
+
+          echo "🚀 Peak viral time ($IST_HOUR:00 IST). Triggering daily.yml..."
           gh workflow run daily.yml --ref main -f mode=myth
 
-          echo "harvest_topics.yml trigger (1 fresh topic) at $(date -u)"
+          echo "🌾 Triggering harvest_topics.yml (1 fresh topic)..."
           gh workflow run harvest_topics.yml --ref main -f count=1 -f source=all
 
+          # Sleep 4 hours (14400s) until next daytime slot
+          echo "⏳ Agle slot ke liye 4 ghante intezaar..."
           sleep 14400
+
+          # ── Check next slot time before re-triggering ──
+          NOW_UTC=$(date -u +%s)
+          NOW_IST=$(( NOW_UTC + 19800 ))
+          NEXT_IST_HOUR=$(date -u -d "@$NOW_IST" +%H)
+          NEXT_IST_HOUR=$((10#$NEXT_IST_HOUR))
+
+          if [ "$NEXT_IST_HOUR" -ge 22 ] || [ "$NEXT_IST_HOUR" -lt 8 ]; then
+            echo "🌙 Agla slot raat ($NEXT_IST_HOUR:00 IST) me pad raha hai. Loop yahan pause hoga. Kal subah 08:30 AM cron dubara shuru karega."
+            exit 0
+          fi
 
           git fetch -q origin main
           if git cat-file -e origin/main:LOOP_OFF 2>/dev/null; then
@@ -43,5 +68,5 @@ jobs:
             exit 0
           fi
 
-          echo "4 ghante poore. Loop ko dobara shuru kar raha hoon."
+          echo "☀️ Din ka samay hai ($NEXT_IST_HOUR:00 IST). Agle daytime slot ke liye loop ko continue kar rahe hain."
           gh workflow run hourly-loop.yml --ref main
