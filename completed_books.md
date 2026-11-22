@@ -77,3 +77,4 @@
 | 71 | 2026-11-22 | 2026-11-22_101649_pf_aai_mogal_bhaguda | Unknown | Productivity & Wisdom | https://youtu.be/xDagTdMgj5w |
 | 72 | 2026-11-22 | 2026-11-22_133955_pf_chehar_mata_marudhar | Unknown | Productivity & Wisdom | https://youtu.be/j5geb5hRN-M |
 | 73 | 2026-11-22 | 2026-11-22_143037_pf_shakti_peeth_maihar_sharda | Unknown | Productivity & Wisdom | https://youtu.be/Xqhe9CWLp-s |
+| 74 | 2026-11-22 | 2026-11-22_144909_pf_shakti_peeth_jogadya_kshirgram | Unknown | Productivity & Wisdom | https://youtu.be/dllHbDTZVxI |
