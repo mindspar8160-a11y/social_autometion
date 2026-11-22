@@ -75,3 +75,4 @@
 | 69 | 2026-11-22 | 2026-11-22_071106_pf_puri_jagannath_7_mysteries | Unknown | Productivity & Wisdom | https://youtu.be/Hq4GxSJuZI0 |
 | 70 | 2026-11-22 | 2026-11-22_093939_pf_lepakshi_hanging_pillar | Unknown | Productivity & Wisdom | https://youtu.be/m6owZzw-WPs |
 | 71 | 2026-11-22 | 2026-11-22_101649_pf_aai_mogal_bhaguda | Unknown | Productivity & Wisdom | https://youtu.be/xDagTdMgj5w |
+| 72 | 2026-11-22 | 2026-11-22_133955_pf_chehar_mata_marudhar | Unknown | Productivity & Wisdom | https://youtu.be/j5geb5hRN-M |
