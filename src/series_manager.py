@@ -100,6 +100,8 @@ PROVEN SHORT-FORM SCRIPTWRITING FRAMEWORK:
 VOICE ME KABHI BHI "BHAG 2" YA ROBOTIC NUMBER MAT BOLO:
 - Part 1 ya beech ke parts ke aakhri scene me voice hamesha bolegi: "dekhiye agle video mein!" ya "iski poori sacchai dekhiye agle video mein!"
 - KABHI BHI voice me "dekhiye bhaag 2" mat bolo!
+- KABHI BHI kisi bhi part ke shuru me "पिछले भाग में देखा था" ya dry recap mat likho!
+- Har part ka hook_line ek DAMDAAR CURIOSITY QUESTION (उत्सुकता जगाने वाला सवाल) ho jo audience ko rok le!
 
 OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi backticks nahi, koi extra text nahi):
 {{
@@ -110,8 +112,8 @@ OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi backticks nah
     {{
       "part_num": 1,
       "part_title": "Hindi title with emoji (max 50 chars), e.g. 🔥 विशालगढ़ पहुँचने का अंतिम संकल्प",
-      "hook_line": "Scene 1 bolne wali line jisme nayak/mandir ka naam ho",
-      "recap_bridge": "" (Part 1 ke liye empty, Part 2+ ke liye chhota recap connector),
+      "hook_line": "Scene 1 bolne wala CHOWKANE WALA SAWAL (Curiosity Hook, jaise 'क्या आप जानते हैं कि...'). KABHI BHI 'पिछले भाग में' mat likho!",
+      "recap_bridge": "Kahaani ka aage ka natural vistar (KABHI BHI 'पिछले भाग में देखा' mat likho)",
       "cliffhanger": "Antim scene ka suspense: '...Lekin iske baad jo hua, usne sabko dang kar diya. Dekhiye agle video mein!'",
       "part_summary": "Is part ki detailed story (100-150 words): Patra, sthan, aur concrete ghatnayen jo 7-8 scenes me clearly sunai jayengi."
     }}

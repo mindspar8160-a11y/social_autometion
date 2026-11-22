@@ -538,62 +538,45 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
             
             # Enforce series branding on scenes and metadata
             scenes = plan["scenes"]
-            if part_num > 1:
-                # Part 2+ should NOT have any map scenes
-                for sc in scenes:
+
+            # MAP SCENE ENFORCEMENT (HAR BHAAG ME MAP SCENE SCENE 1 PAR AAYEGA):
+            st_hi = {
+                "Maharashtra": "महाराष्ट्र", "Gujarat": "गुजरात", "Rajasthan": "राजस्थान",
+                "Madhya Pradesh": "मध्य प्रदेश", "Uttar Pradesh": "उत्तर प्रदेश",
+                "Kerala": "केरल", "Karnataka": "कर्नाटक", "Odisha": "ओडिशा",
+                "Andhra Pradesh": "आंध्र प्रदेश", "Jammu and Kashmir": "जम्मू-कश्मीर",
+                "Haryana": "हरियाणा", "Punjab": "पंजाब", "Bihar": "बिहार",
+            }.get(geo["state"] if geo else "", geo["state"] if geo else "")
+
+            if geo and len(scenes) > 1:
+                # Find if any scene is already map, or set Scene 1 as map
+                map_idx = 1
+                for idx, sc in enumerate(scenes):
                     if sc.get("kind") == "map":
+                        map_idx = idx
+                        break
+
+                for idx, sc in enumerate(scenes):
+                    if idx == map_idx:
+                        sc["kind"] = "map"
+                        sc["state"] = geo["state"]
+                        if geo.get("district"):
+                            sc["district"] = geo["district"]
+                        sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                        sc["text"] = f"भारत → {st_hi} → {geo['name']}"
+                        sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
+                        sc["hit2_word"] = geo["name"].split()[0]
+                    elif sc.get("kind") == "map":
                         sc["kind"] = "card"
                         sc["text"] = re.sub(r"\s*→\s*", " ", sc.get("text", "")).strip()
-
-            if geo and part_num == 1 and len(scenes) > 0:
-                scenes[0]["kind"] = "map"
-                scenes[0]["state"] = geo["state"]
-                if geo.get("district"):
-                    scenes[0]["district"] = geo["district"]
-                scenes[0]["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
-                st_hi = {
-                    "Maharashtra": "महाराष्ट्र", "Gujarat": "गुजरात", "Rajasthan": "राजस्थान",
-                    "Madhya Pradesh": "मध्य प्रदेश", "Uttar Pradesh": "उत्तर प्रदेश",
-                    "Kerala": "केरल", "Karnataka": "कर्नाटक", "Odisha": "ओडिशा",
-                    "Andhra Pradesh": "आंध्र प्रदेश", "Jammu and Kashmir": "जम्मू-कश्मीर",
-                    "Haryana": "हरियाणा", "Punjab": "पंजाब", "Bihar": "बिहार",
-                }.get(geo["state"], geo["state"])
-                scenes[0]["text"] = f"भारत → {st_hi} → {geo['name']}"
-                
-                st_kw = geo["state"]
-                pl_kw = geo["name"].split()[0]
-                # Ensure state and place are in scene 0 narration for map zoom synchronization (NO DUPLICATES)
-                narr = scenes[0].get("narration", "")
-                tts_n = scenes[0].get("tts_text", narr)
-                has_st = st_kw.lower() in narr.lower() or st_hi.lower() in tts_n.lower() or st_kw.lower() in tts_n.lower()
-                has_pl = pl_kw.lower() in narr.lower() or geo["name"].lower() in tts_n.lower() or pl_kw.lower() in tts_n.lower()
-                
-                if not (has_st and has_pl):
-                    if has_pl and not has_st:
-                        # Place is already present in narration, only prepend state
-                        scenes[0]["narration"] = f"{st_kw} ke " + narr
-                        scenes[0]["tts_text"] = f"{st_hi} के " + tts_n
-                    else:
-                        scenes[0]["narration"] = f"{st_kw} ke {pl_kw} mein, " + narr
-                        scenes[0]["tts_text"] = f"{st_hi} के {geo['name']} में, " + tts_n
-                
-                scenes[0]["hit_word"] = st_hi if st_hi in scenes[0].get("tts_text", "") else st_kw
-                scenes[0]["hit2_word"] = pl_kw if pl_kw in scenes[0].get("tts_text", "") else geo["name"].split()[0]
-                
-                # If there was another map scene later, change it to card so there's only 1 map
-                for later_sc in scenes[1:]:
-                    if later_sc.get("kind") == "map":
-                        later_sc["kind"] = "card"
-                        later_sc["text"] = re.sub(r"\s*→\s*", " ", later_sc.get("text", "")).strip()
 
             def _clean_stutters(text: str) -> str:
                 if not text:
                     return ""
-                # Remove duplicate adjacent 1 or 2-word phrases in English or Devanagari (e.g. "Amarkantak mein, Amarkantak mein")
-                t = re.sub(r'([\u0900-\u097F\w]+(?:\s+[\u0900-\u097F\w]+)?)\s*[,]?\s+\1', r'\1', text, flags=re.IGNORECASE)
-                # Remove duplicate particles "mein mein", "में में"
-                t = re.sub(r'(?i)\b(mein|के|ke)\s*[,]?\s+\1\b', r'\1', t)
-                t = re.sub(r'(में)\s*[,]?\s+\1', r'\1', t)
+                # Remove duplicate repeated phrases up to 4 words (e.g. "Madhya Pradesh ke Amarkantak mein")
+                t = re.sub(r'([\u0900-\u097F\w]+(?:\s+[\u0900-\u097F\w]+){0,3})\s*[,]?\s+\1', r'\1', text, flags=re.IGNORECASE)
+                # Remove repeated particles "mein mein", "में में", "ke ke"
+                t = re.sub(r'(?i)\b(mein|के|ke|ki|की)\s*[,]?\s+\1\b', r'\1', t)
                 # Clean consecutive commas or excessive spaces
                 t = re.sub(r'\s*,\s*,\s*', ', ', t)
                 return re.sub(r'\s+', ' ', t).strip(' ,')
@@ -632,20 +615,6 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
             for pat in bad_recap_patterns:
                 scenes[0]["narration"] = re.sub(pat, "", scenes[0].get("narration", ""), flags=re.IGNORECASE).strip()
                 scenes[0]["tts_text"] = re.sub(pat, "", scenes[0].get("tts_text", ""), flags=re.IGNORECASE).strip()
-
-            # Ensure a MAP scene exists in EVERY part when geography lore is known
-            if geo and not any(s.get("kind") == "map" for s in scenes):
-                map_idx = 1 if len(scenes) > 1 else 0
-                scenes[map_idx]["kind"] = "map"
-                scenes[map_idx]["state"] = geo["state"]
-                scenes[map_idx]["district"] = geo.get("district", "")
-                scenes[map_idx]["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
-                scenes[map_idx]["text"] = f"भारत → {geo['state']} → {geo['name']}"
-                if geo["state"] not in scenes[map_idx].get("tts_text", ""):
-                    scenes[map_idx]["tts_text"] = f"{geo['state']} के {geo['name']} में, " + scenes[map_idx].get("tts_text", "")
-                    scenes[map_idx]["narration"] = f"{geo['state']} ke {geo['name']} mein, " + scenes[map_idx].get("narration", "")
-                scenes[map_idx]["hit_word"] = geo["state"]
-                scenes[map_idx]["hit2_word"] = geo["name"].split()[0]
 
             scenes[0]["stamp"] = f"भाग {part_num}"
             if not is_final:
