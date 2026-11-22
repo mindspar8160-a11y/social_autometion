@@ -2589,5 +2589,46 @@
     "seed": 868438,
     "engine": "paperfilm",
     "video_key": "2026-11-22_105112_pf_shakti_peeth_shondesh_narmada"
+  },
+  {
+    "topic_id": "shakti_peeth_shondesh_narmada",
+    "topic_title": "शोणदेश (अमरकंटक) शक्तिपीठ: माता सती का दायां नितंब जहाँ गिरा",
+    "date": "2026-11-22",
+    "seed": 498067,
+    "engine": "paperfilm",
+    "video_key": "2026-11-22_110142_pf_shakti_peeth_shondesh_narmada"
+  },
+  {
+    "topic_id": "myth",
+    "topic_title": "myth",
+    "date": "2026-11-22",
+    "seed": 611696,
+    "opening_fx": 2,
+    "closing_fx": 4,
+    "video_key": "2026-11-22_112016_myth_myth"
+  },
+  {
+    "topic_id": "somnath_first_jyotirlinga_curse",
+    "topic_title": "सोमनाथ ज्योतिर्लिंग: चंद्रमा का भयंकर शाप और प्रथम ज्योतिर्लिंग का प्राकट्य",
+    "date": "2026-11-22",
+    "seed": 15797,
+    "engine": "paperfilm",
+    "video_key": "2026-11-22_114339_pf_somnath_first_jyotirlinga_curse"
+  },
+  {
+    "topic_id": "somnath_first_jyotirlinga_curse",
+    "topic_title": "सोमनाथ ज्योतिर्लिंग: चंद्रमा का भयंकर शाप और प्रथम ज्योतिर्लिंग का प्राकट्य",
+    "date": "2026-11-22",
+    "seed": 263477,
+    "engine": "paperfilm",
+    "video_key": "2026-11-22_114746_pf_somnath_first_jyotirlinga_curse"
+  },
+  {
+    "topic_id": "somnath_first_jyotirlinga_curse",
+    "topic_title": "सोमनाथ ज्योतिर्लिंग: चंद्रमा का भयंकर शाप और प्रथम ज्योतिर्लिंग का प्राकट्य",
+    "date": "2026-11-22",
+    "seed": 433866,
+    "engine": "paperfilm",
+    "video_key": "2026-11-22_115037_pf_somnath_first_jyotirlinga_curse"
   }
 ]
