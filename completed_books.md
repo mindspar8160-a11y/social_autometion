@@ -73,3 +73,4 @@
 | 67 | 2026-11-21 | 2026-11-21_230933_pf_shakti_peeth_shondesh_narmada | Unknown | Productivity & Wisdom | https://youtu.be/HWqtj-P-haI |
 | 68 | 2026-11-22 | 2026-11-22_031005_pf_shakti_peeth_shondesh_narmada | Unknown | Productivity & Wisdom | https://youtu.be/-lotXIw54T0 |
 | 69 | 2026-11-22 | 2026-11-22_071106_pf_puri_jagannath_7_mysteries | Unknown | Productivity & Wisdom | https://youtu.be/Hq4GxSJuZI0 |
+| 70 | 2026-11-22 | 2026-11-22_093939_pf_lepakshi_hanging_pillar | Unknown | Productivity & Wisdom | https://youtu.be/m6owZzw-WPs |
