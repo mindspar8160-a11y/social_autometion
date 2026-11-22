@@ -106,7 +106,7 @@ def get_instagram_channel(api_key: str, preferred_channel_id: Optional[str] = No
           id
           name
           service
-          serviceType
+          
         }
       }
     }
