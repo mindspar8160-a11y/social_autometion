@@ -188,36 +188,17 @@ jobs:
             -d chat_id="${TELEGRAM_CHAT_ID}" \
             -d text="❌ YouTube auto-upload fail hua. GitHub Actions ka log dekho."
 
-      # ── Instagram (DEFAULT BAND). Chalu karne ke liye repo Variable IG_AUTO_UPLOAD = true banao ──
-      # Sirf din me 1 baar (12 UTC wale run me), taaki account par automation ka shak na badhe.
-      - name: Restore Instagram session
-        if: steps.guard.outputs.skip != 'true' && vars.IG_AUTO_UPLOAD == 'true'
-        uses: actions/cache@v4
-        with:
-          path: config/ig_session.json
-          key: ig-session-${{ github.run_id }}
-          restore-keys: ig-session-
-
-      - name: Upload to Instagram (3/day)
-        if: steps.guard.outputs.skip != 'true' && vars.IG_AUTO_UPLOAD == 'true'
+      # ── Upload to Instagram via Buffer (1-to-1 with YouTube, Every Single Video) ──
+      - name: Upload to Instagram (via Buffer API)
+        id: ig_buffer
+        if: steps.guard.outputs.skip != 'true'
         continue-on-error: true
         env:
-          IG_USERNAME: ${{ secrets.IG_USERNAME }}
-          IG_PASSWORD: ${{ secrets.IG_PASSWORD }}
-          IG_APP_VERSION: ${{ secrets.IG_APP_VERSION }}
-          IG_VERSION_CODE: ${{ secrets.IG_VERSION_CODE }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          BUFFER_CHANNEL_ID: ${{ secrets.BUFFER_CHANNEL_ID }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: |
-          # 10# ensures bash treats 08, 09 as base-10 numbers
-          HOUR=$((10#$(date -u +%H)))
-          # Har 4 ghante ke loop mein (HOUR / 4) % 2 check karne se alternate runs (6 me se 3) hi chalenge
-          SLOT=$(( (HOUR / 4) % 2 ))
-          if [ "$SLOT" -ne 0 ]; then
-            echo "Instagram: is 4-hour slot ko skip kar rahe hain (din me max 3 upload)."
-            exit 0
-          fi
-          python src/instagram_upload.py data/output/*/
+        run: python src/buffer_upload.py data/output/*/
 
       # ── run_id save karo taaki bot artifact se full-quality video utha sake ──
       - name: Stamp run id into pending_video.json
