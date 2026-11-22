@@ -263,6 +263,7 @@ OUTPUT: sirf ek JSON object (koi markdown nahi, koi explanation nahi):
   "scenes": [
     {
       "kind": "title | card | number | quote | list | map",
+      "emotion": "heroic | suspense | conversational | emotional | divine (har scene ka bhav)",
       "narration": "STRICTLY Hinglish (Hindi bolchal in Roman / English alphabet, jaise WhatsApp par likhte hain: 'Shivaji Maharaj Vishalgadh mein ghire hue the'). KABHI BHI English bhasha ke words (jaise 'were trapped', 'surrounded by', 'facing', 'their eyes') mat likho! Ye video screen par LYRICS / SUBTITLE banegi, STRICTLY 8-12 words max.",
       "tts_text": "WAHI line shuddh Devanagari Hindi me, voice ke liye. Numbers aur Saal (years) bilkul shabdon me likho (jaise 1660 ko 'सन सोलह सौ साठ', 1947 ko 'सन उन्नीस सौ सैंतालीस', 300 ko 'तीन सौ', 4000 ko 'चार हज़ार'). Kabhi bhi 'सौ छह सौ' ya toote shabdon me mat likho.",
       "text": "Screen par bada text, Devanagari, max 6 words",

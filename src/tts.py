@@ -277,49 +277,66 @@ def _synth_gemini(text, cfg, out):
 async def _synth_edge_async(text, cfg, out):
     import edge_tts
     voice = cfg.get("voice") or "hi-IN-MadhurNeural"
-    # Dynamic Emotion & Cadence Adaptation based on scene delivery/style and text cues:
+    # Dynamic Emotion & Cadence Adaptation based on scene delivery/style, emotion field, and inline text cues:
+    raw_text = str(text or "")
+    combined_cues = (
+        raw_text + " " +
+        str(cfg.get("style", "")) + " " +
+        str(cfg.get("delivery", "")) + " " +
+        str(cfg.get("emotion", ""))
+    ).lower()
+
     is_dialogue = bool(
-        "'" in text or '"' in text or "‘" in text or "’" in text or "“" in text or "”" in text or
-        "बोले" in text or "कहा" in text or "पूछा" in text
+        "'" in raw_text or '"' in raw_text or "‘" in raw_text or "’" in raw_text or "“" in raw_text or "”" in raw_text or
+        "बोले" in raw_text or "कहा" in raw_text or "पूछा" in raw_text
     )
 
-    base_rate_val = 4   # default cool rate +4%
-    base_pitch_val = 8  # default cool pitch +8Hz
+    base_rate_val = 15   # default rate +15%
+    base_pitch_val = -2  # default pitch -2Hz
     try:
-        base_rate_val = int(str(cfg.get("rate", "+4%")).replace("%", "").replace("+", ""))
+        base_rate_val = int(str(cfg.get("rate", "+15%")).replace("%", "").replace("+", ""))
     except Exception:
         pass
     try:
-        base_pitch_val = int(str(cfg.get("pitch", "+8Hz")).replace("Hz", "").replace("+", ""))
+        base_pitch_val = int(str(cfg.get("pitch", "-2Hz")).replace("Hz", "").replace("+", ""))
     except Exception:
         pass
 
-    style_lower = (str(cfg.get("style", "")) + " " + str(cfg.get("delivery", ""))).lower()
-
-    # 1. Action / Intense / Urgent / Fast / Fight / Climax:
-    if any(k in style_lower for k in ["urgent", "action", "intense", "fast", "shocking", "fight", "climax", "war"]):
-        rate_val = base_rate_val + 3   # e.g. +7%
-        pitch_val = base_pitch_val + 2  # e.g. +10Hz
+    # 1. Action / Intense / Urgent / Fast / Fight / Climax / Heroic:
+    if any(k in combined_cues for k in ["heroic", "urgent", "action", "intense", "fast", "shocking", "fight", "climax", "war"]):
+        rate_val = base_rate_val + 3    # +18% (punchy, high velocity)
+        pitch_val = base_pitch_val + 2  # 0Hz (resonant, commanding)
     # 2. Suspenseful / Mysterious / Secret / Whisper:
-    elif any(k in style_lower for k in ["suspense", "mysterious", "secret", "whisper", "deep"]):
-        rate_val = base_rate_val - 2   # e.g. +2% (paced for suspense)
-        pitch_val = base_pitch_val - 1  # e.g. +7Hz
-    # 3. Thoughtful / Emotional / Sorrow / Devotional / Peaceful / Calm:
-    elif any(k in style_lower for k in ["thoughtful", "emotional", "sorrow", "devotional", "peaceful", "calm", "wisdom", "sad"]):
-        rate_val = base_rate_val - 3   # e.g. +1% (deep, serene)
-        pitch_val = base_pitch_val - 2  # e.g. +6Hz
-    # 4. Dialogue (direct quoted speech):
+    elif any(k in combined_cues for k in ["[whisper", "whisper", "suspense", "mysterious", "secret", "deep", "khauf", "rahasya"]):
+        rate_val = base_rate_val - 4    # +11% (slower, gripping suspense)
+        pitch_val = base_pitch_val - 2  # -4Hz (deep chest mystery)
+    # 3. Conversational / Sarcastic / Intriguing / Giggles:
+    elif any(k in combined_cues for k in ["[sarcastically", "[giggle", "[laugh", "sarcastic", "conversational", "rochak", "vyangya"]):
+        rate_val = base_rate_val - 2    # +13% (natural conversational pace)
+        pitch_val = base_pitch_val + 1  # -1Hz (engaging, lively inflection)
+    # 4. Thoughtful / Emotional / Sorrow / Sad / Melancholic:
+    elif any(k in combined_cues for k in ["[sad", "[emotional", "thoughtful", "emotional", "sorrow", "karuna", "bhavuk", "sad"]):
+        rate_val = base_rate_val - 5    # +10% (tender, poignant)
+        pitch_val = base_pitch_val - 3  # -5Hz (heavy, warm sorrow)
+    # 5. Divine / Devotional / Peaceful / Calm:
+    elif any(k in combined_cues for k in ["[divine", "devotional", "divine", "peaceful", "calm", "wisdom", "bhakti", "sacred"]):
+        rate_val = base_rate_val - 3    # +12% (stately, serene reverence)
+        pitch_val = base_pitch_val - 1  # -3Hz (dignified calm)
+    # 6. Dialogue (direct quoted speech):
     elif is_dialogue:
-        rate_val = base_rate_val - 1   # e.g. +3%
-        pitch_val = base_pitch_val - 2  # e.g. +6Hz
+        rate_val = base_rate_val - 2    # +13%
+        pitch_val = base_pitch_val - 1  # -3Hz
     else:
         rate_val = base_rate_val
         pitch_val = base_pitch_val
 
     rate = f"{'+' if rate_val >= 0 else ''}{rate_val}%"
     pitch = f"{'+' if pitch_val >= 0 else ''}{pitch_val}Hz"
-    vol = cfg.get("volume", "+0%")
-    comm = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch, volume=vol)
+    vol = cfg.get("volume", "+15%")
+
+    # Strip bracketed tags (e.g. [whispers], [sarcastically]) so edge_tts only gets clean natural words:
+    clean_spoken_text = strip_tags(raw_text)
+    comm = edge_tts.Communicate(clean_spoken_text, voice, rate=rate, pitch=pitch, volume=vol)
     with open(out, "wb") as f:
         async for ch in comm.stream():
             if ch["type"] == "audio":
@@ -886,8 +903,12 @@ def narrate(scenes, workdir, cfg, pad=0.45):
         if s.get("tts_text"):
             s["tts_text"] = normalize_hindi_numbers(s["tts_text"])
         scene_cfg = dict(cfg)
-        if str(s.get("delivery") or "").strip():          # LLM ka scene-wise "kaise bolna hai" (chhota English phrase)
-            scene_cfg["style"] = str(s["delivery"]).strip()[:80]
+        delivery_parts = [str(s.get("delivery") or "").strip(), str(s.get("emotion") or "").strip()]
+        combined_delivery = " ".join(p for p in delivery_parts if p)
+        if combined_delivery:
+            scene_cfg["style"] = combined_delivery[:80]
+        if s.get("emotion"):
+            scene_cfg["emotion"] = str(s["emotion"]).strip()[:40]
         synth_speech(voice_text, scene_cfg, raw)
         report.append({"scene": i, "provider": _STATE["provider"], "voice": _STATE["voice"], "cached": _STATE["cached"],
                        "style": scene_cfg.get("style", ""), "fails": [f[0] for f in _STATE["fails"]],
@@ -926,7 +947,14 @@ def narrate(scenes, workdir, cfg, pad=0.45):
         words = []
         if tokens:
             speech = max(0.3, s["durationSec"] - lead_s - tail)
-            weights = [len(t) + 2 for t in tokens]
+            # Emotion & punctuation aware weighting:
+            # Give words with punctuation marks extra duration so lyrics sync with human breathing pauses
+            weights = []
+            for t in tokens:
+                w = len(t) + 2
+                if any(t.endswith(p) for p in [",", "!", "?", "—", "-", ":", ";", "..."]):
+                    w += 4  # Extra weight for natural breath pause
+                weights.append(w)
             tot, cur = float(sum(weights)), lead_s
             for t, w in zip(tokens, weights):
                 d = speech * w / tot

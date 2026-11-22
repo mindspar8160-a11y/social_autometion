@@ -1,0 +1,68 @@
+{
+  "version": "1.0",
+  "title": "MindSpark Storytelling Emotion & Pacing Guide",
+  "description": "Script emotion archetypes, voice pitch/rate modulations, and lyric timing rules to eliminate robotic TTS and synchronize visuals with human breathing pauses.",
+  "emotions": {
+    "suspense": {
+      "name_hindi": "रहस्य / खौफ / जिज्ञासा (Suspense & Mystery)",
+      "rate_delta": "-4%",
+      "pitch_delta": "-3Hz",
+      "pause_weight": 4,
+      "tone": "धीमी, गहरी और सांस रोक देने वाली रहस्यमयी आवाज़",
+      "tags": ["[whispers]", "[suspense]", "[secret]", "[mysterious]"],
+      "rule": "Pacing थोड़ी धीमी (-4%), पिच गहरी (-3Hz), और शब्दों के बीच रहस्यमयी ठहराव।",
+      "example": "चारों तरफ गहरा सन्नाटा था... पर हवा जो राज़ फुसफुसा रही थी, वह साधारण नहीं थी!"
+    },
+    "heroic": {
+      "name_hindi": "वीर रस / जोश / पराक्रम (Heroic & Action Thrill)",
+      "rate_delta": "+4%",
+      "pitch_delta": "+2Hz",
+      "pause_weight": 2,
+      "tone": "तीव्र, बुलंद, जोशीली और सीने से निकलने वाली हुंकार",
+      "tags": ["[heroic]", "[shout]", "[intense]", "[action]", "[war]"],
+      "rule": "Pacing तेज़ (+4%), पिच बुलंद (+2Hz), और विस्मयबोधक (!) पर ज़ोरदार वार।",
+      "example": "महाबली योद्धा ने जब हुंकार भरी, तो दुश्मनों के कलेजे कांप उठे!"
+    },
+    "conversational": {
+      "name_hindi": "व्यंग्य / रोचकता / बातचीत (Conversational & Sarcastic)",
+      "rate_delta": "+0%",
+      "pitch_delta": "+1Hz",
+      "pause_weight": 3,
+      "tone": "स्वाभाविक, हल्की मुस्कान वाली और रोचक अनूठी बातचीत",
+      "tags": ["[sarcastically]", "[giggles]", "[laugh]", "[chuckle]", "[curious]"],
+      "rule": "स्वाभाविक बोलचाल (0% स्पीड), हल्की ऊपर-नीचे पिच (+1Hz), कोई रोबोटिक खिंचाव नहीं।",
+      "example": "वह “सब कुछ जला दो” वाला ड्रैगन नहीं था... बल्कि उसकी आँखें तारों जैसी समझदार थीं।"
+    },
+    "emotional": {
+      "name_hindi": "भावुक / करुणा / विदाई (Emotional & Melancholic)",
+      "rate_delta": "-5%",
+      "pitch_delta": "-4Hz",
+      "pause_weight": 5,
+      "tone": "कोमल, दिल को छूने वाला, भारी और नम लहज़ा",
+      "tags": ["[sad]", "[emotional]", "[crying]", "[sorrow]", "[gentle]"],
+      "rule": "Pacing धीमी (-5%), पिच भारी (-4Hz), और वाक्य के अंत में गहरा ठहराव।",
+      "example": "गायों की आँखों से आंसू बह रहे थे, और पाबूजी ने अपना अंतिम वचन निभाया।"
+    },
+    "divine": {
+      "name_hindi": "दिव्य / भक्ति / शांति (Divine Grace & Sacred Awe)",
+      "rate_delta": "-2%",
+      "pitch_delta": "-1Hz",
+      "pause_weight": 4,
+      "tone": "गंभीर, आदरपूर्ण, शुद्ध और दिव्य शांति से भरा स्वर",
+      "tags": ["[divine]", "[reverent]", "[peaceful]", "[sacred]"],
+      "rule": "संतुलित स्पीड (-2%), स्पष्ट उच्चारण, और मन को शांति देने वाली दिव्यता।",
+      "example": "भगवान श्रीकृष्ण की दिव्य वाणी गूंजी—धर्म की रक्षा ही सबसे बड़ा संकल्प है!"
+    }
+  },
+  "lyric_timing_rules": {
+    "punctuation_weights": {
+      ",": 2,
+      "!": 3,
+      "?": 3,
+      "—": 4,
+      "...": 4,
+      ".": 2
+    },
+    "explanation": "जब किसी शब्द के बाद ?, !, — या ... आता है, तो इंसान स्वाभाविक सांस लेता है। लिरिक्स टाइमिंग में इन शब्दों को अतिरिक्त भार (weight) दिया जाता है ताकि सबटाइटल आवाज़ के साथ बिल्कुल सटीक तालमेल में रहे और आगे न भागे।"
+  }
+}
