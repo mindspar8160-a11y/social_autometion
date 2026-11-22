@@ -2,8 +2,8 @@
 
 Features:
 - Official Meta / Instagram publishing partner (Zero strikes, 100% account safety).
-- Automatically discovers your connected Instagram channel ID.
-- Uploads MP4 to temporary direct public host (Catbox / tmpfiles) so Buffer can ingest it.
+- Automatically discovers your connected Instagram channel ID (organizations -> channels).
+- Uploads MP4 to a temporary public host (tries several) and verifies the URL is directly readable.
 - Publishes Reel immediately to Instagram (mode: shareNow).
 - Sends success/failure notification to Telegram.
 
@@ -35,6 +35,7 @@ except Exception:
     pass
 
 BUFFER_GRAPHQL_ENDPOINT = "https://api.buffer.com"
+UA = {"User-Agent": "Mozilla/5.0"}
 
 
 def _tg_send(text: str) -> None:
@@ -52,46 +53,114 @@ def _tg_send(text: str) -> None:
         print(f"[Buffer] Telegram message failed: {e}")
 
 
-def upload_temp_video(video_path: Path) -> str:
-    """Uploads local MP4 file to a fast temporary direct public host so Buffer can ingest it."""
-    print(f"[Buffer] Uploading video ({video_path.stat().st_size / (1024*1024):.1f} MB) to temporary public host...")
+# ---------------------------------------------------------------------------
+# Temporary public video hosting
+# ---------------------------------------------------------------------------
 
-    # Method 1: Catbox.moe (Reliable, high speed, direct MP4 link)
+def _check_public_video(url: str) -> bool:
+    """Checks that the URL is directly readable as a video (like Buffer would fetch it)."""
     try:
+        r = requests.get(
+            url,
+            headers={"Range": "bytes=0-1023", "User-Agent": "Mozilla/5.0"},
+            timeout=20,
+            stream=True,
+            allow_redirects=True,
+        )
+        ctype = r.headers.get("Content-Type", "").lower()
+        status = r.status_code
+        r.close()
+        print(f"[Buffer] URL check: HTTP {status}, Content-Type: {ctype}")
+        return status in (200, 206) and ("video" in ctype or "octet-stream" in ctype)
+    except Exception as e:
+        print(f"[Buffer] URL check failed: {e}")
+        return False
+
+
+def upload_temp_video(video_path: Path) -> str:
+    """Uploads MP4 to temporary hosts; returns the first URL that passes a direct-read check."""
+    size_mb = video_path.stat().st_size / (1024 * 1024)
+    print(f"[Buffer] Uploading video ({size_mb:.1f} MB) to temporary public host...")
+
+    def litterbox() -> str:
+        with open(video_path, "rb") as f:
+            r = requests.post(
+                "https://litterbox.catbox.moe/resources/internals/api.php",
+                data={"reqtype": "fileupload", "time": "24h"},
+                files={"fileToUpload": (video_path.name, f, "video/mp4")},
+                headers=UA, timeout=180,
+            )
+        r.raise_for_status()
+        return r.text.strip()
+
+    def catbox() -> str:
         with open(video_path, "rb") as f:
             r = requests.post(
                 "https://catbox.moe/user/api.php",
                 data={"reqtype": "fileupload"},
                 files={"fileToUpload": (video_path.name, f, "video/mp4")},
-                timeout=120,
+                headers=UA, timeout=180,
             )
-        if r.status_code == 200 and r.text.startswith("http"):
-            url = r.text.strip()
-            print(f"[Buffer] Temporary public video URL ready: {url}")
-            return url
-    except Exception as e:
-        print(f"[Buffer] Catbox upload error: {e}. Trying fallback...")
+        r.raise_for_status()
+        return r.text.strip()
 
-    # Method 2: tmpfiles.org
-    try:
+    def uguu() -> str:
+        with open(video_path, "rb") as f:
+            r = requests.post(
+                "https://uguu.se/upload",
+                files={"files[]": (video_path.name, f, "video/mp4")},
+                headers=UA, timeout=180,
+            )
+        r.raise_for_status()
+        return r.json()["files"][0]["url"]
+
+    def zerox0() -> str:
+        with open(video_path, "rb") as f:
+            r = requests.post(
+                "https://0x0.st",
+                files={"file": (video_path.name, f, "video/mp4")},
+                headers=UA, timeout=180,
+            )
+        r.raise_for_status()
+        return r.text.strip()
+
+    def tmpfiles() -> str:
         with open(video_path, "rb") as f:
             r = requests.post(
                 "https://tmpfiles.org/api/v1/upload",
                 files={"file": (video_path.name, f, "video/mp4")},
-                timeout=120,
+                headers=UA, timeout=180,
             )
-        if r.status_code == 200:
-            data = r.json()
-            raw_url = data.get("data", {}).get("url", "")
-            if raw_url:
-                dl_url = raw_url.replace("tmpfiles.org/", "tmpfiles.org/dl/")
-                print(f"[Buffer] Temporary public video URL ready via tmpfiles: {dl_url}")
-                return dl_url
-    except Exception as e:
-        print(f"[Buffer] tmpfiles fallback error: {e}")
+        r.raise_for_status()
+        raw = r.json().get("data", {}).get("url", "")
+        return raw.replace("tmpfiles.org/", "tmpfiles.org/dl/")
 
-    raise RuntimeError("Failed to obtain a public video URL for Buffer upload.")
+    hosts = [
+        ("litterbox", litterbox),
+        ("catbox", catbox),
+        ("uguu", uguu),
+        ("0x0.st", zerox0),
+        ("tmpfiles", tmpfiles),
+    ]
+    for name, fn in hosts:
+        try:
+            url = fn()
+            if not url.startswith("http"):
+                print(f"[Buffer] {name}: unexpected response: {url[:100]}")
+                continue
+            print(f"[Buffer] {name} URL: {url}")
+            if _check_public_video(url):
+                return url
+            print(f"[Buffer] {name} URL not directly readable, trying next host...")
+        except Exception as e:
+            print(f"[Buffer] {name} failed: {e}")
 
+    raise RuntimeError("No temporary host gave a directly readable public video URL.")
+
+
+# ---------------------------------------------------------------------------
+# Buffer GraphQL
+# ---------------------------------------------------------------------------
 
 def _gql(api_key: str, query: str, variables: Optional[dict] = None) -> dict:
     """Runs one Buffer GraphQL request and returns the 'data' dict (raises on any error)."""
@@ -103,7 +172,7 @@ def _gql(api_key: str, query: str, variables: Optional[dict] = None) -> dict:
         BUFFER_GRAPHQL_ENDPOINT,
         json={"query": query, "variables": variables or {}},
         headers=headers,
-        timeout=20,
+        timeout=30,
     )
     if res.status_code != 200:
         raise RuntimeError(f"Buffer API error ({res.status_code}): {res.text}")
@@ -215,6 +284,10 @@ def publish_reel(api_key: str, channel_id: str, video_url: str, caption: str) ->
     return create_data.get("post") or {}
 
 
+# ---------------------------------------------------------------------------
+# Directory discovery + upload
+# ---------------------------------------------------------------------------
+
 def find_candidate_dirs(args: List[str]) -> List[Path]:
     """Finds all output directories containing final.mp4."""
     candidates = []
@@ -294,7 +367,7 @@ def upload_directory(d: Path, api_key: str, channel_id: str, channel_name: str):
     print(f"📝 Title: {title}")
     print("=" * 60)
 
-    # Step 1: Upload temporary video
+    # Step 1: Upload temporary video (verified directly readable)
     public_url = upload_temp_video(video_file)
 
     # Step 2: Publish Reel via Buffer
