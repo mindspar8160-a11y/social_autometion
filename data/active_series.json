@@ -286,42 +286,240 @@
       ]
     },
     {
-      "topic_id": "shakti_peeth_vimala_puri",
-      "topic_title": "विमला (पुरी) शक्तिपीठ: माता सती का चरण जहाँ गिरा",
-      "story_synopsis": "जगन्नाथ पुरी के रोहिणी कुंड के पास सती का पवित्र चरण गिरा, जहाँ से महाप्रसाद का अद्भुत रहस्य उत्पन्न हुआ। भक्तों ने अनुष्ठान करके इस चरण को विमला रूप में पूजित किया और प्रथम बार महाप्रसाद का जादू देखी। अंत में सती के चरण से निकली शुद्ध शक्ति ने पूरे जग को नई शांति और आशा से भर दिया।",
+      "topic_id": "aai_khodiyar_crocodile",
+      "topic_title": "આઈ ખોડિયાર માતાજી: મગરમચ્છની સવારી અને અમૃત કુંભનો પરચો",
+      "story_synopsis": "Mata Khodiyar apne bhai ki praan raksha ke liye samundar ke gahare mein utar gayi. Usne vishal makar par sawari karke amrit kumbh laaya. Is divya ghatna se bhakton ka sankat hat gaya.",
       "total_parts": 3,
       "current_part": 1,
-      "created_at": "2026-11-22 12:22:16.550197",
+      "created_at": "2026-11-22 12:42:57.381456",
       "parts": [
         {
           "part_num": 1,
-          "part_title": "🔱 सती का पवित्र चरण: रोहिणी कुंड की कथा",
-          "hook_line": "जगन्नाथ पुरी में सती का चरण गिरा, महाप्रसाद बनता!",
-          "recap_bridge": "राह में धुंध घनी, पर भक्तों ने दीप जलाए।",
-          "cliffhanger": "...और तभी रोहिणी कुंड से उठी चमकती ज्वाला, जो सबको चकित कर गई!",
-          "part_summary": "श्री जगन्नाथ मंदिर के विशाल परिसर में, रोहिणी कुंड के किनारे एक रहस्यमय घटना घटित हुई। एक तीव्र वृष्टि के बाद, सती का पवित्र चरण जमीन में धँस गया, जिससे आसपास की हवा में दिव्य गंध फैली। मंदिर के पुजारी और स्थानीय भक्त तुरंत इसे पवित्र मानकर अनुष्ठान आरंभ कर गये। उन्होंने चरण को साफ़ किया, धूप और जल अर्पित किया, और विशेष मंत्रों का उच्चारण किया। इस अनुष्ठान के दौरान, एक अद्भुत प्रकाश की किरण निकली, जिसने सभी को आश्चर्यचकित कर दिया। इस क्षण से ही यह स्थान विमला शक्ति के रूप में प्रतिष्ठित हो गया, और यहाँ से महाप्रसाद का निर्माण शुरू हुआ।",
+          "part_title": "🌊 समुद्र की गहराई में उतरी माता",
+          "hook_line": "Samundar ke gahare mein koi aam insaan nahi utarta, par ye Mata thi?",
+          "end_question": "Lekin kya wo vishal makar amrit dega, ya use nigal jayega?",
+          "recap_bridge": "",
+          "cliffhanger": "Makar ne apni soond kholi, aur samundar ka pani tham gaya!",
+          "part_summary": "Mata Khodiyar apne bhai ki jaadui astra se hone wali bimari ko theek karne ke liye paatal mein utari. Usne vishal makar ko apna vahan bana liya. Samundar ka pani uthne laga aur dar badh gaya.",
+          "scenes": [
+            {
+              "kind": "title",
+              "emotion": "suspense",
+              "narration": "Samundar ke gahare mein koi aam insaan nahi utarta.",
+              "tts_text": "समुद्र के गहरे में कोई आम इंसान नहीं उतरता।",
+              "text": "समुद्र की गहराई",
+              "stamp": "भाग 1",
+              "accent": "teal"
+            },
+            {
+              "kind": "card",
+              "emotion": "emotional",
+              "narration": "Mata Khodiyar ke bhai ki jaan khatre mein thi.",
+              "tts_text": "माता खोड़ियार के भाई की जान खतरे में थी।",
+              "text": "भाई की जान",
+              "stamp": "भाग 1",
+              "accent": "red"
+            },
+            {
+              "kind": "quote",
+              "emotion": "heroic",
+              "narration": "Raksha ke liye usne paatal ki oron chun li.",
+              "tts_text": "रक्षा के लिए उसने पाताल की ओर चुन ली।",
+              "text": "पाताल की ओर",
+              "stamp": "भाग 1",
+              "accent": "ink"
+            },
+            {
+              "kind": "map",
+              "emotion": "suspense",
+              "narration": "Samundar ka pani achanak se bhi utar gaya.",
+              "tts_text": "समुद्र का पानी अचानक से भी उतर गया।",
+              "text": "पानी उतर गया",
+              "stamp": "भाग 1",
+              "accent": "teal"
+            },
+            {
+              "kind": "number",
+              "emotion": "heroic",
+              "narration": "Ek vishal makar uske paas aakar khada ho gaya.",
+              "tts_text": "एक विशाल मकर उसके पास आकर खड़ा हो गया।",
+              "text": "विशाल मकर",
+              "stamp": "भाग 1",
+              "accent": "mustard"
+            },
+            {
+              "kind": "card",
+              "emotion": "suspense",
+              "narration": "Mata ne us par sawari karke amrit dhoonda.",
+              "tts_text": "माता ने उस पर सवारी करके अमृत ढूंढा।",
+              "text": "अमृत की खोज",
+              "stamp": "भाग 1",
+              "accent": "teal"
+            },
+            {
+              "kind": "quote",
+              "emotion": "suspense",
+              "narration": "Lekin kya wo vishal makar amrit dega, ya nigal dega?",
+              "tts_text": "लेकिन क्या वो विशाल मकर अमृत देगा, या निगलेगा?",
+              "text": "क्या मिलेगा?",
+              "stamp": "अगला भाग",
+              "accent": "red"
+            }
+          ],
           "completed": false,
           "rendered_at": null,
           "video_dir": null
         },
         {
           "part_num": 2,
-          "part_title": "🕉️ महाप्रसाद का रहस्य: विमला शक्ति",
-          "hook_line": "विमला शिखर पर प्रथम बार महाप्रसाद का जादू प्रकट!",
-          "recap_bridge": "भक्तों ने अनुष्ठान शुरू किया, अग्नि ने आकाश छू लिया।",
-          "cliffhanger": "...और अचानक रोहिणी कुंड से निकली तेज ध्वनि, जिसने समय को थाम लिया!",
-          "part_summary": "पहले भाग की घटना के बाद, पुजारी ने विमला शिखर पर एक विशेष अनुष्ठान आयोजित किया। सती के चरण को पवित्र धातु की थाली में रखा गया और चारों ओर गंधी धूप जलायी गयी। जैसे ही मंत्रों का उच्चारण शुरू हुआ, शिखर पर एक चमकीली रोशनी फैली और हवा में मीठी सुगंध घुली। इस प्रकाश से निकली ऊर्जा ने किचन में रखे भोग को स्वर्णिम रूप दिया, जिससे महाप्रसाद का पहला भाग स्वर्णिम बना। सभी भक्तों ने इस दिव्य परिवर्तन को देख कर आश्चर्य और श्रद्धा से भर गए। अनुष्ठान के अंत में, एक रहस्यमय ध्वनि ने सभी को स्तब्ध कर दिया, जो आगे की घटनाओं का संकेत थी।",
+          "part_title": "🐊 मगरमच्छ का विध्वंसक आक्रमण",
+          "hook_line": "Makar ne apni soond kholi aur samundar ka pani tham gaya!",
+          "end_question": "Kya amrit kumbh samay se pehle pahunch payega, ya sab khatam ho jayega?",
+          "recap_bridge": "",
+          "cliffhanger": "Kumbh haath se phisla aur samundar ki gehrayi mein chala gaya!",
+          "part_summary": "Makar ne amrit kumbh liya par half road par use badalne ki koshish ki. Pani ka lehar udhar aaya. Mata ne apni shakti se makar ko dabaya. Kumbh phisla aur paani mein gir gaya. Ab raasta khatam ho chuka tha.",
+          "scenes": [
+            {
+              "kind": "card",
+              "emotion": "suspense",
+              "narration": "Makar ne apni soond kholi, pani tham gaya.",
+              "tts_text": "मकर ने अपनी सूंड खोली, पानी थम गया।",
+              "text": "सूंड खोली",
+              "stamp": "भाग 2",
+              "accent": "red"
+            },
+            {
+              "kind": "number",
+              "emotion": "heroic",
+              "narration": "Usne amrit kumbh uthakar apne paas rakha.",
+              "tts_text": "उसने अमृत कुंभ उठाकर अपने पास रखा।",
+              "text": "अमृत कुंभ",
+              "stamp": "भाग 2",
+              "accent": "teal"
+            },
+            {
+              "kind": "quote",
+              "emotion": "emotional",
+              "narration": "Raasta aadha par makar ne badalne ki koshish ki.",
+              "tts_text": "रास्ता आधा पर मकर ने बदलने की कोशिश की।",
+              "text": "बदलाव की कोशिश",
+              "stamp": "भाग 2",
+              "accent": "mustard"
+            },
+            {
+              "kind": "map",
+              "emotion": "suspense",
+              "narration": "Samundar ki bhayanak leharen aakar uske paas aa gayi.",
+              "tts_text": "समुद्र की भयानक लहरें आकर उसके पास आ गईं।",
+              "text": "भयानक लहरें",
+              "stamp": "भाग 2",
+              "accent": "teal"
+            },
+            {
+              "kind": "card",
+              "emotion": "heroic",
+              "narration": "Mata ne apni divya shakti se makar ko dabaya.",
+              "tts_text": "माता ने अपनी दिव्य शक्ति से मकर को दबाया।",
+              "text": "दिव्य शक्ति",
+              "stamp": "भाग 2",
+              "accent": "ink"
+            },
+            {
+              "kind": "quote",
+              "emotion": "emotional",
+              "narration": "Kumbh haath se phisla aur gehrayi mein chala gaya.",
+              "tts_text": "कुंभ हाथ से फिसला और गहराई में चला गया।",
+              "text": "कुंभ गिर गया",
+              "stamp": "भाग 2",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "suspense",
+              "narration": "Kya amrit samay se pehle pahunch payega, ya sab khatam?",
+              "tts_text": "क्या अमृत समय से पहले पहुंचेगा, या सब खत्म?",
+              "text": "समय खत्म?",
+              "stamp": "अगला भाग",
+              "accent": "red"
+            }
+          ],
           "completed": false,
           "rendered_at": null,
           "video_dir": null
         },
         {
           "part_num": 3,
-          "part_title": "✨ दिव्य लीला: विमला शिखर पर शांति",
-          "hook_line": "सती के चरण से निकली शुद्ध शक्ति, जग को बदल देती!",
-          "recap_bridge": "विमला ने आशीर्वाद दिया, सभी को असीम शांति मिली।",
-          "cliffhanger": "...और जब सती का चरण चमका, तो धरती पर नई सुबह का सवेरा फूट पड़ा!",
-          "part_summary": "तीसरे भाग में, सती के चरण से निकली शुद्ध शक्ति ने पूरे पुरी को नई ऊर्जा से भर दिया। विमला ने अपने चरणों से एक दिव्य प्रकाश निकाला, जिससे सभी भक्तों के मन में शांति और आनंद का संचार हुआ। इस प्रकाश ने मंदिर के प्रांगण में मौजूद सभी रोगों को दूर किया और लोगों के दिलों में प्रेम की भावना को पुनर्जीवित किया। इस अद्भुत घटना के बाद, महाप्रसाद का स्वाद और भी अधिक पवित्र हो गया, जिससे हर एक को आंतरिक शांति का अनुभव हुआ। अंत में, सती के चरण की चमक ने एक नई सुबह को जन्म दिया, जो सभी के जीवन में नई आशा और उन्नति का प्रतीक बन गया।",
+          "part_title": "✨ अमृत की दिव्य प्राप्ति",
+          "hook_line": "Kumbh phisla aur samundar ki gehrayi mein chala gaya!",
+          "end_question": "Mata ke is divya chamatkar ne sabko jhuka diya. Boliye Jai Maa Khodiyar!",
+          "recap_bridge": "",
+          "cliffhanger": "Boliye Jai Maa Khodiyar! Boliye Jai Maa!",
+          "part_summary": "Mata ne apne haath se amrit wapas laaya. Makar shant ho gaya aur bhakti bhav se maan gayi. Bhai ko amrit piya gaya aur toot gaya. Mata ne bhakton ko mukti ka aashirwaad diya. Is ghatna se sab dar gaye aur maan gaye.",
+          "scenes": [
+            {
+              "kind": "card",
+              "emotion": "divine",
+              "narration": "Mata ne apne haath se amrit wapas laaya.",
+              "tts_text": "माता ने अपने हाथ से अमृत वापस लाया।",
+              "text": "अमृत वापस",
+              "stamp": "भाग 3",
+              "accent": "teal"
+            },
+            {
+              "kind": "quote",
+              "emotion": "heroic",
+              "narration": "Makar shant ho gaya aur bhakti bhav se maan gaya.",
+              "tts_text": "मकर शांत हो गया और भक्ति भाव से मान गया।",
+              "text": "मकर शांत",
+              "stamp": "भाग 3",
+              "accent": "mustard"
+            },
+            {
+              "kind": "number",
+              "emotion": "emotional",
+              "narration": "Bhai ko amrit piya gaya aur toot gaya.",
+              "tts_text": "भाई को अमृत पिया गया और तूट गया।",
+              "text": "भाई को अमृत",
+              "stamp": "भाग 3",
+              "accent": "red"
+            },
+            {
+              "kind": "map",
+              "emotion": "divine",
+              "narration": "Mata ne bhakton ko mukti ka aashirwaad diya.",
+              "tts_text": "माता ने भक्तों को मुक्ति का आशीर्वाद दिया।",
+              "text": "मुक्ति का आशीर्वाद",
+              "stamp": "भाग 3",
+              "accent": "teal"
+            },
+            {
+              "kind": "card",
+              "emotion": "heroic",
+              "narration": "Is ghatna se sab dar gaye aur maan gaye.",
+              "tts_text": "इस घटना से सब डर गए और मान गए।",
+              "text": "सब डर गए",
+              "stamp": "भाग 3",
+              "accent": "ink"
+            },
+            {
+              "kind": "quote",
+              "emotion": "divine",
+              "narration": "Mata ke is divya chamatkar ne sabko jhuka diya.",
+              "tts_text": "माता के इस दिव्य चमत्कार ने सबको झुका दिया।",
+              "text": "दिव्य चमत्कार",
+              "stamp": "कथा सम्पूर्ण",
+              "accent": "red"
+            },
+            {
+              "kind": "title",
+              "emotion": "divine",
+              "narration": "Boliye Jai Maa Khodiyar! Boliye Jai Maa!",
+              "tts_text": "बोलिए जय माता खोड़ियार! बोलिए जय माता!",
+              "text": "जय माता खोड़ियार",
+              "stamp": "कथा सम्पूर्ण",
+              "accent": "mustard"
+            }
+          ],
           "completed": false,
           "rendered_at": null,
           "video_dir": null
@@ -417,8 +615,223 @@
         }
       ],
       "completed_at": "2026-11-22 12:22:10.608353"
+    },
+    {
+      "topic_id": "shakti_peeth_vimala_puri",
+      "topic_title": "विमला (पुरी) शक्तिपीठ: माता सती का चरण जहाँ गिरा",
+      "story_synopsis": "जगन्नाथपुरी के रोहिणी कुंड के पास सती का चरण गिरा, जिससे महाप्रसाद का अद्भुत रहस्य उत्पन्न हुआ। भक्तों ने अनुष्ठान करके इस चरण को विमला रूप में पूजित किया और प्रथम बार महाप्रसाद का जादू देखा। अंत में सती के चरण से निकली शुद्ध शक्ति ने पूरे जग को नई शांति और आशा से भर दिया।",
+      "total_parts": 3,
+      "current_part": 4,
+      "created_at": "2026-11-22 12:22:16.550197",
+      "parts": [
+        {
+          "part_num": 1,
+          "part_title": "🔥 रोहिणी कुंड का रहस्य",
+          "hook_line": "जगन्नाथपुरी के रोहिणी कुंड में एक अद्भुत घटना हुई, जिसने धर्मजगत को हिला दिया।",
+          "end_question": "क्या यह चरण सच में सती का था, या यह कोई भ्रम था?",
+          "recap_bridge": "",
+          "cliffhanger": "क्या यह चरण सच में सती का था, या यह कोई भ्रम था?",
+          "part_summary": "इस भाग में रोहिणी कुंड के पास सती के चरण के गिरने की घटना का वर्णन है। भक्तों की उत्सुकता और संशय का वर्णन किया गया है।",
+          "scenes": [
+            {
+              "kind": "title",
+              "emotion": "suspense",
+              "narration": "Jagannath Puri ke Rohini Kund mein ek anokha satya paya gaya.",
+              "tts_text": "जगन्नाथ पुरी के रोहिणी कुंड में एक अनोखा सत्य पाया गया।",
+              "text": "रोहिणी कुंड का रहस्य",
+              "stamp": "भाग 1",
+              "accent": "red"
+            },
+            {
+              "kind": "map",
+              "emotion": "emotional",
+              "narration": "Mata Sati ke shringar ke baad yahan unka charan gir gaya tha.",
+              "tts_text": "माता सती के श्रृंगार के बाद यहाँ उनका चरण गिर गया था।",
+              "text": "सती का चरण",
+              "stamp": "भाग 1",
+              "accent": "teal"
+            },
+            {
+              "kind": "card",
+              "emotion": "heroic",
+              "narration": "Wahan bhakton ne dikhayi ek behtareen roshni, jo aam nahi thi.",
+              "tts_text": "वहाँ भक्तों ने दिखाई एक बेहतरीन रोशनी, जो आम नहीं थी।",
+              "text": "अलौकिक रोशनी",
+              "stamp": "भाग 1",
+              "accent": "mustard"
+            },
+            {
+              "kind": "quote",
+              "emotion": "suspense",
+              "narration": "Charo taraf andhera tha, par gufa se aati wo roshni chamki.",
+              "tts_text": "चारों तरफ अंधेरा था, पर गुफा से आती वो रोशनी चमकी।",
+              "text": "गुफा की रोशनी",
+              "stamp": "भाग 1",
+              "accent": "ink"
+            },
+            {
+              "kind": "list",
+              "emotion": "emotional",
+              "narration": "Bhakton ne kaha, yeh koi aam mitti ke tukde nahi hain.",
+              "tts_text": "भक्तों ने कहा, यह कोई आम मिट्टी के टुकड़े नहीं हैं।",
+              "text": "भक्तों का विश्वास",
+              "stamp": "भाग 1",
+              "accent": "red"
+            },
+            {
+              "kind": "number",
+              "emotion": "suspense",
+              "narration": "Kya yeh charan sach me Sati ka tha, ya koi bhrm tha?",
+              "tts_text": "क्या यह चरण सच में सती का था, या कोई भ्रम था?",
+              "text": "सवाल बना रहता है",
+              "stamp": "अगला भाग",
+              "accent": "teal"
+            }
+          ],
+          "completed": true,
+          "rendered_at": "2026-11-22 12:38:30.019622",
+          "video_dir": "D:\\mindspark\\data\\output\\2026-11-22_123553_pf_shakti_peeth_vimala_puri"
+        },
+        {
+          "part_num": 2,
+          "part_title": "🕉️ अनुष्ठान और प्रतीक्षा",
+          "hook_line": "भक्तों ने तीव्र अनुष्ठान किया, लेकिन परिणाम अभी नहीं आया था।",
+          "end_question": "क्या विमला माता का रूप सामने आएगा, या यह सब व्यर्थ था?",
+          "recap_bridge": "",
+          "cliffhanger": "क्या विमला माता का रूप सामने आएगा, या यह सब व्यर्थ था?",
+          "part_summary": "इस भाग में भक्तों के द्वारा किए गए अनुष्ठान और माता के रूप के प्रकट होने की प्रतीक्षा का वर्णन है।",
+          "scenes": [
+            {
+              "kind": "title",
+              "emotion": "heroic",
+              "narration": "Bhakton ne tivr anushthan kiya, par phal abhi nahi mila.",
+              "tts_text": "भक्तों ने तीव्र अनुष्ठान किया, पर फल अभी नहीं मिला।",
+              "text": "तीव्र अनुष्ठान",
+              "stamp": "भाग 2",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "suspense",
+              "narration": "Pratidin mandir mein mantra-chanting ki goonj goonjti rehti thi.",
+              "tts_text": "प्रतिदिन मंदिर में मंत्र- जाप की गूँज गूँजती रहती थी।",
+              "text": "मंत्रों की गूँज",
+              "stamp": "भाग 2",
+              "accent": "teal"
+            },
+            {
+              "kind": "map",
+              "emotion": "emotional",
+              "narration": "Rohini Kund ke paas bhakt ka sabr pariksha hoti rahi.",
+              "tts_text": "रोहिणी कुंड के पास भक्त का संयम परीक्षा होती रही।",
+              "text": "संयम की परीक्षा",
+              "stamp": "भाग 2",
+              "accent": "mustard"
+            },
+            {
+              "kind": "quote",
+              "emotion": "suspense",
+              "narration": "Kya Vimla Mata ka roop samne aayega, ya yeh vyarth tha?",
+              "tts_text": "क्या विमला माता का रूप सामने आएगा, या यह व्यर्थ था?",
+              "text": "अनिश्चितता का साया",
+              "stamp": "भाग 2",
+              "accent": "ink"
+            },
+            {
+              "kind": "list",
+              "emotion": "emotional",
+              "narration": "Bhakton ne apna sar jhuka liya, maan gaye bhagwan ke upar.",
+              "tts_text": "भक्तों ने अपना सिर झुका लिया, मान गए भगवान के ऊपर।",
+              "text": "भक्ति का प्रदर्शन",
+              "stamp": "भाग 2",
+              "accent": "red"
+            },
+            {
+              "kind": "number",
+              "emotion": "suspense",
+              "narration": "Kya yeh vyarth tha, ya koi anokha chamatkar hone wala tha?",
+              "tts_text": "क्या यह व्यर्थ था, या कोई अनोखा चमत्कार होने वाला था?",
+              "text": "चमत्कार की प्रतीक्षा",
+              "stamp": "अगला भाग",
+              "accent": "teal"
+            }
+          ],
+          "completed": true,
+          "rendered_at": "2026-11-22 12:40:21.089515",
+          "video_dir": "D:\\mindspark\\data\\output\\2026-11-22_123835_pf_shakti_peeth_vimala_puri"
+        },
+        {
+          "part_num": 3,
+          "part_title": "✨ विमला रूप और विजय",
+          "hook_line": "विमला माता का रूप सामने आया, और महाप्रसाद का रहस्य खुल गया।",
+          "end_question": "विमला माता की कृपा से पूरा जग नई शांति और आशा से भर गया।",
+          "recap_bridge": "",
+          "cliffhanger": "बोलिये जय विमला माता!",
+          "part_summary": "इस भाग में विमला माता के रूप का प्रकट होना और महाप्रसाद के रहस्य का खुलना वर्णित है। भक्तों को प्राप्ति का आशीर्वाद दिया गया है।",
+          "scenes": [
+            {
+              "kind": "title",
+              "emotion": "divine",
+              "narration": "Vimla Mata ka roop samne aaya, aur mahaprashad ka rahasya khula.",
+              "tts_text": "विमला माता का रूप सामने आया, और महाप्रसाद का रहस्य खुला।",
+              "text": "विमला माता का रूप",
+              "stamp": "भाग 3",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "emotional",
+              "narration": "Bhakton ko pratham baar mahaprashad ka aishwaryik ras mila.",
+              "tts_text": "भक्तों को पहली बार महाप्रसाद का ऐश्वर्यिक रस मिला।",
+              "text": "महाप्रसाद का जादू",
+              "stamp": "भाग 3",
+              "accent": "teal"
+            },
+            {
+              "kind": "map",
+              "emotion": "heroic",
+              "narration": "Sati ke charan se nikli shuddh shakti ne poore jag ko bhara.",
+              "tts_text": "सती के चरण से निकली शुद्ध शक्ति ने पूरे जग को भरा।",
+              "text": "शुद्ध शक्ति का प्रवाह",
+              "stamp": "भाग 3",
+              "accent": "mustard"
+            },
+            {
+              "kind": "quote",
+              "emotion": "divine",
+              "narration": "Nayi shaanti aur aasha se poora jag bhara gaya, bhakton ko mukti mili.",
+              "tts_text": "नई शांति और आशा से पूरा जग भरा गया, भक्तों को मुक्ति मिली।",
+              "text": "शांति और आशा",
+              "stamp": "भाग 3",
+              "accent": "ink"
+            },
+            {
+              "kind": "list",
+              "emotion": "emotional",
+              "narration": "Bhakton ne Vimla Mata ke charon paas jhuk kar pranam kiya.",
+              "tts_text": "भक्तों ने विमला माता के चारों पास झुक कर प्रणाम किया।",
+              "text": "भक्तों का प्रणाम",
+              "stamp": "भाग 3",
+              "accent": "red"
+            },
+            {
+              "kind": "number",
+              "emotion": "divine",
+              "narration": "Boliye jay Vimla Mata, jai Sati, jai Jagannath Puri ke shaktipeeth!",
+              "tts_text": "बोलिये जय विमला माता, जय सती, जय जगन्नाथ पुरी के शक्तिपीठ!",
+              "text": "जय विमला माता",
+              "stamp": "कथा सम्पूर्ण",
+              "accent": "teal"
+            }
+          ],
+          "completed": true,
+          "rendered_at": "2026-11-22 12:42:50.682485",
+          "video_dir": "D:\\mindspark\\data\\output\\2026-11-22_124026_pf_shakti_peeth_vimala_puri"
+        }
+      ],
+      "completed_at": "2026-11-22 12:42:50.683260"
     }
   ],
-  "last_updated": "2026-11-22 12:32:35.406671",
-  "total_series_completed": 2
+  "last_updated": "2026-11-22 12:42:57.382992",
+  "total_series_completed": 3
 }

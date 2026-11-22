@@ -197,6 +197,7 @@ GEO_LORE = {
     "kurukshetra": {"state": "Haryana", "district": "Kurukshetra", "name": "कुरुक्षेत्र", "lat": 29.9695, "lon": 76.8783, "aliases": ["कुरुक्षेत्र", "kurukshetra"]},
     "hampi": {"state": "Karnataka", "district": "Vijayanagara", "name": "हम्पी विजयनगर", "lat": 15.3350, "lon": 76.4600, "aliases": ["हम्पी", "hampi", "विजयनगर"]},
     "khodiyar": {"state": "Gujarat", "district": "Bhavnagar", "name": "राजपरा खोडियार धाम", "lat": 21.7645, "lon": 72.1519, "aliases": ["खोडियार", "khodiyar", "मगरमच्छ"]},
+    "vimala": {"state": "Odisha", "district": "Puri", "name": "विमला शक्तिपीठ (पुरी)", "lat": 19.8049, "lon": 85.8179, "aliases": ["विमला", "vimala", "रोहिणी कुंड", "rohini"]},
 }
 
 
