@@ -244,7 +244,7 @@ jobs:
         run: |
           git config user.name "studio-bot"
           git config user.email "bot@users.noreply.github.com"
-          for f in data/theme_history.json data/template_history.json data/pending_video.json data/style_history.json state/recent-styles.json data/myth_history.json completed_books.md; do
+          for f in data/theme_history.json data/template_history.json data/pending_video.json data/style_history.json state/recent-styles.json data/myth_history.json data/active_series.json data/rendered_parts_history.json completed_books.md; do
             if [ -f "$f" ]; then
               git add "$f"
             fi

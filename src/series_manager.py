@@ -22,30 +22,84 @@ import llm
 from myth_picker import pick_myth_topic
 
 STATE_FILE = ROOT / "data" / "active_series.json"
+HISTORY_FILE = ROOT / "data" / "rendered_parts_history.json"
+
+
+def load_rendered_history():
+    """Load the immutable ledger of all rendered parts."""
+    hist = jload(HISTORY_FILE, [])
+    return hist if isinstance(hist, list) else []
+
+
+def save_rendered_history(hist):
+    """Save the immutable ledger of all rendered parts."""
+    jsave(HISTORY_FILE, hist)
+
+
+def is_part_already_rendered(topic_id, part_num):
+    """Checks if a specific topic part has already been rendered."""
+    hist = load_rendered_history()
+    key = f"{topic_id}_part{part_num}"
+    for item in hist:
+        if isinstance(item, dict):
+            if item.get("key") == key or (item.get("topic_id") == topic_id and item.get("part_num") == part_num):
+                return True
+    return False
+
+
+def record_rendered_part(topic_id, part_num, topic_title="", part_title="", video_dir=None):
+    """Records a completed render into the permanent ledger file."""
+    hist = load_rendered_history()
+    key = f"{topic_id}_part{part_num}"
+    if not any(isinstance(x, dict) and x.get("key") == key for x in hist):
+        hist.append({
+            "key": key,
+            "topic_id": topic_id,
+            "part_num": part_num,
+            "topic_title": topic_title,
+            "part_title": part_title,
+            "rendered_at": str(datetime.datetime.now()),
+            "video_dir": str(video_dir) if video_dir else None
+        })
+        save_rendered_history(hist)
+        print(f"[SeriesManager] 📝 Ledger updated: Recorded '{key}' into {HISTORY_FILE.name}")
+
 
 SERIES_PROMPT = """Tum ek anubhavi Hindi dharmik/mythological katha-vachak aur viral YouTube scriptwriter ho.
-Hamare paas ek kahani ka topic aaya hai. Hume iski EK ASLI, POORI, VISTAAR-POORVAK (detailed & authentic) katha likhni hai.
-Kyunki YouTube Shorts 35-45 second ka hota hai, isliye poori kahani ek video me nahi aa sakti.
-Tumhe is poori kahani ko 2 se 4 sequential PARTS (भाग 1, भाग 2, भाग 3...) me todna hai.
+Hamari audience Sanatan dharm, pauranik rahasya, veer balidan aur divya leelaon ko gahrai se janana chahti hai.
+Inhe superficial trailer nahi, balki PROVEN VIRAL FRAMEWORK: HOOK -> VALUE -> FOLLOW -> OPTIMIZE ke sath ASLI katha sunani hai.
 
 TOPIC:
 Title: {title}
 Summary: {summary}
 
-CRITICAL STORYTELLING NIYAM (KATHA-VACHAN, NOT A MOVIE TRAILER):
-1. YE KOI MOVIE TRAILER YA TEASER NAHI HAI! KABHI BHI disjointed, abstract ya cinematic teaser dialogues mat likho (jaise "आँखें खोलें", "कदम बढ़ाएँ", "सामंत की हँसी").
-2. HAR PART ME ASLI KATHA (Real Story) SUNAO:
-   - Kahani kiski hai? (Pauranik patra, Devi/Devta, Mandir, Nayak ka asli naam saaf bolo)
-   - Ghatna kahan ghati? (Asli jagah, prant ya sthan)
-   - Asal me kya ghatna ghati thi? (Kalyug ka sankat, raja ka atyachar, shrap, ya divya pariksha)
-   - Har ek part me 5-6 concrete ghatnaon ke vaakya hon jo kahani ko sequential kram me aage badhayein!
-3. VOICE ME KABHI BHI "BHAG 2" YA ROBOTIC NUMBER MAT BOLO:
-   - Part 1 ya beech ke parts ke aakhri scene me voice hamesha bolegi: "dekhiye agle video mein!" ya "iski poori sacchai dekhiye agle video mein!"
-   - KABHI BHI voice me "dekhiye bhaag 2" mat bolo!
-4. HAR PART KA DHANCHE (Structure):
-   - Part 1: Dhamakedar Hook (jisme kahani ke nayak/vishay ka naam saaf ho) + Katha ka aarambh + Sankat khada hona + Suspenseful ending: "...Lekin tabhi kya hua? Dekhiye agle video mein!"
-   - Part 2+: Shuruat me 1 line recap connector + Asli sangharsh / katha ka vistaar + Ending: "...Lekin aage kya hua? Dekhiye agle video mein!"
-   - Final Part: Chamatkar + Antim divya purnata aur sandesh.
+PROVEN SHORT-FORM SCRIPTWRITING FRAMEWORK:
+1. AUDIENCE INTENT:
+   - Viewer pauranik/itihaasik kathaon ka asali marm, nayak ka naam, ghatna sthal aur asali rahasya janne aaya hai.
+   - Shallow teaser ya artificial suspense mat do—seedha sacchi aur pramanik katha shuru karo!
+
+2. 4-STAGE RETENTION STRUCTURE (HOOK / VALUE / FOLLOW / OPTIMIZE):
+   - STAGE 1: HOOK (0-4 seconds):
+     * Visual Hook: Torn paper desk, Bharat ka nakshe par zoom, ya do talwaron ka takraav.
+     * Verbal Hook: High-stakes paradox ya anokha satya (jaise 'San 1660 mein, 300 maratha veeron ne 4000 mughal sena ko akele rok diya!').
+     * ZERO REPETITION: Hook aur Scene 1 ki pehli line me koi bhi sthan ya shabd 2 baar repeat nahi hona chahiye.
+   - STAGE 2: VALUE & ENGAGEMENT (5-28 seconds):
+     * Asli katha ka vistar: Nayak ka vachan, kalyug ka sankat, ya kshatriya dharm ki raksha.
+     * Fast pacing: Har agla scene pichhle scene ki ghatna ko aage badhaye (Cause & Effect).
+   - STAGE 3: FOLLOW & RETENTION (29-38 seconds):
+     * Climax buildup: Sankat aur badh jata hai, kathin pariksha khadi hoti hai.
+   - STAGE 4: OPTIMIZE & STRONG CLOSE (38-42 seconds):
+     * Non-final part: Clear Cliffhanger Bridge: "...Lekin aage kya hua? Dekhiye agle episode mein!" (Screen Stamp: 'अगला भाग').
+     * Final part: Divya chamatkar, purnata aur katha ka antim sandesh (Screen Stamp: 'कथा सम्पूर्ण').
+
+3. THE 3 CORE PILLARS IN EVERY SCRIPT:
+   - VISUAL HOOK: Scene 1 me striking paper cutout presentation.
+   - VERBAL HOOK: Spoken line me hero/sthan ka damdaar aagaz.
+   - CLEAR CTA: Agle part ke liye natural suspense bridge.
+
+VOICE ME KABHI BHI "BHAG 2" YA ROBOTIC NUMBER MAT BOLO:
+- Part 1 ya beech ke parts ke aakhri scene me voice hamesha bolegi: "dekhiye agle video mein!" ya "iski poori sacchai dekhiye agle video mein!"
+- KABHI BHI voice me "dekhiye bhaag 2" mat bolo!
 
 OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi backticks nahi, koi extra text nahi):
 {{
@@ -55,7 +109,7 @@ OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi backticks nah
   "parts": [
     {{
       "part_num": 1,
-      "part_title": "Hindi title with emoji (max 50 chars), e.g. द्वारका का वो अंतिम द्वार",
+      "part_title": "Hindi title with emoji (max 50 chars), e.g. 🔥 विशालगढ़ पहुँचने का अंतिम संकल्प",
       "hook_line": "Scene 1 bolne wali line jisme nayak/mandir ka naam ho",
       "recap_bridge": "" (Part 1 ke liye empty, Part 2+ ke liye chhota recap connector),
       "cliffhanger": "Antim scene ka suspense: '...Lekin iske baad jo hua, usne sabko dang kar diya. Dekhiye agle video mein!'",
@@ -203,36 +257,47 @@ def get_next_slot(pool_size=3):
     """
     Returns the next active topic and part to render in round-robin order.
     Format returned: (topic_obj, part_obj, slot_info)
+    Guarantees that already-rendered parts recorded in the immutable ledger
+    (data/rendered_parts_history.json) are NEVER repeated!
     """
-    state = load_series_state()
-    ensure_active_pool(state, pool_size=pool_size)
+    max_check_loops = pool_size * 6
+    for _ in range(max_check_loops):
+        state = load_series_state()
+        ensure_active_pool(state, pool_size=pool_size)
 
-    active = state["active_topics"]
-    if not active:
-        raise RuntimeError("No active topics available")
+        active = state["active_topics"]
+        if not active:
+            raise RuntimeError("No active topics available")
 
-    # Round-robin index safely wrapped
-    idx = state.get("current_index", 0) % len(active)
-    topic = active[idx]
+        # Round-robin index safely wrapped
+        idx = state.get("current_index", 0) % len(active)
+        topic = active[idx]
+        current_part_num = topic.get("current_part", 1)
 
-    current_part_num = topic.get("current_part", 1)
-    # Find the part object
-    part = next((p for p in topic["parts"] if p["part_num"] == current_part_num), None)
-    if not part:
-        # All parts done for this topic
-        part = topic["parts"][-1]
+        # CHECK IMMUTABLE LEDGER: Was this part already rendered?
+        if is_part_already_rendered(topic["topic_id"], current_part_num):
+            print(f"[SeriesManager] 🛡️ Guard: '{topic['topic_title']}' Part {current_part_num} is already in ledger! Auto-advancing...")
+            mark_slot_completed(topic["topic_id"], current_part_num)
+            continue
 
-    slot_info = {
-        "topic_index": idx,
-        "topic_id": topic["topic_id"],
-        "topic_title": topic["topic_title"],
-        "current_part": current_part_num,
-        "total_parts": topic["total_parts"],
-        "active_pool_count": len(active),
-        "is_final_part": current_part_num >= topic["total_parts"]
-    }
+        # Find the part object
+        part = next((p for p in topic["parts"] if p["part_num"] == current_part_num), None)
+        if not part:
+            part = topic["parts"][-1]
 
-    return topic, part, slot_info
+        slot_info = {
+            "topic_index": idx,
+            "topic_id": topic["topic_id"],
+            "topic_title": topic["topic_title"],
+            "current_part": current_part_num,
+            "total_parts": topic["total_parts"],
+            "active_pool_count": len(active),
+            "is_final_part": current_part_num >= topic["total_parts"]
+        }
+
+        return topic, part, slot_info
+
+    raise RuntimeError("Failed to resolve next slot: all topics/parts in rotation loop were already rendered")
 
 
 def mark_slot_completed(topic_id, part_num, video_dir=None):
@@ -255,16 +320,23 @@ def mark_slot_completed(topic_id, part_num, video_dir=None):
 
     if matched_topic_idx is None:
         print(f"[SeriesManager] Warning: Topic {topic_id} not found in active topics")
+        # Still record to immutable ledger if possible
+        record_rendered_part(topic_id, part_num, video_dir=video_dir)
         return state
 
     topic = active[matched_topic_idx]
+    part_title = ""
     # Mark part complete
     for p in topic["parts"]:
         if p["part_num"] == part_num:
             p["completed"] = True
             p["rendered_at"] = str(datetime.datetime.now())
+            part_title = p.get("part_title", "")
             if video_dir:
                 p["video_dir"] = str(video_dir)
+
+    # 📝 Record into the immutable ledger so it can NEVER be repeated
+    record_rendered_part(topic_id, part_num, topic_title=topic.get("topic_title", ""), part_title=part_title, video_dir=video_dir)
 
     topic["current_part"] = part_num + 1
 

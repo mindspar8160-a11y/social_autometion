@@ -227,21 +227,29 @@ Ek kahani ko __N__ chhote scenes me todo. Har scene ek torn paper card jaisa dik
 
 __CONTEXT__
 
-ASLI KATHA NIYAM (REAL STORYTELLING - NO FAKE TRAILER DIALOGUES):
-- KABHI BHI movie teaser ya trailer jaise toote-foote phrases mat likho (jaise "आँखें खोलें", "कदम बढ़ाएँ", "सामंत की हँसी"). Ye trailer nahi, balki ek asli katha hai!
-- Scene 1 me seedha KAHANI KA VISHAY / NAYAK / MANDIR ka naam aur sthan bolo taaki viewer ko pehle 2 second me saaf pata chale ki KAHANI KISKI HAI!
-- Scene 2 se Scene 6 tak katha ko natural chronological kram me sunao: Sthan/Patra parichay -> Sankat/Atyachar -> Divya Chamatkar -> Shiksha.
-- AAKHRI SCENE ME VOICE CALL-TO-ACTION: Voiceover me KABHI BHI "bhaag 2" ya "part 2" mat bolo! Voice hamesha bolegi: "dekhiye agle video mein!" (e.g. "...lekin iske baad kya hua? Dekhiye agle video mein!").
+PROVEN VIRAL FRAMEWORK (HOOK -> VALUE -> FOLLOW -> OPTIMIZE):
+1. AUDIENCE INTENT:
+   - Hamari audience Sanatan dharm, pauranik rahasya, amar balidan aur divya leelaon ki ASLI sachhai janana chahti hai.
+   - Shallow teaser ya fake trailer phrases ("आँखें खोलें", "कदम बढ़ाएँ") KABHI BHI mat likho! Seedha sacchi aur pramanik katha shuru karo!
 
-VIRAL HOOK NIYAM (Scene 1 - 21 Hook Formulas):
-- Scene 1 hamesha kind "title" hoga: strictly 0-3 second ka thumb-stopper hook!
-- KABHI BHI boring ya generic shuruat mat karo.
-- Seedha Extreme Stakes ("जब 1 लाख की सुल्तानी सेना के सामने..."), Forbidden Mystery ("काशी का वह गुप्त रहस्य जिसे इतिहास ने छुपाया..."), ya Contrarian Flip se shuru karo!
+2. 4-STAGE RETENTION STRUCTURE:
+   - STAGE 1: HOOK (Scenes 0-1 / 0-4s):
+     * VISUAL HOOK: Scene 1 me striking paper cutout (jaise Bharat ka naksha zoom, talwaron ka takraav, ya pavitra gayen).
+     * VERBAL HOOK: Damdaar verbal aagaz jisme katha ke nayak/sthan ka naam ho (jaise '1660 mein Maharashtra ke Pawankhind mein, Bajiprabhu Deshpande ne...').
+     * ZERO DUPLICATION: Hook aur Scene 1 ki pehli line me koi sthan ya shabd repeat nahi hona chahiye!
+   - STAGE 2: VALUE & ENGAGEMENT (Scenes 2-4 / 5-25s):
+     * Asli katha ka sequential vistar: Vachan, dharam-sankat, ya asuri atyachar.
+     * High narrative velocity: Har agla scene pichhle scene ka natural kram (Cause & Effect) ho.
+   - STAGE 3: FOLLOW & RETENTION (Scenes 5-6 / 26-38s):
+     * Climax buildup: Sankat charam par pahunchta hai, aakhri ghadi ka sangharsh.
+   - STAGE 4: OPTIMIZE & CLEAR CTA (Final Scene / 38-42s):
+     * Non-final part: Clear Cliffhanger Bridge: "...Lekin aage kya hua? Dekhiye agle episode mein!" (Screen Stamp: 'अगला भाग').
+     * Final part: Divya chamatkar aur katha ka antim sandesh (Screen Stamp: 'कथा सम्पूर्ण').
 
-NARRATIVE BRIDGES & STORY SPINE (SEAMLESS SCENE CONTINUITY):
-- KABHI BHI toote hue ya alag-thalag cards mat banao!
-- Har agla scene pichhle scene ka natural kram (Cause-and-Effect / Karana aur Parinaam) hona chahiye.
-- Scene narration me natural connectors use karo: 'लेकिन तभी...', 'और फिर...', 'पिता के वचनों की मर्यादा के लिए...', 'तभी अचानक...', 'इसलिए...'
+3. THE 3 CORE PILLARS:
+   - VISUAL HOOK: Scene 1 me striking visual.
+   - VERBAL HOOK: High-retention opening speech without robotic repetition.
+   - CLEAR CTA: Agle episode ke liye strong cliffhanger bridge.
 
 OUTPUT: sirf ek JSON object (koi markdown nahi, koi explanation nahi):
 {
@@ -549,8 +557,13 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                 has_pl = pl_kw.lower() in narr.lower() or geo["name"].lower() in tts_n.lower() or pl_kw.lower() in tts_n.lower()
                 
                 if not (has_st and has_pl):
-                    scenes[0]["narration"] = f"{st_kw} ke {pl_kw} mein, " + narr
-                    scenes[0]["tts_text"] = f"{st_hi} के {geo['name']} में, " + tts_n
+                    if has_pl and not has_st:
+                        # Place is already present in narration, only prepend state
+                        scenes[0]["narration"] = f"{st_kw} ke " + narr
+                        scenes[0]["tts_text"] = f"{st_hi} के " + tts_n
+                    else:
+                        scenes[0]["narration"] = f"{st_kw} ke {pl_kw} mein, " + narr
+                        scenes[0]["tts_text"] = f"{st_hi} के {geo['name']} में, " + tts_n
                 
                 scenes[0]["hit_word"] = st_hi if st_hi in scenes[0].get("tts_text", "") else st_kw
                 scenes[0]["hit2_word"] = pl_kw if pl_kw in scenes[0].get("tts_text", "") else geo["name"].split()[0]
@@ -561,14 +574,39 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                         later_sc["kind"] = "card"
                         later_sc["text"] = re.sub(r"\s*→\s*", " ", later_sc.get("text", "")).strip()
 
-            # Clean any repeated consecutive phrases in scene 0 narration / tts_text
-            if len(scenes) > 0:
-                for k in ["narration", "tts_text"]:
-                    val = scenes[0].get(k, "")
-                    if val and "," in val:
-                        chunks = [c.strip() for c in val.split(",") if c.strip()]
-                        if len(chunks) >= 2 and chunks[0].lower() == chunks[1].lower():
-                            scenes[0][k] = ", ".join(chunks[1:])
+            def _clean_stutters(text: str) -> str:
+                if not text:
+                    return ""
+                # Remove duplicate adjacent 1 or 2-word phrases in English or Devanagari (e.g. "Amarkantak mein, Amarkantak mein")
+                t = re.sub(r'([\u0900-\u097F\w]+(?:\s+[\u0900-\u097F\w]+)?)\s*[,]?\s+\1', r'\1', text, flags=re.IGNORECASE)
+                # Remove duplicate particles "mein mein", "में में"
+                t = re.sub(r'(?i)\b(mein|के|ke)\s*[,]?\s+\1\b', r'\1', t)
+                t = re.sub(r'(में)\s*[,]?\s+\1', r'\1', t)
+                # Clean consecutive commas or excessive spaces
+                t = re.sub(r'\s*,\s*,\s*', ', ', t)
+                return re.sub(r'\s+', ' ', t).strip(' ,')
+
+            # Clean any repeated consecutive phrases in all scenes
+            for sc in scenes:
+                sc["narration"] = _clean_stutters(sc.get("narration", ""))
+                sc["tts_text"] = _clean_stutters(sc.get("tts_text", sc["narration"]))
+
+            # Clean any accidental repetition where Scene 1 starts with same words as Scene 0
+            if len(scenes) > 1:
+                s0_words = [w.lower() for w in re.findall(r'[\w\u0900-\u097F]+', scenes[0].get("narration", ""))]
+                s1_narr = scenes[1].get("narration", "")
+                s1_words = [w.lower() for w in re.findall(r'[\w\u0900-\u097F]+', s1_narr)]
+                if len(s0_words) >= 3 and len(s1_words) >= 4 and s0_words[:3] == s1_words[:3]:
+                    comma_pos = s1_narr.find(",")
+                    if comma_pos != -1 and comma_pos < len(s1_narr) - 5:
+                        scenes[1]["narration"] = s1_narr[comma_pos + 1:].strip()
+                s1_tts = scenes[1].get("tts_text", "")
+                s0_tts_words = [w.lower() for w in re.findall(r'[\w\u0900-\u097F]+', scenes[0].get("tts_text", ""))]
+                s1_tts_words = [w.lower() for w in re.findall(r'[\w\u0900-\u097F]+', s1_tts)]
+                if len(s0_tts_words) >= 3 and len(s1_tts_words) >= 4 and s0_tts_words[:3] == s1_tts_words[:3]:
+                    comma_pos = s1_tts.find(",")
+                    if comma_pos != -1 and comma_pos < len(s1_tts) - 5:
+                        scenes[1]["tts_text"] = s1_tts[comma_pos + 1:].strip()
 
             scenes[0]["stamp"] = f"भाग {part_num}"
             if not is_final:
