@@ -196,6 +196,7 @@ GEO_LORE = {
     "ayodhya": {"state": "Uttar Pradesh", "district": "Ayodhya", "name": "अयोध्या धाम", "lat": 26.7922, "lon": 82.1998, "aliases": ["अयोध्या", "ayodhya"]},
     "kurukshetra": {"state": "Haryana", "district": "Kurukshetra", "name": "कुरुक्षेत्र", "lat": 29.9695, "lon": 76.8783, "aliases": ["कुरुक्षेत्र", "kurukshetra"]},
     "hampi": {"state": "Karnataka", "district": "Vijayanagara", "name": "हम्पी विजयनगर", "lat": 15.3350, "lon": 76.4600, "aliases": ["हम्पी", "hampi", "विजयनगर"]},
+    "khodiyar": {"state": "Gujarat", "district": "Bhavnagar", "name": "राजपरा खोडियार धाम", "lat": 21.7645, "lon": 72.1519, "aliases": ["खोडियार", "khodiyar", "मगरमच्छ"]},
 }
 
 
