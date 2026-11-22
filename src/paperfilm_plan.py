@@ -198,6 +198,7 @@ GEO_LORE = {
     "hampi": {"state": "Karnataka", "district": "Vijayanagara", "name": "हम्पी विजयनगर", "lat": 15.3350, "lon": 76.4600, "aliases": ["हम्पी", "hampi", "विजयनगर"]},
     "khodiyar": {"state": "Gujarat", "district": "Bhavnagar", "name": "राजपरा खोडियार धाम", "lat": 21.7645, "lon": 72.1519, "aliases": ["खोडियार", "khodiyar", "मगरमच्छ"]},
     "vimala": {"state": "Odisha", "district": "Puri", "name": "विमला शक्तिपीठ (पुरी)", "lat": 19.8049, "lon": 85.8179, "aliases": ["विमला", "vimala", "रोहिणी कुंड", "rohini"]},
+    "godavari": {"state": "Andhra Pradesh", "district": "East Godavari", "name": "कोटिलिंगेश्वर (राजमहेंद्रवरम)", "lat": 16.9891, "lon": 81.7770, "aliases": ["गोदावरी", "godavari", "राजमहेंद्रवरम", "rajahmundry", "कोटिलिंगेश्वर", "kotilingeshwar", "सर्वशैल"]},
 }
 
 
@@ -511,17 +512,34 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
         plan = clean_plan(plan, seed)
         scenes = plan["scenes"]
 
-        # Map scene: only enrich if script naturally created a map scene
+        # Smart Map Detection: JAHAN KISI JAGAH KA NAAM AAYE, WAHAN MAP SCENE AAYEGA!
         if geo:
-            for sc in scenes:
+            map_scene_idx = None
+            for idx, sc in enumerate(scenes):
                 if sc.get("kind") == "map":
-                    sc["state"] = geo["state"]
-                    if geo.get("district"):
-                        sc["district"] = geo["district"]
-                    sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
-                    sc["text"] = f"भारत → {st_hi} → {geo['name']}"
-                    sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
-                    sc["hit2_word"] = geo["name"].split()[0]
+                    map_scene_idx = idx
+                    break
+            if map_scene_idx is None:
+                aliases = [geo["name"].lower()] + [al.lower() for al in geo.get("aliases", [])] + [geo["state"].lower(), st_hi.lower()]
+                for idx, sc in enumerate(scenes):
+                    sc_text = (sc.get("narration", "") + " " + sc.get("tts_text", "") + " " + sc.get("text", "")).lower()
+                    if any(a in sc_text for a in aliases if len(a) > 2):
+                        map_scene_idx = idx
+                        break
+            if map_scene_idx is not None:
+                for idx, sc in enumerate(scenes):
+                    if idx == map_scene_idx:
+                        sc["kind"] = "map"
+                        sc["state"] = geo["state"]
+                        if geo.get("district"):
+                            sc["district"] = geo["district"]
+                        sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                        sc["text"] = f"भारत → {st_hi} → {geo['name']}"
+                        sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
+                        sc["hit2_word"] = geo["name"].split()[0]
+                    elif sc.get("kind") == "map":
+                        sc["kind"] = "card"
+                        sc["text"] = re.sub(r"\s*→\s*", " ", sc.get("text", "")).strip()
 
         # STAMPS RULE: Only Scene 0 (Hook) gets 'भाग X' once!
         # Intermediate scenes (1 to N-2) MUST NOT have 'भाग X' or repetitive popups.
@@ -616,17 +634,34 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
             # Enforce series branding on scenes and metadata
             scenes = plan["scenes"]
 
-            # Map scene: only enrich if script naturally created a map scene
+            # Smart Map Detection: JAHAN KISI JAGAH KA NAAM AAYE, WAHAN MAP SCENE AAYEGA!
             if geo:
-                for sc in scenes:
+                map_scene_idx = None
+                for idx, sc in enumerate(scenes):
                     if sc.get("kind") == "map":
-                        sc["state"] = geo["state"]
-                        if geo.get("district"):
-                            sc["district"] = geo["district"]
-                        sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
-                        sc["text"] = f"भारत → {st_hi} → {geo['name']}"
-                        sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
-                        sc["hit2_word"] = geo["name"].split()[0]
+                        map_scene_idx = idx
+                        break
+                if map_scene_idx is None:
+                    aliases = [geo["name"].lower()] + [al.lower() for al in geo.get("aliases", [])] + [geo["state"].lower(), st_hi.lower()]
+                    for idx, sc in enumerate(scenes):
+                        sc_text = (sc.get("narration", "") + " " + sc.get("tts_text", "") + " " + sc.get("text", "")).lower()
+                        if any(a in sc_text for a in aliases if len(a) > 2):
+                            map_scene_idx = idx
+                            break
+                if map_scene_idx is not None:
+                    for idx, sc in enumerate(scenes):
+                        if idx == map_scene_idx:
+                            sc["kind"] = "map"
+                            sc["state"] = geo["state"]
+                            if geo.get("district"):
+                                sc["district"] = geo["district"]
+                            sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                            sc["text"] = f"भारत → {st_hi} → {geo['name']}"
+                            sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
+                            sc["hit2_word"] = geo["name"].split()[0]
+                        elif sc.get("kind") == "map":
+                            sc["kind"] = "card"
+                            sc["text"] = re.sub(r"\s*→\s*", " ", sc.get("text", "")).strip()
 
             def _clean_stutters(text: str) -> str:
                 if not text:
