@@ -236,7 +236,10 @@ PROVEN VIRAL FRAMEWORK (HOOK -> VALUE -> FOLLOW -> OPTIMIZE):
      * Rochak / Vyangya (Intriguing / Sarcastic Contrast): "Wo aam yoddha nahi tha—na talwar, na dhaal, par aakhon me aisi aag ki samne wala tharthara uthe!"
      * Josh / Veer Ras (Heroic thrill): "Jab unhone hunkar bhari, toh dushman ki sena me bhagdhad mach gayi!"
    - PUNCTUATION-DRIVEN EMOTION: TTS aawaz me natural emotion laane ke liye sahi viram-chinh use karo: vismay ke liye `!`, jigyasa ke liye `?`, aur natakiya mod ke liye `—`. (Bracketed tags jaise [whispers] mat likho, balki shabdon se wahi bhav paida karo).
-   - Shallow teaser ya fake trailer phrases ("आँखें खोलें", "कदम बढ़ाएँ") KABHI BHI mat likho! Seedha sacchi aur pramanik katha shuru karo!
+   - KABHI BHI "इसका रहस्य जानिए", "रहस्य जानिए", "जानिए इसका रहस्य", "आँखें खोलें", "कदम बढ़ाएँ" jaise cheap filler phrases mat likho! Kahaani ki asli ghatna, nayak ka naam aur sankat seedha bolo!
+   - KABHI BHI har video ke end me wo ka wo robotic phrase "dekhiye agle episode mein" ya "dekhiye agle bhaag mein" mat bolo!
+   - Non-final parts ka aakhri scene ek SOLID, THRILLING NARRATIVE CLIFFHANGER par khatam ho (jaise: '...aur tabhi samandar se uthi aisi pralayankari lehar, jisne aakash ko hila diya!'). Screen par stamp 'अगला भाग' aayega, par aawaz me kahani ka asli dramatic mod ho!
+   - Final part ka antim scene ek SOLID DIVINE CONCLUSION aur pavitra jaikaare par khatam ho (jaise Shiv katha me: 'बोलिए हर हर महादेव!', Krishna katha me: 'बोलिए जय श्री कृष्ण!').
 
 2. 4-STAGE RETENTION STRUCTURE:
    - STAGE 1: HOOK (Scenes 0-1 / 0-4s):
@@ -249,8 +252,8 @@ PROVEN VIRAL FRAMEWORK (HOOK -> VALUE -> FOLLOW -> OPTIMIZE):
    - STAGE 3: FOLLOW & RETENTION (Scenes 5-6 / 26-38s):
      * Climax buildup: Sankat charam par pahunchta hai, aakhri ghadi ka sangharsh.
    - STAGE 4: OPTIMIZE & CLEAR CTA (Final Scene / 38-42s):
-     * Non-final part: Clear Cliffhanger Bridge: "...Lekin aage kya hua? Dekhiye agle episode mein!" (Screen Stamp: 'अगला भाग').
-     * Final part: Divya chamatkar aur katha ka antim sandesh (Screen Stamp: 'कथा सम्पूर्ण').
+     * Non-final part: Solid Narrative Cliffhanger (Screen Stamp: 'अगला भाग').
+     * Final part: Divya chamatkar aur pavitra antim jaikara (Screen Stamp: 'कथा सम्पूर्ण').
 
 3. THE 3 CORE PILLARS:
    - VISUAL HOOK: Scene 1 me striking visual.
@@ -507,13 +510,13 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
 
     if not is_final:
         part_ctx += (
-            f"3. Aakhri scene ka narration agle video ka suspense dega: '...Lekin aage kya hua? Dekhiye agle video mein!'\n"
-            f"   (DHYAN DEIN: Spoken voice me 'bhaag 2' nahi bolna, STRICTLY 'dekhiye agle video mein' bolna hai!)\n"
+            f"3. Aakhri scene ka narration ek SOLID, DRAMATIC NARRATIVE CLIFFHANGER dega (jaise: '...aur tabhi samandar se uthi ek aisi pralayankari lehar, jisne aakash ko tharthara diya!').\n"
+            f"   (DHYAN DEIN: KABHI BHI 'dekhiye agle episode' ya 'dekhiye agle bhaag' ya 'iska rahasya jaaniye' mat bolo! Sirf kahani ka dramatic mod bolo!)\n"
             f"4. Aakhri scene ka 'stamp' STRICTLY 'अगला भाग' hoga!\n"
         )
     else:
         part_ctx += (
-            f"3. Ye is kahani ka FINAL BHAG hai! Aakhri scene me kahani ka antim divya sandesh aur purnata ho.\n"
+            f"3. Ye is kahani ka FINAL BHAG hai! Aakhri scene me kahani ka antim divya sandesh, purnata aur pavitra jaikara ho (jaise Shiv katha me: 'बोलिए हर हर महादेव!', Krishna katha me: 'बोलिए जय श्री कृष्ण!').\n"
             f"4. Aakhri scene ka 'stamp' 'कथा सम्पूर्ण' hoga.\n"
         )
     part_ctx += (
@@ -616,18 +619,56 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                 scenes[0]["narration"] = re.sub(pat, "", scenes[0].get("narration", ""), flags=re.IGNORECASE).strip()
                 scenes[0]["tts_text"] = re.sub(pat, "", scenes[0].get("tts_text", ""), flags=re.IGNORECASE).strip()
 
+            # Clean cheap filler phrases across all scenes
+            def _clean_fillers(text: str) -> str:
+                if not text:
+                    return ""
+                fillers = [
+                    r"जानिए\s+इसका\s+रहस्य[!।?]?",
+                    r"इसका\s+रहस्य\s+जानिए[!।?]?",
+                    r"रहस्य\s+जानिए[!।?]?",
+                    r"जानिए\s+यह\s+रहस्य[!।?]?",
+                    r"का\s+क्या\s+था\s+रहस्य\?",
+                    r"iska\s+rahasya\s+jaaniye",
+                    r"jaaniye\s+iska\s+rahasya",
+                    r"dekhiye\s+agle\s+(?:episode|video|bha?g)\s*(?:mein|me)?[!।?]?",
+                    r"देखिए\s+अगले\s+(?:एपिसोड|वीडियो|भाग)\s*(?:में)?[!।?]?",
+                    r"lekin\s+aage\s+kya\s+hua\??",
+                    r"लेकिन\s+आगे\s+क्या\s+हुआ\??",
+                ]
+                t = text
+                # Normalize any accidental single "हर महादेव" to "हर हर महादेव"
+                t = re.sub(r'(?<!हर\s)हर\s+महादेव', 'हर हर महादेव', t)
+                t = re.sub(r'(?i)(?<!har\s)har\s+mahadev', 'Har Har Mahadev', t)
+                for f in fillers:
+                    t = re.sub(f, "", t, flags=re.IGNORECASE)
+                return re.sub(r"\s+", " ", t).strip(" ,-—")
+
+            for sc in scenes:
+                sc["narration"] = _clean_fillers(sc.get("narration", ""))
+                sc["tts_text"] = _clean_fillers(sc.get("tts_text", sc["narration"]))
+
             scenes[0]["stamp"] = f"भाग {part_num}"
             if not is_final:
                 scenes[-1]["stamp"] = "अगला भाग"
-                last_narr = scenes[-1].get("narration", "").rstrip(".!| ")
-                last_tts = scenes[-1].get("tts_text", last_narr).rstrip(".!|। ")
-                cliff_hinglish = "Lekin aage kya hua? Dekhiye agle episode mein!"
-                cliff_hindi = "लेकिन आगे क्या हुआ? देखिए अगले एपिसोड में!"
-                if "agle" not in last_narr.lower() and "अगले" not in last_tts:
-                    scenes[-1]["narration"] = f"{last_narr}... {cliff_hinglish}"
-                    scenes[-1]["tts_text"] = f"{last_tts}... {cliff_hindi}"
             else:
                 scenes[-1]["stamp"] = "कथा सम्पूर्ण"
+                # Solid sacred conclusion for final part
+                topic_lower = topic_title.lower()
+                last_tts = scenes[-1].get("tts_text", "")
+                last_narr = scenes[-1].get("narration", "")
+                if any(k in topic_lower for k in ["शिव", "सोमनाथ", "महादेव", "ज्योतिर्लिंग", "shiva", "somnath"]):
+                    last_tts = re.sub(r'(?<!हर\s)हर\s+महादेव', 'हर हर महादेव', last_tts)
+                    last_narr = re.sub(r'(?i)(?<!har\s)har\s+mahadev', 'Har Har Mahadev', last_narr)
+                    if "हर हर महादेव" not in last_tts:
+                        last_tts = f"{last_tts.rstrip('.!|। ')}। बोलिए हर हर महादेव!"
+                        last_narr = f"{last_narr.rstrip('.!| ')}. Boliye Har Har Mahadev!"
+                    scenes[-1]["tts_text"] = last_tts
+                    scenes[-1]["narration"] = last_narr
+                elif any(k in topic_lower for k in ["कृष्ण", "द्वारका", "krishna", "dwarka"]):
+                    if "जय श्री कृष्ण" not in last_tts:
+                        scenes[-1]["tts_text"] = f"{last_tts.rstrip('.!|। ')}। बोलिए जय श्री कृष्ण!"
+                        scenes[-1]["narration"] = f"{last_narr.rstrip('.!| ')}. Boliye Jai Shri Krishna!"
 
             # YouTube Packaging with Series Badges
             clean_part_title = re.sub(r"\s*\|\s*MindSpark.*", "", part.get("part_title") or topic_title).strip()

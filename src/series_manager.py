@@ -97,9 +97,11 @@ PROVEN SHORT-FORM SCRIPTWRITING FRAMEWORK:
    - VERBAL HOOK: Spoken line me hero/sthan ka damdaar aagaz.
    - CLEAR CTA: Agle part ke liye natural suspense bridge.
 
-VOICE ME KABHI BHI "BHAG 2" YA ROBOTIC NUMBER MAT BOLO:
-- Part 1 ya beech ke parts ke aakhri scene me voice hamesha bolegi: "dekhiye agle video mein!" ya "iski poori sacchai dekhiye agle video mein!"
-- KABHI BHI voice me "dekhiye bhaag 2" mat bolo!
+VOICE ME KABHI BHI ROBOTIC YA CHEAP FILLER PHRASES MAT BOLO:
+- KABHI BHI "इसका रहस्य जानिए", "जानिए इसका रहस्य", "रहस्य जानिए" jaise cheap filler phrases mat likho! Seedha sacchi ghatna aur nayak ka sankat bolo.
+- KABHI BHI har video ke end me wo ka wo robotic phrase "dekhiye agle video mein" ya "dekhiye agle episode mein" mat bolo!
+- Part 1 aur Part 2 ka aakhri scene ek SOLID, THRILLING NARRATIVE CLIFFHANGER par khatam ho (jaise: '...aur tabhi samandar se uthi aisi pralayankari lehar, jisne aakash ko hila diya!').
+- Final part ka antim scene ek SOLID DIVINE CONCLUSION par khatam ho (jaise Shiv katha me: 'बोलिए हर हर महादेव!', Krishna katha me: 'बोलिए जय श्री कृष्ण!').
 - KABHI BHI kisi bhi part ke shuru me "पिछले भाग में देखा था" ya dry recap mat likho!
 - Har part ka hook_line ek DAMDAAR CURIOSITY QUESTION (उत्सुकता जगाने वाला सवाल) ho jo audience ko rok le!
 
@@ -112,9 +114,9 @@ OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi backticks nah
     {{
       "part_num": 1,
       "part_title": "Hindi title with emoji (max 50 chars), e.g. 🔥 विशालगढ़ पहुँचने का अंतिम संकल्प",
-      "hook_line": "Scene 1 bolne wala CHOWKANE WALA SAWAL (Curiosity Hook, jaise 'क्या आप जानते हैं कि...'). KABHI BHI 'पिछले भाग में' mat likho!",
+      "hook_line": "Scene 1 bolne wala CHOWKANE WALA SAWAL (Curiosity Hook, jaise 'क्या आप जानते हैं कि...'). KABHI BHI 'पिछले भाग में' ya 'रहस्य जानिए' mat likho!",
       "recap_bridge": "Kahaani ka aage ka natural vistar (KABHI BHI 'पिछले भाग में देखा' mat likho)",
-      "cliffhanger": "Antim scene ka suspense: '...Lekin iske baad jo hua, usne sabko dang kar diya. Dekhiye agle video mein!'",
+      "cliffhanger": "Antim scene ka solid narrative suspense: '...aur tabhi katha ne liya ek aisa mod, jiski kisi ne kalpana nahi ki thi!' (NO 'dekhiye agle episode')",
       "part_summary": "Is part ki detailed story (100-150 words): Patra, sthan, aur concrete ghatnayen jo 7-8 scenes me clearly sunai jayengi."
     }}
   ]
