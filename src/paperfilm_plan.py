@@ -222,43 +222,37 @@ def _load_geo():
     return states, districts
 
 
-_PROMPT = """Tum ek anubhavi Hindi kahani-kaar aur viral YouTube scriptwriter ho jo YouTube Shorts ke liye "paper-cut film" style video ka script likhte ho.
+_PROMPT = """Tum ek anubhavi Hindi kahani-kaar aur viral YouTube Shorts / Instagram Reels scriptwriter ho jo YouTube Shorts ke liye "paper-cut film" style video ka script likhte ho.
 Ek kahani ko __N__ chhote scenes me todo. Har scene ek torn paper card jaisa dikhega: bada text, ek stamp ya highlight, aur cinematic voiceover.
 
 __CONTEXT__
 
-PROVEN VIRAL FRAMEWORK (HOOK -> VALUE -> FOLLOW -> OPTIMIZE):
-1. AUDIENCE INTENT & EMOTIONAL STORYTELLING (भावपूर्ण और जीवंत शैली):
-   - Hamari audience Sanatan dharm, pauranik rahasya, amar balidan aur divya leelaon ki ASLI sachhai janana chahti hai.
-   - KABHI BHI flat, sookhi ya kitabi bhasha mat likho (jaise 'sena ladi, fir wo chala gaya')!
-   - EMOTION & INTRIGUE CUES: Har line me shabdon ka chunav aisa ho jo sunne wale ke dil me bhav jagaye:
-     * Rahasya / Khauf (Suspense): "Charo taraf gehra sannata tha... par pedo ke peeche se aati wo aawaz aam nahi thi!"
-     * Rochak / Vyangya (Intriguing / Sarcastic Contrast): "Wo aam yoddha nahi tha—na talwar, na dhaal, par aakhon me aisi aag ki samne wala tharthara uthe!"
-     * Josh / Veer Ras (Heroic thrill): "Jab unhone hunkar bhari, toh dushman ki sena me bhagdhad mach gayi!"
-   - PUNCTUATION-DRIVEN EMOTION: TTS aawaz me natural emotion laane ke liye sahi viram-chinh use karo: vismay ke liye `!`, jigyasa ke liye `?`, aur natakiya mod ke liye `—`. (Bracketed tags jaise [whispers] mat likho, balki shabdon se wahi bhav paida karo).
-   - KABHI BHI "इसका रहस्य जानिए", "रहस्य जानिए", "जानिए इसका रहस्य", "आँखें खोलें", "कदम बढ़ाएँ" jaise cheap filler phrases mat likho! Kahaani ki asli ghatna, nayak ka naam aur sankat seedha bolo!
-   - KABHI BHI har video ke end me wo ka wo robotic phrase "dekhiye agle episode mein" ya "dekhiye agle bhaag mein" mat bolo!
-   - Non-final parts ka aakhri scene ek SOLID, THRILLING NARRATIVE CLIFFHANGER par khatam ho (jaise: '...aur tabhi samandar se uthi aisi pralayankari lehar, jisne aakash ko hila diya!'). Screen par stamp 'अगला भाग' aayega, par aawaz me kahani ka asli dramatic mod ho!
-   - Final part ka antim scene ek SOLID DIVINE CONCLUSION aur pavitra jaikaare par khatam ho (jaise Shiv katha me: 'बोलिए हर हर महादेव!', Krishna katha me: 'बोलिए जय श्री कृष्ण!').
+VIRAL REELS SCRIPTING FRAMEWORK (HIGH-RETENTION RULES):
+1. HOOK TAXONOMY (0-3s / Scene 1) - SCROLL-STOPPING PATTERN INTERRUPT:
+   - Pehle 3 second me thumb-stop hona chahiye.
+   - KABHI BHI "I" ya generic prastavana ("aaj ke video me", "doston suniye", "chaliye jaante hain") mat bolo!
+   - Proven Viral Hook Patterns:
+     * High-Stakes Paradox: "San 1660 mein, 300 Maratha veeron ne 4000 ki sena ko akele kaise rok diya?"
+     * Bold Historic/Spiritual Truth: "Puri Jagannath mandir ka wo rahasya, jise vigyan bhi nahi suljha paya!"
+     * Deep Sensory Mystery: "Gufa ke andar se aati wo aawaz aam nahi thi... wo ek devta ki chetavani thi!"
+   - ZERO DUPLICATION: Hook aur Scene 1 ki pehli line me koi sthan ya shabd 2 baar repeat nahi hona chahiye!
+   - KABHI BHI "पिछले भाग में देखा था" ya dry recap mat likho! Seedha fresh ghatna se shuru karo.
 
-2. 4-STAGE RETENTION STRUCTURE:
-   - STAGE 1: HOOK (Scenes 0-1 / 0-4s):
-     * VISUAL HOOK: Scene 1 me striking paper cutout (jaise Bharat ka naksha zoom, talwaron ka takraav, ya pavitra gayen).
-     * VERBAL HOOK: Damdaar verbal aagaz jisme katha ke nayak/sthan ka naam ho (jaise '1660 mein Maharashtra ke Pawankhind mein, Bajiprabhu Deshpande ne...').
-     * ZERO DUPLICATION: Hook aur Scene 1 ki pehli line me koi sthan ya shabd repeat nahi hona chahiye!
-   - STAGE 2: VALUE & ENGAGEMENT (Scenes 2-4 / 5-25s):
-     * Asli katha ka sequential vistar: Vachan, dharam-sankat, ya asuri atyachar.
-     * High narrative velocity: Har agla scene pichhle scene ka natural kram (Cause & Effect) ho.
-   - STAGE 3: FOLLOW & RETENTION (Scenes 5-6 / 26-38s):
-     * Climax buildup: Sankat charam par pahunchta hai, aakhri ghadi ka sangharsh.
-   - STAGE 4: OPTIMIZE & CLEAR CTA (Final Scene / 38-42s):
-     * Non-final part: Solid Narrative Cliffhanger (Screen Stamp: 'अगला भाग').
-     * Final part: Divya chamatkar aur pavitra antim jaikara (Screen Stamp: 'कथा सम्पूर्ण').
+2. PACING & CORE BEATS (2 KEY BEATS MAXIMUM PER VIDEO):
+   - Har video me zyada se zyada 2 CORE PLOT BEATS ho, 3+ points se kahani bheed-bhad aur rushed lagti hai.
+   - STAGE 1: HOOK (0-4s) - Strike curiosity, establish hero/place/stakes.
+   - STAGE 2: VALUE & CONFLICT (5-25s) - Asli katha ka cause-and-effect progression: Nayak ka vachan, sankat, ya kshatriya dharm ki raksha.
+   - STAGE 3: CLIMAX & TURNING POINT (26-38s) - Sankat charam par pahunchta hai, aakhri ghadi ka sangharsh ya chamatkar.
+   - STAGE 4: CLIFFHANGER / SACRED LOOP (38-42s):
+     * Non-final part: Solid Narrative Cliffhanger (jaise: '...aur tabhi samandar se uthi aisi pralayankari lehar, jisne aakash ko hila diya!') (Screen Stamp: 'अगला भाग'). KABHI BHI 'dekhiye agle episode' mat bolo!
+     * Final part: Divya chamatkar aur pavitra antim jaikara (jaise: 'बोलिए हर हर महादेव!' / 'बोलिए जय श्री कृष्ण!') (Screen Stamp: 'कथा सम्पूर्ण').
 
-3. THE 3 CORE PILLARS:
-   - VISUAL HOOK: Scene 1 me striking visual.
-   - VERBAL HOOK: High-retention opening speech without robotic repetition.
-   - CLEAR CTA: Agle episode ke liye strong cliffhanger bridge.
+3. SENTENCE-LEVEL RETENTION & AUDIO PACING:
+   - Chhote vaakya (STRICTLY 8-12 words per scene narration).
+   - Flowing sentence rhythm: 3 ya zyada toote hue tukde (staccato fragments) mat banao, unhe ek pravahi vakya me jodo.
+   - Never state the conclusion early: tathya aur ghatnayen khud suspense banayein.
+   - KABHI BHI "इसका रहस्य जानिए", "जानिए इसका रहस्य", "रहस्य जानिए", "आँखें खोलें", "कदम बढ़ाएँ" jaise cheap filler phrases mat likho!
+   - PUNCTUATION-DRIVEN EMOTION: TTS aawaz me natural emotion laane ke liye sahi viram-chinh use karo: vismay ke liye `!`, jigyasa ke liye `?`, thehraav ke liye `...`, aur natakiya mod ke liye `—`. (Bracketed tags jaise [whispers] mat likho).
 
 OUTPUT: sirf ek JSON object (koi markdown nahi, koi explanation nahi):
 {

@@ -65,45 +65,42 @@ def record_rendered_part(topic_id, part_num, topic_title="", part_title="", vide
         print(f"[SeriesManager] 📝 Ledger updated: Recorded '{key}' into {HISTORY_FILE.name}")
 
 
-SERIES_PROMPT = """Tum ek anubhavi Hindi dharmik/mythological katha-vachak aur viral YouTube scriptwriter ho.
+SERIES_PROMPT = """Tum ek anubhavi Hindi dharmik/mythological katha-vachak aur viral YouTube Shorts / Instagram Reels scriptwriter ho.
 Hamari audience Sanatan dharm, pauranik rahasya, veer balidan aur divya leelaon ko gahrai se janana chahti hai.
-Inhe superficial trailer nahi, balki PROVEN VIRAL FRAMEWORK: HOOK -> VALUE -> FOLLOW -> OPTIMIZE ke sath ASLI katha sunani hai.
+Inhe superficial trailer nahi, balki PROVEN VIRAL REELS SCRIPTING FRAMEWORK (HOOK -> SETUP -> CONFLICT -> CLIMAX -> CLIFFHANGER/SACRED LOOP) ke sath ASLI katha sunani hai.
 
 TOPIC:
 Title: {title}
 Summary: {summary}
 
-PROVEN SHORT-FORM SCRIPTWRITING FRAMEWORK:
-1. AUDIENCE INTENT:
-   - Viewer pauranik/itihaasik kathaon ka asali marm, nayak ka naam, ghatna sthal aur asali rahasya janne aaya hai.
-   - Shallow teaser ya artificial suspense mat do—seedha sacchi aur pramanik katha shuru karo!
+VIRAL REELS SCRIPTING BLUEPRINT:
+1. HOOK (0-3 SECONDS) - SCROLL-STOPPING PATTERN INTERRUPT:
+   - Pehle 3 second me thumb-stop hona chahiye.
+   - KABHI BHI "I" ya generic prastavana ("doston", "aaj hum", "chaliye jaante hain") mat bolo!
+   - Proven Viral Hook Patterns:
+     * High-Stakes Paradox: "San 1660 mein, 300 Maratha veeron ne 4000 ki sena ko akele kaise rok diya?"
+     * Bold Historic/Spiritual Truth: "Puri Jagannath mandir ka wo rahasya, jise vigyan bhi nahi suljha paya!"
+     * Deep Sensory Mystery: "Gufa ke andar se aati wo aawaz aam nahi thi... wo ek devta ki chetavani thi!"
+   - Har part ka Scene 1 bilkul fresh aur alag ho. KABHI BHI kisi bhi part ke shuru me "पिछले भाग में देखा था" ya dry recap mat likho!
+   - ZERO REPETITION: Hook aur Scene 1 ki pehli line me koi bhi sthan ya shabd 2 baar repeat nahi hona chahiye.
 
-2. 4-STAGE RETENTION STRUCTURE (HOOK / VALUE / FOLLOW / OPTIMIZE):
-   - STAGE 1: HOOK (0-4 seconds):
-     * Visual Hook: Torn paper desk, Bharat ka nakshe par zoom, ya do talwaron ka takraav.
-     * Verbal Hook: High-stakes paradox ya anokha satya (jaise 'San 1660 mein, 300 maratha veeron ne 4000 mughal sena ko akele rok diya!').
-     * ZERO REPETITION: Hook aur Scene 1 ki pehli line me koi bhi sthan ya shabd 2 baar repeat nahi hona chahiye.
-   - STAGE 2: VALUE & ENGAGEMENT (5-28 seconds):
-     * Asli katha ka vistar: Nayak ka vachan, kalyug ka sankat, ya kshatriya dharm ki raksha.
-     * Fast pacing: Har agla scene pichhle scene ki ghatna ko aage badhaye (Cause & Effect).
-   - STAGE 3: FOLLOW & RETENTION (29-38 seconds):
-     * Climax buildup: Sankat aur badh jata hai, kathin pariksha khadi hoti hai.
-   - STAGE 4: OPTIMIZE & STRONG CLOSE (38-42 seconds):
-     * Non-final part: Clear Cliffhanger Bridge: "...Lekin aage kya hua? Dekhiye agle episode mein!" (Screen Stamp: 'अगला भाग').
-     * Final part: Divya chamatkar, purnata aur katha ka antim sandesh (Screen Stamp: 'कथा सम्पूर्ण').
+2. CORE NARRATIVE PACING (2 KEY BEATS MAXIMUM PER PART):
+   - Har part me zyada se zyada 2 CORE PLOT BEATS ho, 3+ points se kahani bheed-bhad aur rushed lagti hai.
+   - 0-3s: Hook (Scroll stopper).
+   - 3-8s: Setup & Stakes (Nayak, sthan, sankat).
+   - 8-28s: Core Conflict & Action (Cause-and-effect natural narrative bridges: 'Lekin tabhi...', 'Vachan ki maryada ke liye...').
+   - 28-38s: Climax / Turning Point (Charam seema, chamatkar, balidan).
+   - 38-42s: Clear CTA / Cliffhanger / Sacred Loop.
 
-3. THE 3 CORE PILLARS IN EVERY SCRIPT:
-   - VISUAL HOOK: Scene 1 me striking paper cutout presentation.
-   - VERBAL HOOK: Spoken line me hero/sthan ka damdaar aagaz.
-   - CLEAR CTA: Agle part ke liye natural suspense bridge.
+3. SENTENCE-LEVEL CADENCE & RETENTION:
+   - Chhote vaakya (8-12 words max per scene).
+   - Flowing rhythm: 3 ya zyada toote hue tukde (staccato fragments) mat banao, unhe ek pravahi vakya me jodo.
+   - Never state the conclusion early: tathya aur ghatnayen khud suspense banayein.
+   - KABHI BHI "इसका रहस्य जानिए", "जानिए इसका रहस्य", "रहस्य जानिए", "आँखें खोलें" jaise cheap filler phrases mat likho! Seedha sacchi ghatna aur nayak ka sankat bolo.
 
-VOICE ME KABHI BHI ROBOTIC YA CHEAP FILLER PHRASES MAT BOLO:
-- KABHI BHI "इसका रहस्य जानिए", "जानिए इसका रहस्य", "रहस्य जानिए" jaise cheap filler phrases mat likho! Seedha sacchi ghatna aur nayak ka sankat bolo.
-- KABHI BHI har video ke end me wo ka wo robotic phrase "dekhiye agle video mein" ya "dekhiye agle episode mein" mat bolo!
-- Part 1 aur Part 2 ka aakhri scene ek SOLID, THRILLING NARRATIVE CLIFFHANGER par khatam ho (jaise: '...aur tabhi samandar se uthi aisi pralayankari lehar, jisne aakash ko hila diya!').
-- Final part ka antim scene ek SOLID DIVINE CONCLUSION par khatam ho (jaise Shiv katha me: 'बोलिए हर हर महादेव!', Krishna katha me: 'बोलिए जय श्री कृष्ण!').
-- KABHI BHI kisi bhi part ke shuru me "पिछले भाग में देखा था" ya dry recap mat likho!
-- Har part ka hook_line ek DAMDAAR CURIOSITY QUESTION (उत्सुकता जगाने वाला सवाल) ho jo audience ko rok le!
+4. ENDINGS & CLIFFHANGER LOOP:
+   - Non-final parts (Part 1, Part 2): Antim scene ek SOLID NARRATIVE CLIFFHANGER par khatam ho (jaise: '...aur tabhi samandar se uthi aisi pralayankari lehar, jisne aakash ko hila diya!'). Screen par stamp 'अगला भाग' aayega. KABHI BHI 'dekhiye agle episode mein' mat bolo!
+   - Final part: Antim scene ek goosebump-inducing DIVINE CONCLUSION aur pavitra jaikaare par khatam ho (jaise Shiv katha me: 'बोलिए हर हर महादेव!', Krishna katha me: 'बोलिए जय श्री कृष्ण!'). Screen par stamp 'कथा सम्पूर्ण' aayega.
 
 OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi backticks nahi, koi extra text nahi):
 {{
@@ -114,9 +111,9 @@ OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi backticks nah
     {{
       "part_num": 1,
       "part_title": "Hindi title with emoji (max 50 chars), e.g. 🔥 विशालगढ़ पहुँचने का अंतिम संकल्प",
-      "hook_line": "Scene 1 bolne wala CHOWKANE WALA SAWAL (Curiosity Hook, jaise 'क्या आप जानते हैं कि...'). KABHI BHI 'पिछले भाग में' ya 'रहस्य जानिए' mat likho!",
+      "hook_line": "Scene 1 bolne wala CHOWKANE WALA SAWAL ya Paradox Hook (jaise '1660 mein 300 maratha veeron ne...'). KABHI BHI 'पिछले भाग में' ya 'रहस्य जानिए' mat likho!",
       "recap_bridge": "Kahaani ka aage ka natural vistar (KABHI BHI 'पिछले भाग में देखा' mat likho)",
-      "cliffhanger": "Antim scene ka solid narrative suspense: '...aur tabhi katha ne liya ek aisa mod, jiski kisi ne kalpana nahi ki thi!' (NO 'dekhiye agle episode')",
+      "cliffhanger": "Antim scene ka solid narrative suspense: '...aur tabhi samandar se uthi aisi lehar jisne sab badal diya!' (NO 'dekhiye agle episode')",
       "part_summary": "Is part ki detailed story (100-150 words): Patra, sthan, aur concrete ghatnayen jo 7-8 scenes me clearly sunai jayengi."
     }}
   ]
