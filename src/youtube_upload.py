@@ -121,7 +121,7 @@ def approve(d, dry_run=False):
     book_title = meta.get("book", d.name)
     video_url = f"https://youtu.be/{vid}" if vid and vid != "dry_run_video_id" else "Archived"
     append_completed_book(book_title, meta.get("author", ""), "Productivity & Wisdom", video_url)
-    shutil.rmtree(d, ignore_errors=True)
+    # Keep directory intact so downstream uploaders (e.g. Buffer Instagram) and artifacts can access final.mp4
     return vid
 
 if __name__ == "__main__":

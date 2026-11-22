@@ -18,7 +18,7 @@ import sys
 import json
 import time
 from pathlib import Path
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional, Dict, Any, Tuple, List
 
 import requests
 
@@ -84,7 +84,6 @@ def upload_temp_video(video_path: Path) -> str:
             data = r.json()
             raw_url = data.get("data", {}).get("url", "")
             if raw_url:
-                # Convert https://tmpfiles.org/12345/video.mp4 -> https://tmpfiles.org/dl/12345/video.mp4
                 dl_url = raw_url.replace("tmpfiles.org/", "tmpfiles.org/dl/")
                 print(f"[Buffer] Temporary public video URL ready via tmpfiles: {dl_url}")
                 return dl_url
@@ -201,81 +200,74 @@ def publish_reel(api_key: str, channel_id: str, video_url: str, caption: str) ->
 
     create_data = result.get("data", {}).get("createPost", {})
     if "message" in create_data:
-        # MutationError
         raise RuntimeError(f"Buffer Mutation Error: {create_data['message']}")
 
     post_info = create_data.get("post", {})
     return post_info
 
 
-def find_latest_output_dir(base_dir: Optional[str] = None) -> Optional[Path]:
-    out_dir = Path(base_dir) if base_dir else (ROOT / "data" / "output")
-    if not out_dir.exists():
-        return None
-    dirs = [d for d in out_dir.iterdir() if d.is_dir() and (d / "final.mp4").exists()]
-    if not dirs:
-        return None
-    dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
-    return dirs[0]
+def find_candidate_dirs(args: List[str]) -> List[Path]:
+    """Finds all output directories containing final.mp4."""
+    candidates = []
+    # 1. From passed args
+    for a in args:
+        p = Path(a)
+        if p.is_dir() and (p / "final.mp4").exists():
+            candidates.append(p)
+        elif p.is_file() and p.name.endswith(".mp4") and p.exists():
+            candidates.append(p.parent)
+
+    if candidates:
+        return candidates
+
+    # 2. Check data/output
+    out_dir = ROOT / "data" / "output"
+    if out_dir.exists():
+        dirs = [d for d in out_dir.iterdir() if d.is_dir() and (d / "final.mp4").exists()]
+        if dirs:
+            dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
+            return [dirs[0]]
+
+    # 3. Check data/work
+    work_dir = ROOT / "data" / "work"
+    if work_dir.exists():
+        dirs = [d for d in work_dir.iterdir() if d.is_dir() and (d / "final.mp4").exists()]
+        if dirs:
+            dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
+            return [dirs[0]]
+
+    return []
 
 
-def main():
-    api_key = (os.environ.get("BUFFER_API_KEY") or "").strip().strip('"').strip("'")
-    if not api_key:
-        print("[Buffer] ℹ️ BUFFER_API_KEY is not set in environment or GitHub Secrets.")
-        print("[Buffer] To enable 100% automated Instagram Reel uploads:")
-        print("  1. Connect Instagram at https://buffer.com")
-        print("  2. Get API key from https://publish.buffer.com/settings/api")
-        print("  3. Add BUFFER_API_KEY to your GitHub Repository Secrets.")
-        print("[Buffer] Skipping Instagram upload for this run.")
-        sys.exit(0)
-
-    # Find video
-    target_dir = None
-    if len(sys.argv) > 1 and sys.argv[1]:
-        p = Path(sys.argv[1])
-        if p.is_file() and p.name.endswith(".mp4"):
-            video_file = p
-            target_dir = p.parent
-        elif p.is_dir():
-            target_dir = p
-            video_file = p / "final.mp4"
-        else:
-            target_dir = find_latest_output_dir(sys.argv[1])
-            video_file = (target_dir / "final.mp4") if target_dir else None
-    else:
-        target_dir = find_latest_output_dir()
-        video_file = (target_dir / "final.mp4") if target_dir else None
-
-    if not video_file or not video_file.exists():
-        print("[Buffer] ❌ No final.mp4 video file found to upload.")
-        sys.exit(1)
+def upload_directory(d: Path, api_key: str, channel_id: str, channel_name: str):
+    video_file = d / "final.mp4"
+    if not video_file.exists():
+        return
 
     # Build Caption (Title + Description + Hashtags)
     title = ""
     desc = ""
     tags = []
-    if target_dir:
-        meta_file = target_dir / "meta.json"
-        plan_file = target_dir / "plan.json"
-        if meta_file.exists():
-            try:
-                m = json.loads(meta_file.read_text(encoding="utf-8"))
-                y = m.get("youtube", {})
-                title = y.get("title", "")
-                desc = y.get("description", "")
-                tags = y.get("tags", [])
-            except Exception:
-                pass
-        elif plan_file.exists():
-            try:
-                p = json.loads(plan_file.read_text(encoding="utf-8"))
-                y = p.get("youtube", {})
-                title = y.get("title", "")
-                desc = y.get("description", "")
-                tags = y.get("tags", [])
-            except Exception:
-                pass
+    meta_file = d / "meta.json"
+    plan_file = d / "plan.json"
+    if meta_file.exists():
+        try:
+            m = json.loads(meta_file.read_text(encoding="utf-8"))
+            y = m.get("youtube", {})
+            title = y.get("title", "")
+            desc = y.get("description", "")
+            tags = y.get("tags", [])
+        except Exception:
+            pass
+    elif plan_file.exists():
+        try:
+            p = json.loads(plan_file.read_text(encoding="utf-8"))
+            y = p.get("youtube", {})
+            title = y.get("title", "")
+            desc = y.get("description", "")
+            tags = y.get("tags", [])
+        except Exception:
+            pass
 
     if not title:
         title = "सनातन गाथा | रहस्य और इतिहास"
@@ -288,36 +280,52 @@ def main():
 
     print("=" * 60)
     print("🚀 STARTING INSTAGRAM REEL UPLOAD VIA BUFFER")
+    print(f"📁 Directory: {d.name}")
     print(f"🎬 Video: {video_file} ({video_file.stat().st_size / (1024*1024):.1f} MB)")
     print(f"📝 Title: {title}")
     print("=" * 60)
 
-    try:
-        # Step 1: Discover channel
-        pref_id = os.environ.get("BUFFER_CHANNEL_ID")
-        channel_id, channel_name = get_instagram_channel(api_key, pref_id)
-        print(f"[Buffer] Found Instagram Channel: {channel_name} (ID: {channel_id})")
+    # Step 1: Upload temporary video
+    public_url = upload_temp_video(video_file)
 
-        # Step 2: Upload temporary video
-        public_url = upload_temp_video(video_file)
+    # Step 2: Publish Reel via Buffer
+    print(f"[Buffer] Publishing Reel to Instagram ({channel_name})...")
+    post = publish_reel(api_key, channel_id, public_url, caption)
+    post_id = post.get("id", "ok")
+    print(f"🎉 SUCCESS! Instagram Reel published successfully via Buffer! (Post ID: {post_id})")
 
-        # Step 3: Publish Reel via Buffer
-        print("[Buffer] Publishing Reel to Instagram via Buffer API...")
-        post = publish_reel(api_key, channel_id, public_url, caption)
-        post_id = post.get("id", "ok")
-        print(f"🎉 SUCCESS! Instagram Reel published successfully via Buffer! (Post ID: {post_id})")
+    _tg_send(
+        f"📸 *Instagram Reel Published!* (via Buffer)\n\n"
+        f"📌 *Title:* {title}\n"
+        f"👤 *Channel:* {channel_name}\n"
+        f"✅ *Status:* Live on Instagram Reels"
+    )
 
-        _tg_send(
-            f"📸 *Instagram Reel Published!* (via Buffer)\n\n"
-            f"📌 *Title:* {title}\n"
-            f"👤 *Channel:* {channel_name}\n"
-            f"✅ *Status:* Live on Instagram Reels"
-        )
-    except Exception as e:
-        err_msg = f"❌ Instagram upload via Buffer failed: {e}"
-        print(f"[Buffer] {err_msg}")
-        _tg_send(err_msg)
-        sys.exit(1)
+
+def main():
+    api_key = (os.environ.get("BUFFER_API_KEY") or "").strip().strip('"').strip("'")
+    if not api_key:
+        print("[Buffer] ℹ️ BUFFER_API_KEY is not set in environment or GitHub Secrets.")
+        print("[Buffer] Skipping Instagram upload for this run.")
+        sys.exit(0)
+
+    candidate_dirs = find_candidate_dirs(sys.argv[1:])
+    if not candidate_dirs:
+        print("[Buffer] ℹ️ No directory with final.mp4 found to upload right now.")
+        sys.exit(0)
+
+    # Discover Instagram Channel once
+    pref_id = os.environ.get("BUFFER_CHANNEL_ID")
+    channel_id, channel_name = get_instagram_channel(api_key, pref_id)
+    print(f"[Buffer] Target Instagram Channel: {channel_name} (ID: {channel_id})")
+
+    for d in candidate_dirs:
+        try:
+            upload_directory(d, api_key, channel_id, channel_name)
+        except Exception as e:
+            err_msg = f"❌ Instagram upload via Buffer failed for {d.name}: {e}"
+            print(f"[Buffer] {err_msg}")
+            _tg_send(err_msg)
 
 
 if __name__ == "__main__":
