@@ -66,55 +66,64 @@ def record_rendered_part(topic_id, part_num, topic_title="", part_title="", vide
 
 
 SERIES_PROMPT = """Tum ek anubhavi Hindi dharmik/mythological katha-vachak aur viral YouTube Shorts / Instagram Reels scriptwriter ho.
-Hamari audience Sanatan dharm, pauranik rahasya, veer balidan aur divya leelaon ko gahrai se janana chahti hai.
-Inhe superficial trailer nahi, balki PROVEN VIRAL REELS SCRIPTING FRAMEWORK (HOOK -> SETUP -> CONFLICT -> CLIMAX -> CLIFFHANGER/SACRED LOOP) ke sath ASLI katha sunani hai.
+Ek poori dharmik/mythological katha ko ek hi baar me shuru se aakhir tak likho, aur use seedha 3 connected sequential parts (Part 1, Part 2, Part 3) me divide karo.
 
 TOPIC:
 Title: {title}
 Summary: {summary}
 
-VIRAL REELS SCRIPTING BLUEPRINT:
-1. HOOK (0-3 SECONDS) - SCROLL-STOPPING PATTERN INTERRUPT:
-   - Pehle 3 second me thumb-stop hona chahiye.
-   - KABHI BHI "I" ya generic prastavana ("doston", "aaj hum", "chaliye jaante hain") mat bolo!
-   - Proven Viral Hook Patterns:
-     * High-Stakes Paradox: "San 1660 mein, 300 Maratha veeron ne 4000 ki sena ko akele kaise rok diya?"
-     * Bold Historic/Spiritual Truth: "Puri Jagannath mandir ka wo rahasya, jise vigyan bhi nahi suljha paya!"
-     * Deep Sensory Mystery: "Gufa ke andar se aati wo aawaz aam nahi thi... wo ek devta ki chetavani thi!"
-   - Har part ka Scene 1 bilkul fresh aur alag ho. KABHI BHI kisi bhi part ke shuru me "पिछले भाग में देखा था" ya dry recap mat likho!
-   - ZERO REPETITION: Hook aur Scene 1 ki pehli line me koi bhi sthan ya shabd 2 baar repeat nahi hona chahiye.
+VIRAL REELS SCRIPTING RULES (ONE CONTINUOUS STORY IN 3 CONNECTED PARTS):
+1. HAR PART me STRICTLY 6 se 7 scenes hone chahiye:
+   - Narration: STRICTLY Hinglish (Hindi in English/Roman alphabet, jaise: 'Shivaji Maharaj Vishalgadh mein khade the', STRICTLY 8-12 words max). KABHI BHI English words mat likho!
+   - tts_text: Shuddh Devanagari Hindi (8-12 words max). Saal aur sankhya shabdon me likho (jaise 1660 ko 'सन सोलह सौ साठ', 300 ko 'तीन सौ').
+   - text: Screen par bada text, Devanagari (3-5 words max).
+   - kind: "title | card | number | quote | list | map".
+   - emotion: "heroic | suspense | conversational | emotional | divine".
+   - accent: "red | teal | mustard | ink".
 
-2. CORE NARRATIVE PACING (2 KEY BEATS MAXIMUM PER PART):
-   - Har part me zyada se zyada 2 CORE PLOT BEATS ho, 3+ points se kahani bheed-bhad aur rushed lagti hai.
-   - 0-3s: Hook (Scroll stopper).
-   - 3-8s: Setup & Stakes (Nayak, sthan, sankat).
-   - 8-28s: Core Conflict & Action (Cause-and-effect natural narrative bridges: 'Lekin tabhi...', 'Vachan ki maryada ke liye...').
-   - 28-38s: Climax / Turning Point (Charam seema, chamatkar, balidan).
-   - 38-42s: Clear CTA / Cliffhanger / Sacred Loop.
+2. PART 1 (Scenes 1 to 6/7) - THE HOOK & CRISIS:
+   - Scene 1: High-stakes curiosity hook (0-3s thumb-stopper, concrete name, year, place, or paradox).
+   - Scenes 2 to 5/6: Katha ki shuruat, nayak ka sankalp, sankat ka aagaz.
+   - Scene AAKHRI (Ending): Ek TEEVRA JIGYASA WALA SAWAL (High-Stakes Curiosity Question Hook) jo viewer ko Part 2 dekhne par majboor kar de! (jaise: '...Lekin kya paatal ka wo vishal jeev amrit dega, ya sab nigaal jayega?'). Stamp: 'अगला भाग'.
 
-3. SENTENCE-LEVEL CADENCE & RETENTION:
-   - Chhote vaakya (8-12 words max per scene).
-   - Flowing rhythm: 3 ya zyada toote hue tukde (staccato fragments) mat banao, unhe ek pravahi vakya me jodo.
-   - Never state the conclusion early: tathya aur ghatnayen khud suspense banayein.
-   - KABHI BHI "इसका रहस्य जानिए", "जानिए इसका रहस्य", "रहस्य जानिए", "आँखें खोलें" jaise cheap filler phrases mat likho! Seedha sacchi ghatna aur nayak ka sankat bolo.
+3. PART 2 (Scenes 1 to 6/7) - THE STRUGGLE & OBSTACLE:
+   - Scene 1: Part 1 ke aakhri sawal se seedha shuru ho (KABHI BHI 'pichhle bhag me dekha tha' mat likho).
+   - Scenes 2 to 5/6: Kathin sangharsh, balidan, ya kathin pariksha (Cause-and-Effect flow).
+   - Scene AAKHRI (Ending): Doosra TEEVRA JIGYASA WALA SAWAL jo viewer ko Part 3 dekhne ke liye uttejit kare! (jaise: '...Lekin kya suryoday se pehle amrit pahunch payega, ya saansein tham jayengi?'). Stamp: 'अगला भाग'.
 
-4. ENDINGS & CLIFFHANGER LOOP:
-   - Non-final parts (Part 1, Part 2): Antim scene ek SOLID NARRATIVE CLIFFHANGER par khatam ho (jaise: '...aur tabhi samandar se uthi aisi pralayankari lehar, jisne aakash ko hila diya!'). Screen par stamp 'अगला भाग' aayega. KABHI BHI 'dekhiye agle episode mein' mat bolo!
-   - Final part: Antim scene ek goosebump-inducing DIVINE CONCLUSION aur pavitra jaikaare par khatam ho (jaise Shiv katha me: 'बोलिए हर हर महादेव!', Krishna katha me: 'बोलिए जय श्री कृष्ण!'). Screen par stamp 'कथा सम्पूर्ण' aayega.
+4. PART 3 (Scenes 1 to 6/7) - THE CLIMAX & SACRED VICTORY:
+   - Scene 1: Antim charam seema aur divya chamatkar ka aagaz.
+   - Scenes 2 to 5/6: Alaukik chamatkar, nayak/mata ki amar vijay, bhakton ko mukti ka aashirwaad.
+   - Scene AAKHRI (Ending): MATA YA DEVTA KA NAAM + KATHA SAMPURNA + DIVINE JAIKARA! (jaise: 'Mata ke is divya chamatkar ne sabko jhuka diya. Boliye Jai Maa Khodiyar!' / 'Boliye Har Har Mahadev!'). Stamp: 'कथा सम्पूर्ण'.
 
-OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi backticks nahi, koi extra text nahi):
+5. BANNED PHRASES:
+   - KABHI BHI 'dekhiye agle video me' ya 'dekhiye agle episode me' mat bolo.
+   - KABHI BHI 'iska rahasya janiye' ya 'aankhein kholein' jaise cheap filler mat likho.
+
+OUTPUT: STRICTLY sirf ek valid JSON object (koi markdown nahi, koi extra text nahi):
 {{
   "topic_title": "{title}",
+  "story_synopsis": "3-4 lines summary",
   "total_parts": 3,
-  "story_synopsis": "3-4 lines Hindi me poori kahani ka saransh",
   "parts": [
     {{
       "part_num": 1,
-      "part_title": "Hindi title with emoji (max 50 chars), e.g. 🔥 विशालगढ़ पहुँचने का अंतिम संकल्प",
-      "hook_line": "Scene 1 bolne wala CHOWKANE WALA SAWAL ya Paradox Hook (jaise '1660 mein 300 maratha veeron ne...'). KABHI BHI 'पिछले भाग में' ya 'रहस्य जानिए' mat likho!",
-      "recap_bridge": "Kahaani ka aage ka natural vistar (KABHI BHI 'पिछले भाग में देखा' mat likho)",
-      "cliffhanger": "Antim scene ka solid narrative suspense: '...aur tabhi samandar se uthi aisi lehar jisne sab badal diya!' (NO 'dekhiye agle episode')",
-      "part_summary": "Is part ki detailed story (100-150 words): Patra, sthan, aur concrete ghatnayen jo 7-8 scenes me clearly sunai jayengi."
+      "part_title": "Hindi title with emoji (max 50 chars)",
+      "hook_line": "Scene 1 hook line",
+      "end_question": "Aakhri scene ka curiosity question",
+      "cliffhanger": "Aakhri scene ka dialogue",
+      "part_summary": "Is part ki detailed story",
+      "scenes": [
+        {{
+          "kind": "title",
+          "emotion": "heroic",
+          "narration": "Hinglish 8-12 words max",
+          "tts_text": "Devanagari 8-12 words max",
+          "text": "Devanagari 3-5 words",
+          "stamp": "भाग 1",
+          "accent": "red"
+        }}
+      ]
     }}
   ]
 }}
@@ -146,13 +155,13 @@ def save_series_state(state):
 
 
 def generate_series_for_topic(topic):
-    """Uses LLM to write a complete story and split into 2-4 sequential parts."""
+    """Uses Groq LLM to write a complete connected story and split into 3 sequential parts upfront."""
     title = topic.get("title", str(topic)) if isinstance(topic, dict) else str(topic)
     summary = topic.get("summary", "") if isinstance(topic, dict) else ""
     topic_id = topic.get("topic") or re.sub(r"[^a-z0-9]+", "_", title.lower()).strip("_")
 
     prompt = SERIES_PROMPT.format(title=title, summary=summary)
-    print(f"[SeriesManager] Generating multi-part series for: '{title}'...")
+    print(f"[SeriesManager] ✍️ Writing full unified 3-part script for: '{title}'...")
 
     for attempt in range(3):
         try:
@@ -164,16 +173,28 @@ def generate_series_for_topic(topic):
             if not isinstance(parts, list) or len(parts) < 2:
                 raise ValueError("Must have at least 2 parts")
 
-            # Validate each part
+            # Validate each part and preserve pre-written scenes
             clean_parts = []
             for idx, p in enumerate(parts):
+                p_scenes = p.get("scenes", [])
+                if not isinstance(p_scenes, list) or len(p_scenes) < 4:
+                    print(f"[SeriesManager] Part {idx+1} has fewer than 4 pre-written scenes, fallback will be used if needed")
+                else:
+                    print(f"[SeriesManager] ✅ Part {idx+1} generated with {len(p_scenes)} pre-written scenes!")
+
+                hook_str = str(p.get("hook_line") or (p_scenes[0].get("tts_text") if p_scenes else "")).strip()
+                end_q = str(p.get("end_question") or (p_scenes[-1].get("tts_text") if p_scenes else "")).strip()
+                cliff_str = str(p.get("cliffhanger") or (p_scenes[-1].get("tts_text") if p_scenes else "")).strip()
+
                 clean_parts.append({
                     "part_num": idx + 1,
                     "part_title": str(p.get("part_title") or f"{title} - भाग {idx + 1}").strip(),
-                    "hook_line": str(p.get("hook_line") or "").strip(),
+                    "hook_line": hook_str,
+                    "end_question": end_q,
                     "recap_bridge": str(p.get("recap_bridge") or "").strip(),
-                    "cliffhanger": str(p.get("cliffhanger") or "").strip(),
+                    "cliffhanger": cliff_str,
                     "part_summary": str(p.get("part_summary") or "").strip(),
+                    "scenes": p_scenes,
                     "completed": False,
                     "rendered_at": None,
                     "video_dir": None
@@ -188,7 +209,7 @@ def generate_series_for_topic(topic):
                 "created_at": str(datetime.datetime.now()),
                 "parts": clean_parts
             }
-            print(f"[SeriesManager] Successfully created {len(clean_parts)}-part series for '{title}'!")
+            print(f"[SeriesManager] 🌟 Successfully authored full connected {len(clean_parts)}-part series for '{title}'!")
             return series_obj
         except Exception as e:
             print(f"[SeriesManager] Attempt {attempt + 1} failed: {e}")
@@ -199,9 +220,11 @@ def generate_series_for_topic(topic):
             "part_num": 1,
             "part_title": f"{title} - भाग 1: रहस्य और संकट",
             "hook_line": f"{title} का वह रहस्य जो आज तक कोई नहीं जान सका।",
+            "end_question": "लेकिन इसके बाद जो हुआ, उसने सबको चौंका दिया?",
             "recap_bridge": "",
-            "cliffhanger": "लेकिन इसके बाद जो हुआ, उसने सबको चौंका दिया। देखिए भाग 2 में!",
+            "cliffhanger": "लेकिन इसके बाद जो हुआ, उसने सबको चौंका दिया।",
             "part_summary": f"{title}: कथा की शुरुआत और प्रथम अध्याय। {summary}",
+            "scenes": [],
             "completed": False,
             "rendered_at": None,
             "video_dir": None
@@ -209,10 +232,12 @@ def generate_series_for_topic(topic):
         {
             "part_num": 2,
             "part_title": f"{title} - भाग 2: अंतिम चमत्कार",
-            "hook_line": f"भाग 1 में आपने देखा {title} का संकट, अब देखिए अंतिम विजय।",
-            "recap_bridge": "भाग 1 में हमने देखा था संकट का आरंभ...",
+            "hook_line": f"संकट के बाद अब देखिए अंतिम विजय।",
+            "end_question": "",
+            "recap_bridge": "",
             "cliffhanger": "यही था इस दिव्य कथा का अमर सत्य।",
             "part_summary": f"{title}: कथा का चरमोत्कर्ष, चमत्कार और अंतिम उपसंहार।",
+            "scenes": [],
             "completed": False,
             "rendered_at": None,
             "video_dir": None
@@ -285,6 +310,26 @@ def get_next_slot(pool_size=3):
         part = next((p for p in topic["parts"] if p["part_num"] == current_part_num), None)
         if not part:
             part = topic["parts"][-1]
+
+        # Auto-populate pre-written scenes if missing or empty
+        if not part.get("scenes") or len(part.get("scenes", [])) < 4:
+            print(f"[SeriesManager] ✍️ Topic '{topic['topic_title']}' needs unified script with pre-written scenes. Generating now...")
+            refreshed = generate_series_for_topic({
+                "title": topic["topic_title"],
+                "topic": topic["topic_id"],
+                "summary": topic.get("story_synopsis", "")
+            })
+            if refreshed and refreshed.get("parts"):
+                for p_idx, old_p in enumerate(topic["parts"]):
+                    if p_idx < len(refreshed["parts"]):
+                        new_p = refreshed["parts"][p_idx]
+                        old_p["scenes"] = new_p.get("scenes", [])
+                        old_p["part_title"] = new_p.get("part_title", old_p.get("part_title", ""))
+                        old_p["hook_line"] = new_p.get("hook_line", old_p.get("hook_line", ""))
+                        old_p["end_question"] = new_p.get("end_question", old_p.get("end_question", ""))
+                        old_p["cliffhanger"] = new_p.get("cliffhanger", old_p.get("cliffhanger", ""))
+                save_series_state(state)
+                part = next((p for p in topic["parts"] if p["part_num"] == current_part_num), topic["parts"][0])
 
         slot_info = {
             "topic_index": idx,

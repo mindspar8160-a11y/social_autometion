@@ -11,36 +11,234 @@
       "parts": [
         {
           "part_num": 1,
-          "part_title": "🌬️ हवा के विपरीत ध्वज का रहस्य",
-          "hook_line": "पुरी के जगन्नाथ मंदिर में एक ऐसी घटना होती है, जिसे देखकर विज्ञान भी सिर झुका देता है।",
+          "part_title": "हवा के विपरीत ध्वजा 🚩",
+          "hook_line": "Puri mein hawa ki dhun se dhvaja ulta lheraya!",
           "recap_bridge": "",
-          "cliffhanger": "लेकिन इस ध्वज के पीछे जो वास्तविक कारण है, वो सिर्फ़ भक्तों को ही पता है। पूरी सचचाई देखें अगली वीडियो में!",
+          "cliffhanger": "Aur tabhi aakash se ek anokhi awaaz aayi...",
           "part_summary": "कथा शुरुआत है जहाँ हम पुरी धाम की रसोई और मंदिर के ऊपरी भाग की चर्चा करते हैं। यहाँ बताया जाता है कि मंदिर की चोटी पर लगा ध्वज हमेशा हवा के विपरीत तरफ लहराता है।",
           "completed": true,
           "rendered_at": "2026-11-22 09:43:46.535283",
-          "video_dir": "D:\\mindspark\\data\\output\\2026-11-22_093739_pf_puri_jagannath_7_mysteries"
+          "video_dir": "D:\\mindspark\\data\\output\\2026-11-22_093739_pf_puri_jagannath_7_mysteries",
+          "scenes": [
+            {
+              "kind": "title",
+              "emotion": "suspense",
+              "narration": "Puri mein hawa ulta chal rahi thi, lekin dhvaja aage lhera raha tha.",
+              "tts_text": "पुरी में हवा उल्टा चल रही थी, लेकिन झंडा आगे लहरा रहा था।",
+              "text": "अद्भुत झंडा",
+              "stamp": "भाग 1",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "conversational",
+              "narration": "Sab bhakt chupchap khade the, unki saansein tham gayi thin.",
+              "tts_text": "सभी भक्त चुपचाप खड़े थे, उनकी सांसें थम गई थीं।",
+              "text": "चुप भक्त",
+              "stamp": "भाग 1",
+              "accent": "mustard"
+            },
+            {
+              "kind": "number",
+              "emotion": "suspense",
+              "narration": "Hawa ki tezi badh gayi, lekin dhvaja ka koi asar nahi.",
+              "tts_text": "हवा की तेज़ी बढ़ गई, लेकिन झंडे पर कोई असर नहीं।",
+              "text": "हवा का खेल",
+              "stamp": "भाग 1",
+              "accent": "teal"
+            },
+            {
+              "kind": "quote",
+              "emotion": "emotional",
+              "narration": "Ek bhakt ne pucha, kya yeh kisi buri baat ka sanket hai?",
+              "tts_text": "एक भक्त ने पूछा, क्या यह किसी बुरी बात का संकेत है?",
+              "text": "भय का सवाल",
+              "stamp": "भाग 1",
+              "accent": "ink"
+            },
+            {
+              "kind": "map",
+              "emotion": "divine",
+              "narration": "Mandir ke upar aakash mein koi nazar nahi aa raha tha.",
+              "tts_text": "मंदिर के ऊपर आकाश में कोई नज़र नहीं आ रहा था।",
+              "text": "गहरा अंधेरा",
+              "stamp": "भाग 1",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "suspense",
+              "narration": "Lekin agar aakash mein koi padi hai, toh dhvaja kyun ulta hai?",
+              "tts_text": "लेकिन यदि आकाश में कोई पड़ा है, तो झंडा क्यों उल्टा है?",
+              "text": "अजीब प्रश्न",
+              "stamp": "अगला भाग",
+              "accent": "mustard"
+            },
+            {
+              "kind": "title",
+              "emotion": "suspense",
+              "narration": "Aur tabhi aakash se ek anokhi awaaz aayi...",
+              "tts_text": "और तभी आकाश से एक अनेक आवाज़ आई...",
+              "text": "अनोखी आवाज़",
+              "stamp": "अगला भाग",
+              "accent": "red"
+            }
+          ],
+          "end_question": "Lekin agar aakash mein koi padi hai, toh dhvaja kyun ulta hai?"
         },
         {
           "part_num": 2,
-          "part_title": "🐦 पक्षियों का अदृश्य दीवार",
-          "hook_line": "उसी मंदिर के ऊपर से कोई भी पक्षी नहीं उड़ता, भले ही आसमान खाली हो और हवा शांत हो।",
+          "part_title": "पक्षियों का रहस्य 🕊️",
+          "hook_line": "Lekin kya wo awaaz shiva ki thi, ya kisi vish ka?",
           "recap_bridge": "पिछली वीडियो में हमने हवा के विपरीत लहराने वाले ध्वज के बारे में सुना था। अब आगे बढ़ते हैं दूसरे रहस्य की ओर।",
-          "cliffhanger": "लेकिन सबसे बड़ा सवाल यह है कि भगवान ने पक्षियों को इस जगह से बैन क्यों किया है? इसका उत्तर अगली वीडियो में मिलेगा।",
+          "cliffhanger": "Aur phir ek bade se pakshi ne awaaz di...",
           "part_summary": "इस भाग में मंदिर के ऊपर से पक्षियों के नहीं उड़ने की घटना का विस्तृत वर्णन किया गया है।",
           "completed": false,
           "rendered_at": null,
-          "video_dir": null
+          "video_dir": null,
+          "scenes": [
+            {
+              "kind": "title",
+              "emotion": "suspense",
+              "narration": "Lekin kya wo awaaz shiva ki thi, ya kisi vish ka?",
+              "tts_text": "लेकिन क्या वह आवाज़ शिव की थी, या किसी विष का?",
+              "text": "आवाज़ का रहस्य",
+              "stamp": "भाग 2",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "emotional",
+              "narration": "Bhakton ne dekha, koi pakshi mandir ke upar se nahi uda raha.",
+              "tts_text": "भक्तों ने देखा, कोई पक्षी मंदिर के ऊपर से नहीं उड़ रहा।",
+              "text": "खाली आकाश",
+              "stamp": "भाग 2",
+              "accent": "teal"
+            },
+            {
+              "kind": "number",
+              "emotion": "suspense",
+              "narration": "Hawa abhi bhi ulta chali ja rahi thi, dhvaja aage lhera raha.",
+              "tts_text": "हवा अभी भी उल्टा चली जा रही थी, झंडा आगे लहरा रहा।",
+              "text": "लहराता झंडा",
+              "stamp": "भाग 2",
+              "accent": "mustard"
+            },
+            {
+              "kind": "quote",
+              "emotion": "conversational",
+              "narration": "Ek purane pujari ne kaha, yeh shakti ka pramand hai.",
+              "tts_text": "एक पुराने पुजारी ने कहा, यह शक्ति का प्रमाण है।",
+              "text": "पुरोहित का वचन",
+              "stamp": "भाग 2",
+              "accent": "ink"
+            },
+            {
+              "kind": "map",
+              "emotion": "divine",
+              "narration": "Mandir ke chhat par koi nazar nahi aa raha tha.",
+              "tts_text": "मंदिर के छत पर कोई नज़र नहीं आ रहा था।",
+              "text": "छत का रहस्य",
+              "stamp": "भाग 2",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "suspense",
+              "narration": "Lekin agar pakshee nahi ud rahe, toh upar kya chupa hai?",
+              "tts_text": "लेकिन यदि पक्षी नहीं उड़ रहे, तो ऊपर क्या छुपा है?",
+              "text": "छिपा रहस्य",
+              "stamp": "अगला भाग",
+              "accent": "mustard"
+            },
+            {
+              "kind": "title",
+              "emotion": "suspense",
+              "narration": "Aur phir ek bade se pakshi ne awaaz di...",
+              "tts_text": "और फिर एक बड़े से पक्षी ने आवाज़ दी...",
+              "text": "पक्षी की आवाज़",
+              "stamp": "अगला भाग",
+              "accent": "red"
+            }
+          ],
+          "end_question": "Lekin agar pakshee nahi ud rahe, toh upar kya chupa hai?"
         },
         {
           "part_num": 3,
-          "part_title": "🍲 सात बर्तनों की चमत्कारी रसोई",
-          "hook_line": "मंदिर की रसोई में एक ही चूल्हे पर सात बर्तन एक के ऊपर एक रखे जाते हैं, और सबसे ऊपर का सबसे पहले पकता है।",
+          "part_title": "रसोई का चमत्कार 🍲",
+          "hook_line": "Lekin kya surya udne se pehle bhog taiyar hoga, ya na?",
           "recap_bridge": "हमने ध्वज और पक्षियों के रहस्य देख लिए। अब आता है सबसे आश्चर्यजनक तथ्य - मंदिर की रसोई का राज़।",
-          "cliffhanger": "यह चमत्कार दर्शाता है कि भगवान का प्रेम कितना गहरा है। यह सचचाई आपको भी छू जाएगी।",
+          "cliffhanger": "Boliye Jai Jagannath! Boliye Jai Baladeva!",
           "part_summary": "अंतिम भाग में मंदिर की प्रसिद्ध 'माथा भोग' की रसोई का वर्णन किया गया है।",
           "completed": false,
           "rendered_at": null,
-          "video_dir": null
+          "video_dir": null,
+          "scenes": [
+            {
+              "kind": "title",
+              "emotion": "divine",
+              "narration": "Lekin kya surya udne se pehle bhog taiyar hoga, ya na?",
+              "tts_text": "लेकिन क्या सूर्य उढ़ने से पहले भोग तैयार होगा, या न?",
+              "text": "भोग की तैयारी",
+              "stamp": "भाग 3",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "conversational",
+              "narration": "Rasoi mein ek hi chulhe par saart bartan rakhe gaye the.",
+              "tts_text": "रसोई में एक ही चूल्हे पर सात बर्तन रखे गए थे।",
+              "text": "सात बर्तन",
+              "stamp": "भाग 3",
+              "accent": "mustard"
+            },
+            {
+              "kind": "number",
+              "emotion": "suspense",
+              "narration": "Sabse upar ka bartan sabse pehle pak gaya, yeh ajeeb tha.",
+              "tts_text": "सबसे ऊपर का बर्तन सबसे पहले पक गया, यह अजीब था।",
+              "text": "अनोखा पकना",
+              "stamp": "भाग 3",
+              "accent": "teal"
+            },
+            {
+              "kind": "quote",
+              "emotion": "emotional",
+              "narration": "Bhakton ne isse Mata ki kripa ka pramand samjha.",
+              "tts_text": "भक्तों ने इसे माता की कृपा का प्रमाण समझा।",
+              "text": "माता की कृपा",
+              "stamp": "भाग 3",
+              "accent": "ink"
+            },
+            {
+              "kind": "map",
+              "emotion": "divine",
+              "narration": "Dhvaja ab theek se lherane laga, aur pakshee phir se udaane lage.",
+              "tts_text": "झंडा अब ठीक से लहराने लगा, और पक्षी फिर से उड़ाने लगे।",
+              "text": "शांति लौटी",
+              "stamp": "भाग 3",
+              "accent": "red"
+            },
+            {
+              "kind": "card",
+              "emotion": "emotional",
+              "narration": "Mata ki kripa se sab kuch anokha ho gaya!",
+              "tts_text": "माता की कृपा से सब कुछ अनोखा हो गया!",
+              "text": "चमत्कार",
+              "stamp": "कथा सम्पूर्ण",
+              "accent": "mustard"
+            },
+            {
+              "kind": "title",
+              "emotion": "divine",
+              "narration": "Boliye Jai Jagannath! Boliye Jai Baladeva!",
+              "tts_text": "बोलिये जय जगन्नाथ! बोलिये जय बालादेव!",
+              "text": "जय जगन्नाथ",
+              "stamp": "कथा सम्पूर्ण",
+              "accent": "red"
+            }
+          ],
+          "end_question": "Mata ki kripa se sab kuch anokha ho gaya!"
         }
       ]
     },
@@ -221,6 +419,6 @@
       "completed_at": "2026-11-22 12:22:10.608353"
     }
   ],
-  "last_updated": "2026-11-22 12:22:16.551053",
+  "last_updated": "2026-11-22 12:32:35.406671",
   "total_series_completed": 2
 }

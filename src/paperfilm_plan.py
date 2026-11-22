@@ -466,6 +466,79 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
     is_final = slot_info.get("is_final_part", False)
     geo = _detect_geo(topic)
 
+    def _clean_stutters(text: str) -> str:
+        if not text:
+            return ""
+        # Remove duplicate repeated phrases up to 4 words (e.g. "Madhya Pradesh ke Amarkantak mein")
+        t = re.sub(r'([\u0900-\u097F\w]+(?:\s+[\u0900-\u097F\w]+){0,3})\s*[,]?\s+\1', r'\1', text, flags=re.IGNORECASE)
+        # Remove repeated particles "mein mein", "में में", "ke ke"
+        t = re.sub(r'(?i)\b(mein|के|ke|ki|की)\s*[,]?\s+\1\b', r'\1', t)
+        # Clean consecutive commas or excessive spaces
+        t = re.sub(r'\s*,\s*,\s*', ', ', t)
+        return re.sub(r'\s+', ' ', t).strip(' ,')
+
+    st_hi = {
+        "Maharashtra": "महाराष्ट्र", "Gujarat": "गुजरात", "Rajasthan": "राजस्थान",
+        "Madhya Pradesh": "मध्य प्रदेश", "Uttar Pradesh": "उत्तर प्रदेश",
+        "Kerala": "केरल", "Karnataka": "कर्नाटक", "Odisha": "ओडिशा",
+        "Andhra Pradesh": "आंध्र प्रदेश", "Jammu and Kashmir": "जम्मू-कश्मीर",
+        "Haryana": "हरियाणा", "Punjab": "पंजाब", "Bihar": "बिहार",
+    }.get(geo["state"] if geo else "", geo["state"] if geo else "")
+
+    # 0. Check if scenes are already pre-written in unified full-story pass
+    pre_scenes = part.get("scenes")
+    if isinstance(pre_scenes, list) and len(pre_scenes) >= 4:
+        print(f"[PaperFilm] 🎬 Using pre-written unified scenes for Part {part_num}/{tot_parts} (zero drift/hallucination)!")
+        plan = {
+            "youtube": {
+                "title": f"{part.get('part_title', topic_title)} | MindSpark",
+                "description": f"{part.get('part_title', topic_title)}\n\n#Shorts #Sanatan #MindSpark #History",
+                "tags": ["MindSpark", "Shorts", "Sanatan", "Hindi"]
+            },
+            "scenes": [dict(s) for s in pre_scenes]
+        }
+        plan = clean_plan(plan, seed)
+        scenes = plan["scenes"]
+
+        # Map scene enforcement
+        if geo and len(scenes) > 1:
+            map_idx = 1
+            for idx, sc in enumerate(scenes):
+                if sc.get("kind") == "map":
+                    map_idx = idx
+                    break
+            for idx, sc in enumerate(scenes):
+                if idx == map_idx:
+                    sc["kind"] = "map"
+                    sc["state"] = geo["state"]
+                    if geo.get("district"):
+                        sc["district"] = geo["district"]
+                    sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                    sc["text"] = f"भारत → {st_hi} → {geo['name']}"
+                    sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
+                    sc["hit2_word"] = geo["name"].split()[0]
+                elif sc.get("kind") == "map":
+                    sc["kind"] = "card"
+                    sc["text"] = re.sub(r"\s*→\s*", " ", sc.get("text", "")).strip()
+
+        # Ending stamps and stamps enforcement
+        scenes[0]["stamp"] = f"भाग {part_num}"
+        if is_final:
+            scenes[-1]["stamp"] = "कथा सम्पूर्ण"
+        else:
+            scenes[-1]["stamp"] = "अगला भाग"
+
+        # Apply destutter, Hindi number normalizer, and Shiva chant fix
+        for sc in scenes:
+            if "tts_text" in sc:
+                sc["tts_text"] = normalize_hindi_numbers(sc["tts_text"])
+                if is_final:
+                    sc["tts_text"] = re.sub(r'(?<!हर\s)हर\s+महादेव', 'हर हर महादेव', sc["tts_text"])
+            if "narration" in sc:
+                sc["narration"] = _clean_stutters(sc["narration"])
+
+        return plan
+
     part_ctx = (
         f"KAHANI: {topic_title}\n"
         f"YE HAI: BHAG {part_num} (Kul {tot_parts} bhag me se)\n"
