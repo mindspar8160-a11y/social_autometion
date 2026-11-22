@@ -1,12 +1,12 @@
 {
-  "current_index": 0,
+  "current_index": 1,
   "active_topics": [
     {
       "topic_id": "puri_jagannath_7_mysteries",
       "topic_title": "पुरी जगन्नाथ मंदिर: हवा के विपरीत लहराती ध्वजा और रसोई का अद्भुत रहस्य",
       "story_synopsis": "पुरी के जगन्नाथ मंदिर की तीन विचित्र घटनाएँ: हवा के विपरीत लहराने वाला ध्वज, ऊपर से पक्षियों के न उड़ने का नियम, और एक ही चूल्हे पर रखे सात बर्तनों में सबसे ऊपर का सबसे पहले पकना।",
       "total_parts": 3,
-      "current_part": 2,
+      "current_part": 3,
       "created_at": "2026-11-21 19:38:06.327849",
       "parts": [
         {
@@ -93,9 +93,9 @@
           "recap_bridge": "पिछली वीडियो में हमने हवा के विपरीत लहराने वाले ध्वज के बारे में सुना था। अब आगे बढ़ते हैं दूसरे रहस्य की ओर।",
           "cliffhanger": "Aur phir ek bade se pakshi ne awaaz di...",
           "part_summary": "इस भाग में मंदिर के ऊपर से पक्षियों के नहीं उड़ने की घटना का विस्तृत वर्णन किया गया है।",
-          "completed": false,
-          "rendered_at": null,
-          "video_dir": null,
+          "completed": true,
+          "rendered_at": "2026-11-22 07:13:55.006482",
+          "video_dir": "/home/runner/work/youtube_autometion/youtube_autometion/data/output/2026-11-22_071106_pf_puri_jagannath_7_mysteries",
           "scenes": [
             {
               "kind": "title",
@@ -832,6 +832,6 @@
       "completed_at": "2026-11-22 12:42:50.683260"
     }
   ],
-  "last_updated": "2026-11-22 12:42:57.382992",
-  "total_series_completed": 3
+  "last_updated": "2026-11-22 07:13:55.007685",
+  "total_series_completed": 2
 }

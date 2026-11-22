@@ -1,15 +1,15 @@
 {
-  "dir_name": "2026-11-22_124026_pf_shakti_peeth_vimala_puri",
-  "file_id": "BAACAgUAAxkDAAIDR2sClfKk1pt5Z4nLv14Yb4KelmmVAAKrJAACSsUZVHiludbvm0q7PQQ",
-  "file_unique_id": "AgADqyQAAkrFGVQ",
-  "message_id": 839,
-  "caption": "\ud83c\udfac *New Reel Ready for Review!*\n\n\ud83d\udd31 *\u2728 \u0935\u093f\u092e\u0932\u093e \u0930\u0942\u092a \u0914\u0930 \u0935\u093f\u091c\u092f | MindSpark*\n\n\ud83d\udcfa *MINDSPARK 3-TOPIC ROTATION SERIES*\n\ud83d\udcd6 *Topic:* \u0935\u093f\u092e\u0932\u093e (\u092a\u0941\u0930\u0940) \u0936\u0915\u094d\u0924\u093f\u092a\u0940\u0920: \u092e\u093e\u0924\u093e \u0938\u0924\u0940 \u0915\u093e \u091a\u0930\u0923 \u091c\u0939\u093e\u0901 \u0917\u093f\u0930\u093e\n\ud83d\udccc *Episode:* \u092d\u093e\u0917 3 of 3\n\ud83c\udf9e\ufe0f PaperFilm Engine | 9:16 Vertical\n\ud83c\udf99\ufe0f Voice: edge-tts 6/6 | hi-IN-MadhurNeural\n\n\ud83d\udc49 Tap *PASS* button to upload immediately to YouTube!",
+  "dir_name": "2026-11-22_071106_pf_puri_jagannath_7_mysteries",
+  "file_id": "BAACAgUAAxkDAAIDSGsCljLNCbUh9Du9VuRNj3m9gMA9AAKtJAACSsUZVN4TeT4L46sYPQQ",
+  "file_unique_id": "AgADrSQAAkrFGVQ",
+  "message_id": 840,
+  "caption": "🎬 *New Reel Ready for Review!*\n\n🔱 *पक्षियों का रहस्य 🕊️ | MindSpark*\n\n📺 *MINDSPARK 3-TOPIC ROTATION SERIES*\n📖 *Topic:* पुरी जगन्नाथ मंदिर: हवा के विपरीत लहराती ध्वजा और रसोई का अद्भुत रहस्य\n📌 *Episode:* भाग 2 of 3\n🎞️ PaperFilm Engine | 9:16 Vertical\n🎙️ Voice: edge-tts 7/7 | hi-IN-MadhurNeural\n\n👉 Tap *PASS* button to upload immediately to YouTube!",
   "meta": {
     "mode": "myth",
     "engine": "paperfilm",
-    "topic": "\u0935\u093f\u092e\u0932\u093e (\u092a\u0941\u0930\u0940) \u0936\u0915\u094d\u0924\u093f\u092a\u0940\u0920: \u092e\u093e\u0924\u093e \u0938\u0924\u0940 \u0915\u093e \u091a\u0930\u0923 \u091c\u0939\u093e\u0901 \u0917\u093f\u0930\u093e",
-    "title": "\u2728 \u0935\u093f\u092e\u0932\u093e \u0930\u0942\u092a \u0914\u0930 \u0935\u093f\u091c\u092f | MindSpark",
-    "description": "\u2728 \u0935\u093f\u092e\u0932\u093e \u0930\u0942\u092a \u0914\u0930 \u0935\u093f\u091c\u092f\n\n#Shorts #Sanatan #MindSpark #History",
+    "topic": "पुरी जगन्नाथ मंदिर: हवा के विपरीत लहराती ध्वजा और रसोई का अद्भुत रहस्य",
+    "title": "पक्षियों का रहस्य 🕊️ | MindSpark",
+    "description": "पक्षियों का रहस्य 🕊️\n\n#Shorts #Sanatan #MindSpark #History",
     "tags": [
       "MindSpark",
       "Shorts",
@@ -17,9 +17,10 @@
       "Hindi"
     ],
     "privacy": "public",
-    "seed": 426101,
-    "scenes_count": 6
+    "seed": 466239,
+    "scenes_count": 7
   },
-  "timestamp": 1795331570,
-  "status": "pending_review"
+  "timestamp": 1795331635,
+  "status": "pending_review",
+  "run_id": "44996712660"
 }
