@@ -49,8 +49,10 @@ def _short_why(msg):
 
 
 def strip_tags(text):
-    """<short pause>, <breath> jaise Gemini tags hatao (Edge/Chirp unhe bol dete hain, captions me bhi nahi chahiye)."""
-    return re.sub(r"\s+", " ", re.sub(r"<[^>]*>", " ", text or "")).strip()
+    """Strip XML/SSML tags <...>, emotion cues in brackets [...], (...), {...}, and scene directions so voice stays clean and natural."""
+    t = re.sub(r"<[^>]*>", " ", text or "")
+    t = re.sub(r"\[.*?\]|\(.*?\)| दृश्य\s*\d*[:\-]?|Scene\s*\d*[:\-]?", " ", t)
+    return re.sub(r"\s+", " ", t).strip()
 
 
 # ----------------------------------------------------------------- helpers
@@ -723,9 +725,56 @@ def _synth_xtts_local(text, cfg, out):
     return []
 
 
+_POCKET_MODEL = None
+_POCKET_STATES = {}
+
+
+def _synth_pocket_tts(text, cfg, out):
+    """Zero-shot fast voice cloning using Pocket-TTS Hindi.
+    Defaults to AI4Bharat Sample 4 or Raju reference audio."""
+    global _POCKET_MODEL, _POCKET_STATES
+    from pocket_tts import TTSModel
+    import scipy.io.wavfile
+    clean = strip_tags(text)
+    clean = _ensure_devanagari_hindi(clean)
+
+    ref_path = cfg.get("voice_reference")
+    if not ref_path:
+        prov = str(cfg.get("provider", "")).lower()
+        if "raju" in prov or "xtts" in prov:
+            ref_path = ROOT / "data" / "voice_references" / "xtts_ref_1.wav"
+        else:
+            ref_path = ROOT / "data" / "ai4bharat_pure" / "ai4bharat_sample4_pure_raw.wav"
+    else:
+        ref_path = ROOT / str(ref_path)
+
+    if _POCKET_MODEL is None:
+        config_uri = "hf://saryps-labs/pocket-tts-hindi/config.yaml"
+        _POCKET_MODEL = TTSModel.load_model(config=config_uri, temp=0.3)
+
+    sig = str(ref_path)
+    if sig not in _POCKET_STATES:
+        _POCKET_STATES[sig] = _POCKET_MODEL.get_state_for_audio_prompt(str(ref_path))
+
+    voice_state = _POCKET_STATES[sig]
+    audio_tensor = _POCKET_MODEL.generate_audio(voice_state, clean)
+    tmp_wav = Path(out).with_suffix(".pock.wav")
+    scipy.io.wavfile.write(str(tmp_wav), _POCKET_MODEL.sample_rate, audio_tensor.numpy())
+
+    # Master audio to 192k MP3
+    af = "loudnorm=I=-16:TP=-1.5:LRA=10,asetpts=PTS-STARTPTS"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(tmp_wav),
+                    "-af", af, "-ar", "44100", "-ac", "2", "-b:a", "192k", str(out)], check=True)
+    if tmp_wav.exists():
+        tmp_wav.unlink()
+    return []
+
+
 PROVIDERS = {
-    "xtts_local": _synth_xtts_local, "xtts_clone": _synth_xtts_local, "voice_clone": _synth_xtts_local,
-    "raju_clone": _synth_xtts_local, "raju": _synth_xtts_local,   # these used to point at edge-tts -> the voice never changed
+    "coquixttsv2": _synth_pocket_tts, "coqui_xtts": _synth_pocket_tts, "xtts": _synth_pocket_tts,
+    "ai4bharat": _synth_pocket_tts, "ai4bharat_sample4": _synth_pocket_tts, "pocket_tts": _synth_pocket_tts,
+    "xtts_local": _synth_pocket_tts, "xtts_clone": _synth_pocket_tts, "voice_clone": _synth_pocket_tts,
+    "raju_clone": _synth_pocket_tts, "raju": _synth_pocket_tts,
     "gemini_tts": _synth_gemini, "gemini": _synth_gemini,
     "google_chirp": _synth_google_chirp, "google": _synth_google_chirp, "chirp3": _synth_google_chirp,
     "edge-tts": _synth_edge, "edge": _synth_edge,
