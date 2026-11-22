@@ -263,7 +263,10 @@ def run_myth_pipeline(a, voice_cfg, custom_script=None):
     except Exception as e:
         print(f"[Pipeline] voice summary skipped: {e}")
 
-    notify.send(final, caption, video_dir=out)
+    if not getattr(a, "no_telegram", False) and os.environ.get("NO_TELEGRAM") != "1":
+        notify.send(final, caption, video_dir=out)
+    else:
+        print(f"[Pipeline] 🔕 Telegram notification skipped (--no-telegram / NO_TELEGRAM). Video saved at: {final}")
     print("DONE:", final)
 
 
@@ -465,7 +468,10 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
     except Exception as e:
         print(f"[Pipeline] voice summary skipped: {e}")
 
-    notify.send(final, caption, video_dir=out)
+    if not getattr(a, "no_telegram", False) and os.environ.get("NO_TELEGRAM") != "1":
+        notify.send(final, caption, video_dir=out)
+    else:
+        print(f"[Pipeline] 🔕 Telegram notification skipped (--no-telegram / NO_TELEGRAM). Video saved at: {final}")
 
     if slot_info:
         import series_manager
@@ -597,7 +603,10 @@ def run_cinematic_pipeline(a, voice_cfg, custom_script=None):
     except Exception as e:
         print(f"[Pipeline] voice summary skipped: {e}")
 
-    notify.send(final, caption, video_dir=out)
+    if not getattr(a, "no_telegram", False) and os.environ.get("NO_TELEGRAM") != "1":
+        notify.send(final, caption, video_dir=out)
+    else:
+        print(f"[Pipeline] 🔕 Telegram notification skipped (--no-telegram / NO_TELEGRAM). Video saved at: {final}")
     print("DONE:", final)
 
 
@@ -616,6 +625,7 @@ def main():
     ap.add_argument("--template")
     ap.add_argument("--style", help="Force Vox style ID (v001 ... v212)")
     ap.add_argument("--headless", action="store_true", help="CI mode (kept for clarity)")
+    ap.add_argument("--no-telegram", action="store_true", help="Skip sending video to Telegram")
     a = ap.parse_args()
     load_env()
     
@@ -877,7 +887,10 @@ def main():
             caption += f"\n🎙️ {vline}"
     except Exception as e:
         print(f"[Pipeline] voice summary skipped: {e}")
-    notify.send(final, caption, video_dir=out)
+    if not getattr(a, "no_telegram", False) and os.environ.get("NO_TELEGRAM") != "1":
+        notify.send(final, caption, video_dir=out)
+    else:
+        print(f"[Pipeline] 🔕 Telegram notification skipped (--no-telegram / NO_TELEGRAM). Video saved at: {final}")
     print("DONE:", final)
 
 if __name__ == "__main__":

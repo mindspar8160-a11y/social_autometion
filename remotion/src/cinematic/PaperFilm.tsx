@@ -2,7 +2,11 @@ import React, {useMemo, useState, useEffect} from "react";
 import {AbsoluteFill, Audio, Easing, Img, Sequence, delayRender, continueRender, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig} from "remotion";
 import type {PFAccent, PFProps, PFScene} from "./types";
 import {MapItem, mapTimes} from "./MapItem";
-import {PaperTempleCutout, PaperCityCutout, PaperCharDhamCutout, PaperDwarkadhishCutout, PaperArmyCutout, PaperCowsCutout, PaperWeaponsCutout, PaperVachanCutout} from "./PaperSvgAssets";
+import {
+  PaperTempleCutout, PaperCityCutout, PaperCharDhamCutout, PaperDwarkadhishCutout,
+  PaperArmyCutout, PaperCowsCutout, PaperWeaponsCutout, PaperVachanCutout,
+  PaperShivaLingamCutout, PaperTrishulCutout, PaperChariotCutout, PaperMountainCaveCutout, PaperSudarshanCutout
+} from "./PaperSvgAssets";
 
 /* ------------------------------------------------------------------ fonts */
 const FONTS: [string, string, string][] = [
@@ -178,14 +182,19 @@ const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: numb
   const itemStart = (k: number) => Math.round((s.words[Math.floor((k * s.words.length) / Math.max(1, shownItems.length))]?.s ?? 0) * fps);
 
   const hay = `${s.text} ${s.sub || ""} ${s.narration || ""}`.toLowerCase();
-  const isCow = hay.includes("गाय") || hay.includes("गायों") || hay.includes("गौ") || hay.includes("gau") || hay.includes("cow") || hay.includes("गोमाता") || hay.includes("कामधेनु") || hay.includes("बछड़ा") || hay.includes("बछड़े");
-  const isVachan = !isCow && (hay.includes("वचन") || hay.includes("vachan") || hay.includes("शपथ") || hay.includes("संकल्प") || hay.includes("आशीर्वाद") || hay.includes("वरदान") || hay.includes("प्रण") || hay.includes("प्रतिज्ञा") || hay.includes("निर्णय"));
-  const isWeapon = !isCow && !isVachan && (hay.includes("तलवार") || hay.includes("talwar") || hay.includes("sword") || hay.includes("धनुष") || hay.includes("बाण") || hay.includes("तीर") || hay.includes("हथियार") || hay.includes("शस्त्र") || hay.includes("चाकू") || hay.includes("ढाल") || hay.includes("वार") || hay.includes("शस्त्रों"));
-  const isArmy = !isCow && !isVachan && !isWeapon && (hay.includes("सेना") || hay.includes("sena") || hay.includes("सैन्य") || hay.includes("युद्ध") || hay.includes("लड़ाई") || hay.includes("फौज") || hay.includes("फ़ौज") || hay.includes("mawla") || hay.includes("मावळा") || hay.includes("सैनिक") || hay.includes("battle") || hay.includes("war") || hay.includes("सैनिकों"));
-  const isDeity = !isCow && !isVachan && !isWeapon && !isArmy && (hay.includes("द्वारकाधीश") || hay.includes("dwarkadhish") || hay.includes("कृष्ण") || hay.includes("krishna") || hay.includes("शिव") || hay.includes("shiva") || hay.includes("महादेव") || hay.includes("राम") || hay.includes("rama") || hay.includes("हनुमान") || hay.includes("hanuman") || hay.includes("भगवान"));
-  const isCharDham = !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && (hay.includes("धाम") || hay.includes("dham") || hay.includes("सप्त") || hay.includes("मान्यता") || hay.includes("चार धाम") || hay.includes("तीर्थ") || hay.includes("ज्योतिर्लिंग"));
-  const isCity = !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && !isCharDham && (hay.includes("नगरी") || hay.includes("नगर") || hay.includes("समुद्र") || hay.includes("किला") || hay.includes("साम्राज्य") || hay.includes("राजधानी"));
-  const isTemple = !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && !isCharDham && !isCity && (hay.includes("द्वारका") || hay.includes("सोमनाथ") || hay.includes("काशी") || hay.includes("उज्जैन") || hay.includes("मंदिर") || hay.includes("temple") || hay.includes("शिखर"));
+  const isShivaLingam = hay.includes("शिवलिंग") || hay.includes("ज्योतिर्लिंग") || hay.includes("लिंगम") || hay.includes("सोमनाथ") || hay.includes("महाकाल") || hay.includes("lingam") || hay.includes("jyotirlinga") || hay.includes("rudra");
+  const isTrishul = !isShivaLingam && (hay.includes("त्रिशूल") || hay.includes("डमरू") || hay.includes("तांडव") || hay.includes("भैरव") || hay.includes("trishul") || hay.includes("damru"));
+  const isChariot = !isShivaLingam && !isTrishul && (hay.includes("रथ") || hay.includes("सारथी") || hay.includes("कुरुक्षेत्र") || hay.includes("अश्व") || hay.includes("घोड़े") || hay.includes("घोड़ा") || hay.includes("chariot") || hay.includes("rath") || hay.includes("घोड़ों"));
+  const isMountainCave = !isShivaLingam && !isTrishul && !isChariot && (hay.includes("गुफा") || hay.includes("पर्वत") || hay.includes("पहाड़") || hay.includes("कैलाश") || hay.includes("हिमालय") || hay.includes("cave") || hay.includes("mountain") || hay.includes("kailash") || hay.includes("हिम"));
+  const isSudarshan = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && (hay.includes("चक्र") || hay.includes("सुदर्शन") || hay.includes("शंख") || hay.includes("विष्णु") || hay.includes("narayan") || hay.includes("chakra"));
+  const isCow = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && !isSudarshan && (hay.includes("गाय") || hay.includes("गायों") || hay.includes("गौ") || hay.includes("gau") || hay.includes("cow") || hay.includes("गोमाता") || hay.includes("कामधेनु") || hay.includes("बछड़ा") || hay.includes("बछड़े"));
+  const isVachan = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && !isSudarshan && !isCow && (hay.includes("वचन") || hay.includes("vachan") || hay.includes("शपथ") || hay.includes("संकल्प") || hay.includes("आशीर्वाद") || hay.includes("वरदान") || hay.includes("प्रण") || hay.includes("प्रतिज्ञा") || hay.includes("निर्णय"));
+  const isWeapon = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && !isSudarshan && !isCow && !isVachan && (hay.includes("तलवार") || hay.includes("talwar") || hay.includes("sword") || hay.includes("धनुष") || hay.includes("बाण") || hay.includes("तीर") || hay.includes("हथियार") || hay.includes("शस्त्र") || hay.includes("चाकू") || hay.includes("ढाल") || hay.includes("वार") || hay.includes("शस्त्रों"));
+  const isArmy = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && !isSudarshan && !isCow && !isVachan && !isWeapon && (hay.includes("सेना") || hay.includes("sena") || hay.includes("सैन्य") || hay.includes("युद्ध") || hay.includes("लड़ाई") || hay.includes("फौज") || hay.includes("फ़ौज") || hay.includes("mawla") || hay.includes("मावळा") || hay.includes("सैनिक") || hay.includes("battle") || hay.includes("war") || hay.includes("सैनिकों") || hay.includes("आक्रमण") || hay.includes("हमला"));
+  const isDeity = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && !isSudarshan && !isCow && !isVachan && !isWeapon && !isArmy && (hay.includes("द्वारकाधीश") || hay.includes("dwarkadhish") || hay.includes("कृष्ण") || hay.includes("krishna") || hay.includes("शिव") || hay.includes("shiva") || hay.includes("महादेव") || hay.includes("राम") || hay.includes("rama") || hay.includes("हनुमान") || hay.includes("hanuman") || hay.includes("भगवान"));
+  const isCharDham = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && !isSudarshan && !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && (hay.includes("धाम") || hay.includes("dham") || hay.includes("सप्त") || hay.includes("मान्यता") || hay.includes("चार धाम") || hay.includes("तीर्थ"));
+  const isCity = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && !isSudarshan && !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && !isCharDham && (hay.includes("नगरी") || hay.includes("नगर") || hay.includes("समुद्र") || hay.includes("किला") || hay.includes("साम्राज्य") || hay.includes("राजधानी") || hay.includes("द्वारका"));
+  const isTemple = !isShivaLingam && !isTrishul && !isChariot && !isMountainCave && !isSudarshan && !isCow && !isVachan && !isWeapon && !isArmy && !isDeity && !isCharDham && !isCity && (hay.includes("मंदिर") || hay.includes("temple") || hay.includes("शिखर") || hay.includes("पूजा") || hay.includes("आरती"));
 
   if (s.kind === "map") {
     return (
@@ -196,178 +205,94 @@ const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: numb
       </Sheet>
     );
   }
-  if (isCow) {
+
+  const getCutout = () => {
+    if (isShivaLingam) return <PaperShivaLingamCutout progress={easeIO(clamp(lf / 14))} width={680} height={520} />;
+    if (isTrishul) return <PaperTrishulCutout progress={easeIO(clamp(lf / 14))} width={680} height={500} />;
+    if (isChariot) return <PaperChariotCutout progress={easeIO(clamp(lf / 14))} width={700} height={490} />;
+    if (isMountainCave) return <PaperMountainCaveCutout progress={easeIO(clamp(lf / 14))} width={690} height={490} />;
+    if (isSudarshan) return <PaperSudarshanCutout progress={easeIO(clamp(lf / 14))} width={680} height={500} />;
+    if (isCow) return <PaperCowsCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />;
+    if (isVachan) return <PaperVachanCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />;
+    if (isWeapon) return <PaperWeaponsCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />;
+    if (isArmy) return <PaperArmyCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />;
+    if (isDeity) return <PaperDwarkadhishCutout progress={easeIO(clamp(lf / 14))} width={680} height={530} />;
+    if (isCharDham) return <PaperCharDhamCutout progress={easeIO(clamp(lf / 14))} width={740} height={490} />;
+    if (isCity) return <PaperCityCutout progress={easeIO(clamp(lf / 14))} width={700} height={490} />;
+    if (isTemple) return <PaperTempleCutout progress={easeIO(clamp(lf / 14))} width={660} height={520} />;
+
+    // Rich Fallback Rotation: Every scene gets a stunning mythological paper craft cutout!
+    const fallbacks = [
+      <PaperTempleCutout progress={easeIO(clamp(lf / 14))} width={660} height={500} />,
+      <PaperShivaLingamCutout progress={easeIO(clamp(lf / 14))} width={670} height={500} />,
+      <PaperTrishulCutout progress={easeIO(clamp(lf / 14))} width={670} height={480} />,
+      <PaperCityCutout progress={easeIO(clamp(lf / 14))} width={690} height={480} />,
+      <PaperChariotCutout progress={easeIO(clamp(lf / 14))} width={690} height={480} />,
+      <PaperMountainCaveCutout progress={easeIO(clamp(lf / 14))} width={680} height={480} />,
+      <PaperSudarshanCutout progress={easeIO(clamp(lf / 14))} width={660} height={480} />,
+      <PaperWeaponsCutout progress={easeIO(clamp(lf / 14))} width={680} height={480} />,
+      <PaperVachanCutout progress={easeIO(clamp(lf / 14))} width={680} height={480} />,
+      <PaperDwarkadhishCutout progress={easeIO(clamp(lf / 14))} width={670} height={500} />,
+    ];
+    return fallbacks[i % fallbacks.length];
+  };
+
+  const cutout = getCutout();
+
+  if (s.kind === "number") {
+    const v = (s.number ?? 0) * easeIO(clamp((lf - hitF) / (fps * 1.0)));
+    const dec = Number.isInteger(s.number ?? 0) ? 0 : 1;
     return (
       <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
         <Tape rot={-2} />
-        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
-          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
+        <div style={{textAlign: "center", marginBottom: 14}}>
+          <div style={{...text(150, DISPLAY), lineHeight: 1, color: a.main}}>{v.toLocaleString("en-IN", {minimumFractionDigits: dec, maximumFractionDigits: dec})}<span style={{fontSize: 85}}>{s.unit}</span></div>
+          <div style={{...text(76), marginTop: 12}}><Highlighter start={hitF} f={lf} color={ACC.mustard.main}>{s.text}</Highlighter></div>
         </div>
-        <PaperCowsCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
-        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
+        {cutout}
+        {s.sub && <div style={{...text(46, BODY), marginTop: 18, opacity: 0.75}}>{s.sub}</div>}
         {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
       </Sheet>
     );
   }
-  if (isVachan) {
+
+  if (s.kind === "quote") {
     return (
       <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
         <Tape rot={2} />
-        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
-          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
+        <div style={{...text(86, HAND), lineHeight: 1.25, textAlign: "center", marginBottom: 18}}>
+          <Highlighter start={hitF} f={lf} color={ACC.mustard.main}>“{s.text}”</Highlighter>
         </div>
-        <PaperVachanCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
-        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
+        {cutout}
+        {s.sub && <div style={{...text(46, BODY), marginTop: 18, opacity: 0.75}}>— {s.sub}</div>}
         {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
       </Sheet>
     );
   }
-  if (isWeapon) {
-    return (
-      <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
-        <Tape rot={-3} />
-        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
-          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
-        </div>
-        <PaperWeaponsCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
-        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  if (isArmy) {
+
+  if (s.kind === "title") {
     return (
       <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
         <Tape rot={-2} />
-        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
-          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
-        </div>
-        <PaperArmyCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
-        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  if (isDeity) {
-    return (
-      <Sheet w={W} h={1200} seed={sd} accent={accent} tilt={tilt}>
-        <Tape rot={-3} />
-        <div style={{...text(104, DISPLAY), lineHeight: 1.15, textAlign: "center", marginBottom: 20}}>
-          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
-        </div>
-        <PaperDwarkadhishCutout progress={easeIO(clamp(lf / 14))} width={680} height={560} />
-        {s.sub && <div style={{...text(46, BODY), marginTop: 22, textAlign: "center", opacity: 0.85}}>{s.sub}</div>}
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  if (isCharDham) {
-    return (
-      <Sheet w={W} h={1160} seed={sd} accent={accent} tilt={tilt}>
-        <Tape rot={3} />
-        <div style={{...text(86, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 26, color: a.main}}>
-          <Highlighter start={hitF} f={lf} color={ACC.mustard.main}>{s.text}</Highlighter>
-        </div>
-        <PaperCharDhamCutout progress={easeIO(clamp(lf / 14))} width={760} height={500} />
-        {s.sub && <div style={{...text(44, BODY), marginTop: 24, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  if (isCity) {
-    return (
-      <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
-        <Tape rot={-2} />
-        <div style={{...text(98, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 22}}>
-          <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
-        </div>
-        <PaperCityCutout progress={easeIO(clamp(lf / 14))} width={720} height={500} />
-        {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  if (isTemple) {
-    return (
-      <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
-        <Tape rot={2} />
         <div style={{...text(104, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 20}}>
           <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
         </div>
-        <PaperTempleCutout progress={easeIO(clamp(lf / 14))} width={660} height={530} />
+        {cutout}
         {s.sub && <div style={{...text(48, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
         {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
       </Sheet>
     );
   }
-  if (s.kind === "number") {
-    const v = (s.number ?? 0) * easeIO(clamp((lf - hitF) / (fps * 1.0)));
-    const dec = Number.isInteger(s.number ?? 0) ? 0 : 1;
-    return (
-      <Sheet w={W} h={820} seed={sd} accent={accent} tilt={tilt}>
-        <div style={{textAlign: "center"}}>
-          <div style={{...text(260, DISPLAY), lineHeight: 1, color: a.main}}>{v.toLocaleString("en-IN", {minimumFractionDigits: dec, maximumFractionDigits: dec})}<span style={{fontSize: 130}}>{s.unit}</span></div>
-          <div style={{...text(78), marginTop: 20}}><Highlighter start={hitF} f={lf} color={ACC.mustard.main}>{s.text}</Highlighter></div>
-          {s.sub && <div style={{...text(46, BODY), marginTop: 18, opacity: 0.75}}>{s.sub}</div>}
-        </div>
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  if (s.kind === "photo" && s.image) {
-    return (
-      <div style={{position: "relative"}}>
-        <Sheet w={W} h={1060} seed={sd} accent={accent} tilt={tilt}>
-          <Tape />
-          <Img src={staticFile(s.image)} style={{width: "100%", height: 700, objectFit: "cover", borderRadius: 6, filter: "sepia(.25) contrast(1.05)"}} />
-          <div style={{...text(66), marginTop: 28, textAlign: "center"}}><Highlighter start={hitF} f={lf} color={ACC.mustard.main}>{s.text}</Highlighter></div>
-        </Sheet>
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </div>
-    );
-  }
-  if (s.kind === "list") {
-    return (
-      <Sheet w={W} h={Math.max(760, 330 + shownItems.length * 150)} seed={sd} accent={accent} tilt={tilt}>
-        <div style={{...text(80, DISPLAY), marginBottom: 30, color: a.main}}>{s.text}</div>
-        {shownItems.map((it, k) => {
-          const p = easeIO(clamp((lf - itemStart(k)) / 10));
-          return (
-            <div key={k} style={{display: "flex", alignItems: "center", gap: 24, margin: "12px 0", opacity: p, transform: `translateX(${(1 - p) * -80}px)`}}>
-              <div style={{minWidth: 62, height: 62, borderRadius: 31, background: a.main, color: CREAM, fontFamily: DISPLAY, fontSize: 40, display: "flex", alignItems: "center", justifyContent: "center"}}>{k + 1}</div>
-              <div style={text(58)}>{it}</div>
-            </div>
-          );
-        })}
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  if (s.kind === "quote") {
-    return (
-      <Sheet w={W} h={880} seed={sd} accent={accent} tilt={tilt}>
-        <div style={{...text(260, DISPLAY), color: a.main, lineHeight: 0.6, height: 120}}>“</div>
-        <div style={{...text(80, HAND), lineHeight: 1.3}}><Highlighter start={hitF} f={lf} color={ACC.mustard.main}>{s.text}</Highlighter></div>
-        {s.sub && <div style={{...text(46, BODY), marginTop: 30, opacity: 0.75}}>— {s.sub}</div>}
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  if (s.kind === "title") {
-    return (
-      <Sheet w={W} h={860} seed={sd} accent={accent} tilt={tilt}>
-        <div style={{...text(128, DISPLAY), lineHeight: 1.22, textAlign: "center"}}><Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter></div>
-        {s.sub && <div style={{...text(52, BODY), marginTop: 34, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
-        {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
-      </Sheet>
-    );
-  }
-  // card
+
+  // card & default scenes: Every scene is fully illustrated with an animated SVG cutout!
   return (
-    <Sheet w={W} h={800} seed={sd} accent={accent} tilt={tilt}>
-      <div style={{alignSelf: "flex-start", background: a.main, color: CREAM, fontFamily: BOLD, fontSize: 40, padding: "6px 28px", borderRadius: 8, marginBottom: 30, transform: "rotate(-2deg)"}}>{String(i + 1).padStart(2, "0")}</div>
-      <div style={{...text(94), lineHeight: 1.22}}><Highlighter start={hitF} f={lf} color={ACC.mustard.main}>{s.text}</Highlighter></div>
-      {s.sub && <div style={{...text(50, BODY), marginTop: 30, opacity: 0.8}}>{s.sub}</div>}
+    <Sheet w={W} h={1180} seed={sd} accent={accent} tilt={tilt}>
+      <Tape rot={tilt > 0 ? 2 : -2} />
+      <div style={{...text(96, DISPLAY), lineHeight: 1.18, textAlign: "center", marginBottom: 20}}>
+        <Highlighter start={hitF} f={lf} color={a.main}>{s.text}</Highlighter>
+      </div>
+      {cutout}
+      {s.sub && <div style={{...text(46, BODY), marginTop: 20, textAlign: "center", opacity: 0.8}}>{s.sub}</div>}
       {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
     </Sheet>
   );

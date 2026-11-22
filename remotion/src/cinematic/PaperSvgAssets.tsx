@@ -699,3 +699,305 @@ export const PaperVachanCutout: React.FC<{ progress: number; width?: number; hei
   );
 };
 
+/* ------------------------------------------------------------------ 8. PAPER SHIVA LINGAM / JYOTIRLINGA CUTOUT */
+export const PaperShivaLingamCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 700, height = 540 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.88, 1]);
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "flex-end", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="0 0 700 540" style={{ overflow: "visible" }}>
+        {/* Layer 0: Paper Shadow */}
+        <g transform="translate(10, 14)" fill={SHADOW} opacity={0.52}>
+          <ellipse cx={350} cy={480} rx={220} ry={45} />
+          <path d="M180,450 L520,450 L500,380 L200,380 Z" />
+          <ellipse cx={350} cy={375} rx={180} ry={35} />
+          <path d="M180,375 L90,370 L110,410 L210,400 Z" />
+          <path d="M280,375 L420,375 L420,170 Q420,90 350,90 Q280,90 280,170 Z" />
+          {/* Trishul shadow */}
+          <rect x={520} y={40} width={16} height={420} />
+          <path d="M470,40 L586,40 L538,0 Z" />
+        </g>
+
+        {/* Layer 1: Peedham / Yoni Base (Layered Stone Steps) */}
+        {/* Bottom Tier */}
+        <ellipse cx={350} cy={480} rx={220} ry={45} fill={PALETTE[3]} stroke={CREAM} strokeWidth={4} />
+        <path d="M130,480 L570,480 L550,440 L150,440 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+
+        {/* Upper Yoni Peedham with Drainage Spout */}
+        <path d="M170,440 L530,440 L510,380 L190,380 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+        <ellipse cx={350} cy={380} rx={180} ry={35} fill={PALETTE[4]} stroke={CREAM} strokeWidth={4} />
+        {/* Sacred Jaladhari / Spout extending to the left */}
+        <path d="M190,380 L80,375 Q70,390 80,405 L180,410 Z" fill={PALETTE[2]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+        <ellipse cx={80} cy={390} rx={8} ry={15} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+
+        {/* Sacred Lingam (Polished Deep Stone with Highlights) */}
+        <path d="M275,380 L425,380 L425,175 Q425,80 350,80 Q275,80 275,175 Z" fill="#242120" stroke={CREAM} strokeWidth={4.5} strokeLinejoin="round" />
+        {/* Stone texture highlight curve */}
+        <path d="M295,180 Q305,110 350,100" fill="none" stroke="#4a4440" strokeWidth={5} strokeLinecap="round" />
+
+        {/* Sacred White Chandan Tripundra (Three Curved Horizontal Lines) */}
+        <path d="M305,190 Q350,205 395,190" fill="none" stroke={CREAM} strokeWidth={7} strokeLinecap="round" />
+        <path d="M302,204 Q350,219 398,204" fill="none" stroke={CREAM} strokeWidth={7} strokeLinecap="round" />
+        <path d="M305,218 Q350,233 395,218" fill="none" stroke={CREAM} strokeWidth={7} strokeLinecap="round" />
+
+        {/* Glowing Red Kumkum Bindi / Third Eye at Center of Tripundra */}
+        <ellipse cx={350} cy={204} rx={7} ry={13} fill={RED} stroke={GOLD} strokeWidth={2.5} />
+        <circle cx={350} cy={204} r={3} fill="#ffeaa7" />
+
+        {/* Golden Crescent Moon (Chandra) on the Lingam */}
+        <path d="M385,120 Q420,135 410,165 Q428,140 405,112 Q395,112 385,120 Z" fill={GOLD} stroke={CREAM} strokeWidth={2.5} />
+
+        {/* Sacred Bilva Patra (Three Green Leaves) at Lingam Base */}
+        <g transform="translate(320, 375)">
+          <path d="M0,0 Q-15,-20 0,-35 Q15,-20 0,0 Z" fill="#2e7d32" stroke={CREAM} strokeWidth={2} />
+          <path d="M-5,-5 Q-25,-12 -28,-30 Q-10,-24 -5,-5 Z" fill="#388e3c" stroke={CREAM} strokeWidth={2} />
+          <path d="M5,-5 Q25,-12 28,-30 Q10,-24 5,-5 Z" fill="#388e3c" stroke={CREAM} strokeWidth={2} />
+          <circle cx={0} cy={-2} r={3} fill={GOLD} />
+        </g>
+
+        {/* Golden Trishul on the right */}
+        <g transform="translate(530, 80)">
+          {/* Staff */}
+          <line x1={0} y1={-40} x2={0} y2={390} stroke={GOLD} strokeWidth={6} strokeLinecap="round" />
+          <line x1={0} y1={-40} x2={0} y2={390} stroke={CREAM} strokeWidth={2} strokeLinecap="round" />
+          {/* Central Spear Prong */}
+          <path d="M0,-80 L12,-40 L-12,-40 Z" fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          {/* Left & Right Curved Prongs */}
+          <path d="M0,-40 Q-45,-45 -40,-85 Q-25,-55 0,-48" fill={GOLD} stroke={CREAM} strokeWidth={3} strokeLinejoin="round" />
+          <path d="M0,-40 Q45,-45 40,-85 Q25,-55 0,-48" fill={GOLD} stroke={CREAM} strokeWidth={3} strokeLinejoin="round" />
+          {/* Damru tied to Trishul */}
+          <g transform="translate(0, 15)">
+            <polygon points="-18,-18 18,-18 0,0 18,18 -18,18 0,0" fill={PALETTE[0]} stroke={CREAM} strokeWidth={2.5} />
+            <line x1={-18} y1={-18} x2={-18} y2={18} stroke={RED} strokeWidth={3} />
+            <line x1={18} y1={-18} x2={18} y2={18} stroke={RED} strokeWidth={3} />
+            <circle cx={0} cy={0} r={4} fill={GOLD} />
+          </g>
+          {/* Saffron Ribbon fluttering */}
+          <path d="M0,45 Q35,60 65,45 Q40,75 0,70 Z" fill={RED} stroke={RED_DARK} strokeWidth={2} />
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ 9. PAPER TRISHUL & DAMRU CUTOUT */
+export const PaperTrishulCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 700, height = 520 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.85, 1]);
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "center", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="0 0 700 520" style={{ overflow: "visible" }}>
+        {/* Layer 0: Shadow */}
+        <g transform="translate(10, 14)" fill={SHADOW} opacity={0.5}>
+          <circle cx={350} cy={220} r={170} />
+          <rect x={342} y={30} width={20} height={470} rx={8} />
+          <path d="M350,10 L390,140 L310,140 Z" />
+        </g>
+
+        {/* Radiant Solar Sunburst Aura */}
+        <circle cx={350} cy={220} r={180} fill={PALETTE[2]} stroke={CREAM} strokeWidth={4} strokeDasharray="16 10" opacity={0.8} />
+        <circle cx={350} cy={220} r={140} fill={PALETTE[0]} stroke={GOLD} strokeWidth={3} />
+
+        {/* Main Golden Trishul Shaft */}
+        <rect x={342} y={20} width={16} height={480} rx={8} fill={GOLD} stroke={CREAM} strokeWidth={3.5} />
+        {/* Brass Rings along Shaft */}
+        {[140, 240, 340, 420].map((ry, i) => (
+          <rect key={i} x={336} y={ry} width={28} height={10} rx={3} fill={RED} stroke={CREAM} strokeWidth={2} />
+        ))}
+
+        {/* Central Trishul Blade */}
+        <path d="M350,15 L375,120 L325,120 Z" fill={GOLD} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+        <line x1={350} y1={25} x2={350} y2={120} stroke={CREAM} strokeWidth={3} />
+
+        {/* Outer Curved Fierce Prongs */}
+        <path d="M350,120 Q240,110 250,25 Q285,75 350,95 Z" fill={GOLD} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+        <path d="M350,120 Q460,110 450,25 Q415,75 350,95 Z" fill={GOLD} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+
+        {/* Large Sacred Damru in the middle */}
+        <g transform="translate(350, 190)">
+          <polygon points="-55,-40 55,-40 0,0 55,40 -55,40 0,0" fill={PALETTE[1]} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+          <ellipse cx={-55} cy={0} rx={10} ry={40} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          <ellipse cx={55} cy={0} rx={10} ry={40} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+          {/* Crossing Red Cords on Damru */}
+          <line x1={-55} y1={-40} x2={55} y2={40} stroke={RED} strokeWidth={3} />
+          <line x1={-55} y1={40} x2={55} y2={-40} stroke={RED} strokeWidth={3} />
+          <circle cx={0} cy={0} r={9} fill={CREAM} stroke={GOLD} strokeWidth={3} />
+          {/* Striker Beads dangling */}
+          <path d="M0,0 Q-40,40 -45,65" fill="none" stroke={INK} strokeWidth={2.5} />
+          <circle cx={-45} cy={65} r={7} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+          <path d="M0,0 Q40,40 45,65" fill="none" stroke={INK} strokeWidth={2.5} />
+          <circle cx={45} cy={65} r={7} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+        </g>
+
+        {/* Two Flying Saffron Banners from Shaft */}
+        <g transform="translate(350, 275)">
+          <path d="M0,0 Q65,-25 130,-15 L105,25 Q55,10 0,15 Z" fill={RED} stroke={RED_DARK} strokeWidth={3} strokeLinejoin="round" />
+          <path d="M0,20 Q-65,0 -125,-10 L-100,30 Q-50,25 0,35 Z" fill={RED} stroke={RED_DARK} strokeWidth={3} strokeLinejoin="round" />
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ 10. PAPER MYTHOLOGY CHARIOT / RATH CUTOUT */
+export const PaperChariotCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 740, height = 500 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.88, 1]);
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "flex-end", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="0 0 740 500" style={{ overflow: "visible" }}>
+        {/* Layer 0: Shadow */}
+        <g transform="translate(10, 14)" fill={SHADOW} opacity={0.5}>
+          <circle cx={240} cy={380} r={95} />
+          <path d="M140,380 L350,380 L390,260 L200,260 Z" />
+          <rect x={350} y={350} width={340} height={25} />
+        </g>
+
+        {/* Ground Dust / Speed Lines in Kraft Muted Gold */}
+        <line x1={40} y1={475} x2={700} y2={475} stroke={PALETTE[3]} strokeWidth={6} strokeDasharray="40 25" strokeLinecap="round" />
+
+        {/* Chariot Shaft / Yoke Pole reaching forward */}
+        <path d="M280,370 L650,340 L650,320 L280,350 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+
+        {/* Golden Royal War Chariot Body */}
+        <path d="M120,380 L370,380 L390,240 Q390,190 320,190 L160,190 Q120,240 120,380 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={4.5} strokeLinejoin="round" />
+        {/* Curved Protective Battle Shield Panels on Side */}
+        <path d="M140,360 Q260,320 360,360 L360,260 Q260,220 140,260 Z" fill={GOLD} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+        <circle cx={250} cy={310} r={24} fill={RED} stroke={CREAM} strokeWidth={3} />
+        <circle cx={250} cy={310} r={10} fill="#ffeaa7" />
+
+        {/* Royal Golden Umbrella / Chatra over the Chariot */}
+        <g transform="translate(250, 100)">
+          <line x1={0} y1={90} x2={0} y2={0} stroke={GOLD} strokeWidth={5} />
+          <path d="M-90,0 Q0,-65 90,0 Q60,15 0,15 Q-60,15 -90,0 Z" fill={GOLD} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+          <circle cx={0} cy={-70} r={8} fill={CREAM} stroke={GOLD} strokeWidth={2} />
+          {/* Saffron Royal Flag from Mast */}
+          <path d="M0,-70 Q55,-50 110,-65 L85,-35 Q40,-45 0,-35 Z" fill={RED} stroke={RED_DARK} strokeWidth={2.5} />
+        </g>
+
+        {/* Great 16-Spoke Wooden Sun Wheel */}
+        <g transform="translate(240, 380)">
+          {/* Wheel Rim Outer */}
+          <circle cx={0} cy={0} r={95} fill={PALETTE[2]} stroke={CREAM} strokeWidth={5} />
+          <circle cx={0} cy={0} r={78} fill={PALETTE[4]} stroke={CREAM} strokeWidth={3.5} />
+          {/* 12 Radiating Wooden Spokes */}
+          {[0, 30, 60, 90, 120, 150].map((deg, i) => (
+            <line key={i} x1={-76} y1={0} x2={76} y2={0} transform={`rotate(${deg})`} stroke={GOLD} strokeWidth={5} strokeLinecap="round" />
+          ))}
+          {/* Wheel Hub */}
+          <circle cx={0} cy={0} r={28} fill={RED} stroke={CREAM} strokeWidth={3.5} />
+          <circle cx={0} cy={0} r={12} fill={GOLD} stroke={CREAM} strokeWidth={2} />
+        </g>
+
+        {/* Rearing Royal War Horse Silhouette in Paper Cutout */}
+        <g transform="translate(560, 330)">
+          {/* Powerful Muscular Horse Body */}
+          <path d="M-60,50 Q-40,-30 40,-40 Q90,-20 90,40 Q50,70 -60,50 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+          {/* Arched Neck & Head */}
+          <path d="M30,-30 Q60,-90 100,-110 Q125,-100 120,-70 Q105,-50 90,-20 Z" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+          {/* Galloping Forelegs raised in air */}
+          <path d="M70,30 L110,-20 L130,-15 L85,45 Z" fill={PALETTE[2]} stroke={CREAM} strokeWidth={3} strokeLinejoin="round" />
+          {/* Royal Saffron Bridle & Reins */}
+          <line x1={-30} y1={-100} x2={110} y2={-80} stroke={RED} strokeWidth={3} />
+          {/* Plume on Horse Forehead */}
+          <polygon points="110,-125 102,-110 118,-110" fill={GOLD} stroke={CREAM} strokeWidth={2} />
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ 11. PAPER MOUNTAIN & CAVE CUTOUT */
+export const PaperMountainCaveCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 720, height = 500 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.88, 1]);
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "flex-end", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="0 0 720 500" style={{ overflow: "visible" }}>
+        {/* Layer 0: Shadow */}
+        <g transform="translate(8, 12)" fill={SHADOW} opacity={0.5}>
+          <polygon points="360,60 120,480 600,480" />
+          <polygon points="180,180 20,480 340,480" />
+          <polygon points="540,180 380,480 700,480" />
+        </g>
+
+        {/* Distant Kailash Snow Peaks (Tier 3) */}
+        <polygon points="360,60 120,480 600,480" fill={PALETTE[3]} stroke={CREAM} strokeWidth={4} strokeLinejoin="round" />
+        {/* Central Snow Cap Peak */}
+        <polygon points="360,60 310,180 350,165 370,185 410,180" fill={CREAM} stroke="#e0d6c3" strokeWidth={2} />
+
+        {/* Flanking Peaks (Tier 2) */}
+        <polygon points="180,180 20,480 340,480" fill={PALETTE[1]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+        <polygon points="180,180 145,260 180,250 215,260" fill={CREAM} stroke="#e0d6c3" strokeWidth={2} />
+
+        <polygon points="540,180 380,480 700,480" fill={PALETTE[2]} stroke={CREAM} strokeWidth={3.5} strokeLinejoin="round" />
+        <polygon points="540,180 505,260 540,250 575,260" fill={CREAM} stroke="#e0d6c3" strokeWidth={2} />
+
+        {/* Foreground Mystic Rishi Cave (Arch Cutout with Golden Divine Light) */}
+        <g transform="translate(360, 480)">
+          {/* Rocky Arch Mound */}
+          <path d="M-140,0 Q-150,-180 0,-190 Q150,-180 140,0 Z" fill={PALETTE[0]} stroke={CREAM} strokeWidth={4.5} strokeLinejoin="round" />
+          {/* Inner Mystical Cave Void */}
+          <path d="M-85,0 Q-90,-130 0,-140 Q90,-130 85,0 Z" fill="#2d2218" stroke={CREAM} strokeWidth={3.5} />
+          {/* Radiant Golden Divine Light inside the Cave */}
+          <ellipse cx={0} cy={-60} rx={45} ry={60} fill="#ffeaa7" opacity={0.85} />
+          <ellipse cx={0} cy={-50} rx={25} ry={35} fill={GOLD} opacity={0.9} />
+          {/* Sacred Trishul at Cave Entrance */}
+          <line x1={-35} y1={0} x2={-35} y2={-110} stroke={GOLD} strokeWidth={3} strokeLinecap="round" />
+          <path d="M-35,-125 L-30,-110 L-40,-110 Z" fill={GOLD} />
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+/* ------------------------------------------------------------------ 12. PAPER SUDARSHAN CHAKRA & SHANKHA CUTOUT */
+export const PaperSudarshanCutout: React.FC<{ progress: number; width?: number; height?: number }> = ({ progress, width = 700, height = 520 }) => {
+  const p = Math.max(0, Math.min(1, progress));
+  const s = interpolate(p, [0, 1], [0.85, 1]);
+  return (
+    <div style={{ width, height, margin: "0 auto", display: "flex", justifyContent: "center", alignItems: "center", transform: `scale(${s})`, opacity: p }}>
+      <svg width={width} height={height} viewBox="0 0 700 520" style={{ overflow: "visible" }}>
+        {/* Layer 0: Shadow */}
+        <g transform="translate(10, 14)" fill={SHADOW} opacity={0.5}>
+          <circle cx={350} cy={230} r={170} />
+          <ellipse cx={350} cy={440} rx={160} ry={30} />
+        </g>
+
+        {/* Sacred Lotus Pedestal */}
+        <ellipse cx={350} cy={440} rx={160} ry={30} fill={PALETTE[3]} stroke={CREAM} strokeWidth={4} />
+        <ellipse cx={350} cy={430} rx={130} ry={22} fill={GOLD} stroke={CREAM} strokeWidth={3} />
+
+        {/* The Blazing Spinning Sudarshan Chakra */}
+        <g transform="translate(350, 220)">
+          {/* Outer Fiery Serrated Teeth (16 Razor Blades) */}
+          {[0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5, 180, 202.5, 225, 247.5, 270, 292.5, 315, 337.5].map((deg, i) => (
+            <path key={i} d="M0,-170 L28,-130 L-8,-140 Z" transform={`rotate(${deg})`} fill={GOLD} stroke={CREAM} strokeWidth={2.5} strokeLinejoin="round" />
+          ))}
+
+          {/* Golden Outer Rim */}
+          <circle cx={0} cy={0} r={140} fill={PALETTE[1]} stroke={CREAM} strokeWidth={4.5} />
+          {/* Sacred Crimson Ring */}
+          <circle cx={0} cy={0} r={115} fill={RED} stroke={CREAM} strokeWidth={3.5} />
+          {/* Solar Hub with 8 Spokes */}
+          <circle cx={0} cy={0} r={80} fill={GOLD} stroke={CREAM} strokeWidth={3.5} />
+          {[0, 45, 90, 135].map((deg, i) => (
+            <line key={i} x1={-75} y1={0} x2={75} y2={0} transform={`rotate(${deg})`} stroke={CREAM} strokeWidth={4} strokeLinecap="round" />
+          ))}
+          {/* Central Blue Diamond / Vishnu Gem (Kaustubha) */}
+          <circle cx={0} cy={0} r={32} fill="#1e3a8a" stroke={CREAM} strokeWidth={3} />
+          <polygon points="0,-18 18,0 0,18 -18,0" fill="#60a5fa" stroke={CREAM} strokeWidth={2} />
+        </g>
+
+        {/* Sacred White Shankha (Panchajanya Conch) on the side */}
+        <g transform="translate(480, 360)">
+          <path d="M-30,40 Q-50,-20 0,-40 Q50,-30 40,20 Q10,50 -30,40 Z" fill={CREAM} stroke={GOLD} strokeWidth={3.5} strokeLinejoin="round" />
+          <path d="M-20,-10 Q0,-25 20,-10 Q5,20 -15,15" fill="none" stroke={GOLD} strokeWidth={2.5} />
+          <circle cx={-5} cy={-30} r={6} fill={RED} />
+        </g>
+      </svg>
+    </div>
+  );
+};
+
+
