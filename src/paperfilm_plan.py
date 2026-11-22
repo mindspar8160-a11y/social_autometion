@@ -201,6 +201,16 @@ GEO_LORE = {
     "godavari": {"state": "Andhra Pradesh", "district": "East Godavari", "name": "कोटिलिंगेश्वर (राजमहेंद्रवरम)", "lat": 16.9891, "lon": 81.7770, "aliases": ["गोदावरी", "godavari", "राजमहेंद्रवरम", "rajahmundry", "कोटिलिंगेश्वर", "kotilingeshwar", "सर्वशैल"]},
 }
 
+STATE_HI = {
+    "Maharashtra": "महाराष्ट्र", "Gujarat": "गुजरात", "Rajasthan": "राजस्थान",
+    "Madhya Pradesh": "मध्य प्रदेश", "Uttar Pradesh": "उत्तर प्रदेश",
+    "Kerala": "केरल", "Karnataka": "कर्नाटक", "Odisha": "ओडिशा",
+    "Andhra Pradesh": "आंध्र प्रदेश", "Jammu and Kashmir": "जम्मू-कश्मीर",
+    "Haryana": "हरियाणा", "Punjab": "पंजाब", "Bihar": "बिहार", "West Bengal": "पश्चिम बंगाल",
+    "Uttarakhand": "उत्तराखंड", "Himachal Pradesh": "हिमाचल प्रदेश", "Assam": "असम",
+    "Tamil Nadu": "तमिलनाडु", "Telangana": "तेलंगाना",
+}
+
 
 def _detect_geo(topic):
     hay = (str(topic.get("title", "")) + " " + str(topic.get("summary", "")) + " " + str(topic.get("topic", "")) + " " + str(topic.get("topic_title", ""))).lower()
@@ -407,9 +417,9 @@ def clean_plan(plan, seed=None):
 
     if len(out) < 4:
         raise ValueError("fewer than 4 usable scenes")
-    # Strictly cap at 8 scenes max for 38-45s timeline
-    if len(out) > 8:
-        out = out[:7] + [out[-1]]
+    # Cap at 11 scenes max for 45-50s timeline
+    if len(out) > 11:
+        out = out[:10] + [out[-1]]
     # only one map scene
     seen_map = False
     for sc in out:
@@ -468,6 +478,18 @@ def clean_plan(plan, seed=None):
     return {"youtube": y, "scenes": out}
 
 
+def _clean_stutters(text: str) -> str:
+    if not text:
+        return ""
+    # Remove duplicate repeated phrases up to 4 words (e.g. "Madhya Pradesh ke Amarkantak mein")
+    t = re.sub(r'([\u0900-\u097F\w]+(?:\s+[\u0900-\u097F\w]+){0,3})\s*[,]?\s+\1', r'\1', text, flags=re.IGNORECASE)
+    # Remove repeated particles "mein mein", "में में", "ke ke"
+    t = re.sub(r'(?i)\b(mein|के|ke|ki|की)\s*[,]?\s+\1\b', r'\1', t)
+    # Clean consecutive commas or excessive spaces
+    t = re.sub(r'\s*,\s*,\s*', ', ', t)
+    return re.sub(r'\s+', ' ', t).strip(' ,')
+
+
 def make_series_part_plan(topic, part, slot_info, seed=None):
     """Creates a strictly 35-45s PaperFilm plan for a specific Part in a multi-part series."""
     rnd = random.Random(seed)
@@ -477,17 +499,6 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
     tot_parts = slot_info.get("total_parts", 2)
     is_final = slot_info.get("is_final_part", False)
     geo = _detect_geo(topic)
-
-    def _clean_stutters(text: str) -> str:
-        if not text:
-            return ""
-        # Remove duplicate repeated phrases up to 4 words (e.g. "Madhya Pradesh ke Amarkantak mein")
-        t = re.sub(r'([\u0900-\u097F\w]+(?:\s+[\u0900-\u097F\w]+){0,3})\s*[,]?\s+\1', r'\1', text, flags=re.IGNORECASE)
-        # Remove repeated particles "mein mein", "में में", "ke ke"
-        t = re.sub(r'(?i)\b(mein|के|ke|ki|की)\s*[,]?\s+\1\b', r'\1', t)
-        # Clean consecutive commas or excessive spaces
-        t = re.sub(r'\s*,\s*,\s*', ', ', t)
-        return re.sub(r'\s+', ' ', t).strip(' ,')
 
     st_hi = {
         "Maharashtra": "महाराष्ट्र", "Gujarat": "गुजरात", "Rajasthan": "राजस्थान",
@@ -784,12 +795,73 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
 
 
 def make_plan(topic, custom_script=None, seed=None):
+    """Default entrypoint: Generates a full 45-50s standalone video plan (no parts)."""
+    return make_standalone_45s_plan(topic, custom_script=custom_script, seed=seed)
+
+
+_PROMPT_STANDALONE_45S = """Tum ek anubhavi Hindi kahani-kaar aur viral YouTube Shorts / Instagram Reels scriptwriter ho jo YouTube Shorts ke liye "paper-cut film" style video ka script likhte ho.
+Ye video ek SINGLE FULL COMPLETE STANDALONE VIDEO hai (KOI PARTS NAHI, NO PART 1, 2, 3)! Poori kahani ek hi video me 45 se 50 second ki duration me aayegi.
+Is kahani ko STRICTLY 9 se 10 chhote scenes me todo.
+
+__CONTEXT__
+
+VIRAL REELS SCRIPTING FRAMEWORK (FULL 45-50 SEC STANDALONE VIDEO):
+1. PACING & TOTAL DURATION (TARGET 45-50 SECONDS):
+   - Total Scenes: STRICTLY 9 se 10 scenes! (Na 8 se kam, na 11 se zyada).
+   - Har scene ki narration length: STRICTLY 11-14 words!
+   - Total words poore video me: ~115 se 130 words (jo 1.05 voice speed par theek 45-50 seconds banti hai).
+
+2. STANDALONE NARRATIVE ARC:
+   - Scene 1 (Hook, 0-4s): Scroll-stopping thumb-stop paradox / sensory curiosity hook. Stamp: "कथा" ya blank. KABHI BHI "भाग 1" mat likho!
+   - Scene 2 (Setting / Origin, 5-9s): Sthan, kaal aur katha ka aagaaz. Agar sthan ka naam aaye to 'map' scene banega!
+   - Scene 3-6 (Rising Action & Conflict, 10-28s): Kathin sangharsh, vachan, aakraman ya divya tapasya ka vistar.
+   - Scene 7-8 (Climax & Turning Point, 29-41s): Sankat charam par, chamatkar ya antim vijay.
+   - Scene 9-10 (Resolution & Divine Conclusion, 42-48s): Antim divya sandesh aur pavitra jaikara ('बोलिए हर हर महादेव!' ya 'बोलिए जय श्री कृष्ण!'). Stamp: STRICTLY 'कथा सम्पूर्ण'!
+
+3. CRITICAL RULES:
+   - KOI BHI PART NAHI: KABHI BHI 'भाग 1', 'भाग 2', 'अगला भाग', 'dekhiye agle video' mat likho! Poori kahani isi ek video me samapt hogi.
+   - ZERO DUPLICATION: Hook aur Scene 2 me koi shabd ya naam dohrana nahi hai.
+   - KABHI BHI "जानिए इसका रहस्य", "रहस्य जानिए" jaise filler phrases mat likho.
+   - Shuddh Devanagari Hindi for tts_text, Hinglish for narration. Numbers aur Saal bilkul shabdon me likho (jaise 'सन सोलह सौ साठ').
+
+OUTPUT: sirf ek JSON object (koi markdown nahi, koi explanation nahi):
+{
+  "youtube": {"title": "Hindi viral title without part numbers, max 60 chars", "description": "3-4 line Hindi description + hashtags", "tags": ["..."]},
+  "scenes": [
+    {
+      "kind": "title | card | number | quote | list | map",
+      "emotion": "heroic | suspense | conversational | emotional | divine (har scene ka bhav)",
+      "narration": "STRICTLY Hinglish (Hindi bolchal in Roman / English alphabet). STRICTLY 11-14 words.",
+      "tts_text": "WAHI line shuddh Devanagari Hindi me, voice ke liye. Numbers aur Saal shabdon me.",
+      "text": "Screen par bada text, Devanagari, max 6 words",
+      "sub": "chhoti line (optional), max 6 words",
+      "hit_word": "narration ka ek word jis par effect lage",
+      "stamp": "optional stamp (sirf Scene 0 me, intermediate scenes me nahi)",
+      "accent": "red | teal | mustard | ink"
+    }
+  ]
+}
+"""
+
+
+def make_standalone_45s_plan(topic, custom_script=None, seed=None):
     rnd = random.Random(seed)
     states, _ = _load_geo()
-    prompt = (_PROMPT
-              .replace("__N__", rnd.choice(["7", "8", "7"]))
+    prompt = (_PROMPT_STANDALONE_45S
               .replace("__CONTEXT__", _context(topic, custom_script))
               .replace("__STATES__", json.dumps(states, ensure_ascii=False)))
+    
+    topic_title = topic.get("title", "") if isinstance(topic, dict) else str(topic)
+    topic_summary = topic.get("summary", "") if isinstance(topic, dict) else ""
+    topic_key = topic.get("topic", "") if isinstance(topic, dict) else ""
+    search_text = f"{topic_key} {topic_title} {topic_summary}".lower()
+    
+    geo = None
+    for k, v in GEO_LORE.items():
+        if k in search_text or any(al in search_text for al in v.get("aliases", [])):
+            geo = v
+            break
+
     err = None
     for attempt in range(3):
         try:
@@ -798,12 +870,116 @@ def make_plan(topic, custom_script=None, seed=None):
             if "{" in raw and "}" in raw:
                 raw = raw[raw.index("{"): raw.rindex("}") + 1]
             plan = clean_plan(llm._salvage_json(raw), seed)
-            print(f"[PaperFilm] plan ready: {len(plan['scenes'])} scenes, kinds = {[s['kind'] for s in plan['scenes']]}")
+            scenes = plan["scenes"]
+
+            # Smart Map Detection: JAHAN KISI JAGAH KA NAAM AAYE, WAHAN MAP SCENE AAYEGA!
+            if geo:
+                st_hi = STATE_HI.get(geo["state"], geo["state"])
+                map_scene_idx = None
+                for idx, sc in enumerate(scenes):
+                    if sc.get("kind") == "map":
+                        map_scene_idx = idx
+                        break
+                if map_scene_idx is None:
+                    aliases = [geo["name"].lower()] + [al.lower() for al in geo.get("aliases", [])] + [geo["state"].lower(), st_hi.lower()]
+                    for idx, sc in enumerate(scenes):
+                        sc_text = (sc.get("narration", "") + " " + sc.get("tts_text", "") + " " + sc.get("text", "")).lower()
+                        if any(a in sc_text for a in aliases if len(a) > 2):
+                            map_scene_idx = idx
+                            break
+                if map_scene_idx is not None:
+                    for idx, sc in enumerate(scenes):
+                        if idx == map_scene_idx:
+                            sc["kind"] = "map"
+                            sc["state"] = geo["state"]
+                            if geo.get("district"):
+                                sc["district"] = geo["district"]
+                            sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                            sc["text"] = f"भारत → {st_hi} → {geo['name']}"
+                            sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
+                            sc["hit2_word"] = geo["name"].split()[0]
+                        elif sc.get("kind") == "map":
+                            sc["kind"] = "card"
+                            sc["text"] = re.sub(r"\s*→\s*", " ", sc.get("text", "")).strip()
+
+            # Clean stutters & fillers
+            for sc in scenes:
+                sc["narration"] = _clean_stutters(sc.get("narration", ""))
+                sc["tts_text"] = _clean_stutters(sc.get("tts_text", sc["narration"]))
+
+            def _clean_fillers(text: str) -> str:
+                if not text:
+                    return ""
+                fillers = [
+                    r"जानिए\s+इसका\s+रहस्य[!।?]?",
+                    r"इसका\s+रहस्य\s+जानिए[!।?]?",
+                    r"रहस्य\s+जानिए[!।?]?",
+                    r"जानिए\s+यह\s+रहस्य[!।?]?",
+                    r"का\s+क्या\s+था\s+रहस्य\?",
+                    r"iska\s+rahasya\s+jaaniye",
+                    r"jaaniye\s+iska\s+rahasya",
+                    r"dekhiye\s+agle\s+(?:episode|video|bha?g)\s*(?:mein|me)?[!।?]?",
+                    r"देखिए\s+अगले\s+(?:एपिसोड|वीडियो|भाग)\s*(?:में)?[!।?]?",
+                    r"lekin\s+aage\s+kya\s+hua\??",
+                    r"लेकिन\s+आगे\s+क्या\s+हुआ\??",
+                    r"bha?g\s*\d+",
+                    r"भाग\s*\d+",
+                ]
+                t = text
+                t = re.sub(r'(?<!हर\s)हर\s+महादेव', 'हर हर महादेव', t)
+                t = re.sub(r'(?i)(?<!har\s)har\s+mahadev', 'Har Har Mahadev', t)
+                for f in fillers:
+                    t = re.sub(f, "", t, flags=re.IGNORECASE)
+                return re.sub(r"\s+", " ", t).strip(" ,-—")
+
+            for sc in scenes:
+                sc["narration"] = _clean_fillers(sc.get("narration", ""))
+                sc["tts_text"] = _clean_fillers(sc.get("tts_text", sc["narration"]))
+
+            # STAMPS RULE: Standalone video - NO "भाग X" anywhere!
+            if scenes[0].get("stamp") and "भाग" in scenes[0]["stamp"]:
+                scenes[0]["stamp"] = "कथा"
+            for sc in scenes[1:-1]:
+                sc.pop("stamp", None)
+            scenes[-1]["stamp"] = "कथा सम्पूर्ण"
+
+            # Sacred conclusion
+            topic_lower = topic_title.lower()
+            last_tts = scenes[-1].get("tts_text", "")
+            last_narr = scenes[-1].get("narration", "")
+            if any(k in topic_lower for k in ["शिव", "सोमनाथ", "महादेव", "ज्योतिर्लिंग", "shiva", "somnath"]):
+                last_tts = re.sub(r'(?<!हर\s)हर\s+महादेव', 'हर हर महादेव', last_tts)
+                last_narr = re.sub(r'(?i)(?<!har\s)har\s+mahadev', 'Har Har Mahadev', last_narr)
+                if "हर हर महादेव" not in last_tts:
+                    last_tts = f"{last_tts.rstrip('.!|। ')}। बोलिए हर हर महादेव!"
+                    last_narr = f"{last_narr.rstrip('.!| ')}. Boliye Har Har Mahadev!"
+                scenes[-1]["tts_text"] = last_tts
+                scenes[-1]["narration"] = last_narr
+            elif any(k in topic_lower for k in ["कृष्ण", "द्वारका", "krishna", "dwarka"]):
+                if "जय श्री कृष्ण" not in last_tts:
+                    scenes[-1]["tts_text"] = f"{last_tts.rstrip('.!|। ')}। बोलिए जय श्री कृष्ण!"
+                    scenes[-1]["narration"] = f"{last_narr.rstrip('.!| ')}. Boliye Jai Shri Krishna!"
+                scenes[-1]["tts_text"] = last_tts
+                scenes[-1]["narration"] = last_narr
+
+            # YouTube Packaging: Clean title without part numbers
+            raw_title = plan.get("youtube", {}).get("title", topic_title)
+            clean_title = re.sub(r"\s*\|\s*(?:भाग|part)\s*\d+.*", "", raw_title, flags=re.IGNORECASE).strip()
+            clean_title = re.sub(r"#\w+", "", clean_title).strip()
+            if not clean_title.startswith("🚩") and not clean_title.startswith("🔱"):
+                clean_title = f"🔱 {clean_title}"
+            clean_title = f"{clean_title} #Shorts"
+            plan["youtube"] = {
+                "title": clean_title[:70],
+                "description": f"{topic_title}\n\n#shorts #mythology #sanatandharma #viralshorts",
+                "tags": [topic_title, "shorts", "mythology", "history", "hindi stories"]
+            }
+            print(f"[PaperFilm] Standalone 45-50s plan ready: {len(scenes)} scenes")
             return plan
         except Exception as e:
             err = str(e)
-            print(f"[PaperFilm] plan attempt {attempt + 1} failed: {err}")
-    raise RuntimeError(f"PaperFilm plan failed after 3 attempts: {err}")
+            print(f"[PaperFilm] Standalone plan attempt {attempt + 1} failed: {err}")
+    raise RuntimeError(f"Standalone plan failed after 3 attempts: {err}")
 
 
 def _find(words, target, default_frac):

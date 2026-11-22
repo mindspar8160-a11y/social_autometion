@@ -313,39 +313,46 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
             clean_first = re.sub(r"^/(story|create|script)\s*", "", first_line, flags=re.IGNORECASE).strip()
             short_title = " ".join(clean_first.split()[:6]).title() or "भारतीय वीर गाथा"
         topic = {"title": short_title, "summary": custom_script}
-        print(f"📖 Myth Topic (Custom Script): {topic['title']}")
-        plan = paperfilm_plan.make_plan(topic, custom_script=custom_script, seed=seed)
-    elif getattr(a, "topic", None):
-        import series_manager
-        state = series_manager.load_series_state()
-        topic_obj = next((t for t in state["active_topics"] if t["topic_id"] == a.topic), None)
-        if not topic_obj:
-            raise ValueError(f"Topic {a.topic} not found in active topics")
-        part_num = getattr(a, "part", None) or topic_obj.get("current_part", 1)
-        part = next((p for p in topic_obj["parts"] if p["part_num"] == part_num), None)
-        if not part:
-            raise ValueError(f"Part {part_num} not found in topic {a.topic}")
-        slot_info = {
-            "topic_index": 0,
-            "topic_id": topic_obj["topic_id"],
-            "topic_title": topic_obj["topic_title"],
-            "current_part": part_num,
-            "total_parts": topic_obj["total_parts"],
-            "active_pool_count": len(state["active_topics"]),
-            "is_final_part": part_num >= topic_obj["total_parts"]
-        }
-        topic = {"title": topic_obj["topic_title"], "topic": topic_obj["topic_id"], "summary": topic_obj.get("story_synopsis", "")}
-        print(f"📖 Targeted Series Slot: {topic_obj['topic_title']} | Part {part_num}/{slot_info['total_parts']}")
-        print(f"🎬 Episode Title: {part['part_title']}")
-        plan = paperfilm_plan.make_series_part_plan(topic_obj, part, slot_info, seed=seed)
+        print(f"📖 Myth Topic (Custom Script - Full 45-50s): {topic['title']}")
+        plan = paperfilm_plan.make_standalone_45s_plan(topic, custom_script=custom_script, seed=seed)
+    elif getattr(a, "series", False):
+        if getattr(a, "topic", None):
+            import series_manager
+            state = series_manager.load_series_state()
+            topic_obj = next((t for t in state["active_topics"] if t["topic_id"] == a.topic), None)
+            if not topic_obj:
+                raise ValueError(f"Topic {a.topic} not found in active topics")
+            part_num = getattr(a, "part", None) or topic_obj.get("current_part", 1)
+            part = next((p for p in topic_obj["parts"] if p["part_num"] == part_num), None)
+            if not part:
+                raise ValueError(f"Part {part_num} not found in topic {a.topic}")
+            slot_info = {
+                "topic_index": 0,
+                "topic_id": topic_obj["topic_id"],
+                "topic_title": topic_obj["topic_title"],
+                "current_part": part_num,
+                "total_parts": topic_obj["total_parts"],
+                "active_pool_count": len(state["active_topics"]),
+                "is_final_part": part_num >= topic_obj["total_parts"]
+            }
+            topic = {"title": topic_obj["topic_title"], "topic": topic_obj["topic_id"], "summary": topic_obj.get("story_synopsis", "")}
+            print(f"📖 Targeted Series Slot: {topic_obj['topic_title']} | Part {part_num}/{slot_info['total_parts']}")
+            print(f"🎬 Episode Title: {part['part_title']}")
+            plan = paperfilm_plan.make_series_part_plan(topic_obj, part, slot_info, seed=seed)
+        else:
+            # 3-Topic Multi-Part Series Rotation Engine
+            import series_manager
+            topic_obj, part, slot_info = series_manager.get_next_slot(pool_size=3)
+            topic = {"title": topic_obj["topic_title"], "topic": topic_obj["topic_id"], "summary": topic_obj.get("story_synopsis", "")}
+            print(f"📖 Active Series Slot: {topic_obj['topic_title']} | Part {slot_info['current_part']}/{slot_info['total_parts']}")
+            print(f"🎬 Episode Title: {part['part_title']}")
+            plan = paperfilm_plan.make_series_part_plan(topic_obj, part, slot_info, seed=seed)
     else:
-        # 3-Topic Multi-Part Series Rotation Engine
-        import series_manager
-        topic_obj, part, slot_info = series_manager.get_next_slot(pool_size=3)
-        topic = {"title": topic_obj["topic_title"], "topic": topic_obj["topic_id"], "summary": topic_obj.get("story_synopsis", "")}
-        print(f"📖 Active Series Slot: {topic_obj['topic_title']} | Part {slot_info['current_part']}/{slot_info['total_parts']}")
-        print(f"🎬 Episode Title: {part['part_title']}")
-        plan = paperfilm_plan.make_series_part_plan(topic_obj, part, slot_info, seed=seed)
+        # Default: Full 45-50s Standalone Video (No Parts!)
+        forced = getattr(a, "topic", None) or getattr(a, "book", None)
+        topic = pick_myth_topic(forced=forced)
+        print(f"📖 Myth Topic (Full 45-50s Standalone Video): {topic['title']}")
+        plan = paperfilm_plan.make_standalone_45s_plan(topic, seed=seed)
 
     scenes = plan["scenes"]
 
@@ -447,8 +454,9 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
     else:
         caption = (
             f"🔱 *{y.get('title', topic['title'])}*\n\n"
-            f"🎞️ MindSpark Mythology Shorts (PaperFilm)\n"
-            f"🎲 Seed: {seed} | 9:16 Vertical"
+            f"✨ *MindSpark Mythology Shorts (Full 45-50s Standalone)*\n"
+            f"📖 *Topic:* {topic['title']}\n"
+            f"🎞️ PaperFilm Engine | 9:16 Vertical"
         )
     try:
         vline = tts.voice_summary()
@@ -597,8 +605,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--book")
     ap.add_argument("--script", help="Custom user script or arbitrary topic")
-    ap.add_argument("--topic", help="Target topic ID from active_series.json (e.g. baji_prabhu_pawankhind)")
+    ap.add_argument("--topic", help="Target topic ID or name")
     ap.add_argument("--part", type=int, help="Target part number (e.g. 2 or 3)")
+    ap.add_argument("--standalone", action="store_true", default=True, help="Render full 45-50s standalone video (no multi-part series)")
+    ap.add_argument("--series", action="store_true", default=False, help="Use 3-part rotation series engine")
     ap.add_argument("--mode", choices=["book", "myth"], default="myth", help="Pipeline mode: 'myth' (default) or 'book'")
     ap.add_argument("--myth", action="store_true", help="Shortcut for --mode myth")
     ap.add_argument("--engine", choices=["paperfilm", "myth", "cinematic", "random"], default=os.environ.get("MYTH_ENGINE", "paperfilm"),
