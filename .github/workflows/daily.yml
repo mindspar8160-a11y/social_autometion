@@ -81,6 +81,10 @@ jobs:
           restore-keys: |
             xtts-v2-weights-
 
+      - name: Pre-flight XTTS-v2 Cache Check
+        if: steps.guard.outputs.skip != 'true'
+        run: python scripts/ensure_xtts_model.py
+
       - if: steps.guard.outputs.skip != 'true'
         uses: actions/cache@v4
         with:
