@@ -71,3 +71,4 @@
 | 65 | 2026-11-21 | 2026-11-21_154930_pf_shakti_peeth_shondesh_narmada | Unknown | Productivity & Wisdom | https://youtu.be/URkaGF2pgp4 |
 | 66 | 2026-11-21 | 2026-11-21_190905_pf_shakti_peeth_shondesh_narmada | Unknown | Productivity & Wisdom | https://youtu.be/nAYgrVcMwbc |
 | 67 | 2026-11-21 | 2026-11-21_230933_pf_shakti_peeth_shondesh_narmada | Unknown | Productivity & Wisdom | https://youtu.be/HWqtj-P-haI |
+| 68 | 2026-11-22 | 2026-11-22_031005_pf_shakti_peeth_shondesh_narmada | Unknown | Productivity & Wisdom | https://youtu.be/-lotXIw54T0 |
