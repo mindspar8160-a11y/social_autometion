@@ -479,23 +479,28 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
         f"CRITICAL STORYTELLING RULES:\n"
         f"1. YE KOI TRAILER NAHI HAI! KABHI BHI disjointed cinematic teaser dialogues mat likho. Asli katha sunao.\n"
     )
-    if geo and part_num == 1:
+    if geo:
         part_ctx += (
-            f"2. PEHLA SCENE (SCENE 1) STRICTLY KIND 'map' HOGA (THE MAP HOOK)!\n"
-            f"   - 'state': '{geo['state']}'\n"
-            f"   - 'district': '{geo.get('district', '')}'\n"
-            f"   - 'place': {json.dumps({'name': geo['name'], 'lat': geo['lat'], 'lon': geo['lon']}, ensure_ascii=False)}\n"
-            f"   - 'text': 'भारत → {geo['state']} → {geo['name']}'\n"
-            f"   - 'hit_word': Narration ka wo word jab '{geo['state']}' bola jaye\n"
-            f"   - 'hit2_word': Narration ka wo word jab '{geo['name'].split()[0]}' bola jaye\n"
-            f"   - Scene 1 Narration me seedha sthan, nayak aur sankat ka damdaar dialogue aana chahiye (jaise '1660 mein Maharashtra ke Pawankhind mein, Bajiprabhu Deshpande ne maha-balidan diya!')\n"
+            f"2. CRITICAL HOOK & MAP RULES (HAR BHAAG ME MAP ZAROORI HAI):\n"
+            f"   - SCENE 1 (THE HOOK): STRICTLY KIND 'title' ya 'card'.\n"
+            f"     * KABHI BHI 'पिछले भाग में देखा था' ya 'पिछले भाग में हमने देखा' se shuru mat karo! KABHI NAHI!\n"
+            f"     * Scene 1 hamesha ek DAMDAAR, CHOWKANE WALE SAWAL (Curiosity Question Hook) se shuru hoga taaki audience turant ruk jaye!\n"
+            f"     * Udaharan: '{geo['name']} mein Sati ka ansh girte hi Bhairav ne kya bhayanak pratigya li thi?'\n"
+            f"   - SCENE 2 (THE MAP SCENE): STRICTLY KIND 'map' HOGA (Bharat ke naksha zoom hokar rajya aur jagah dikhayega)!\n"
+            f"     * 'state': '{geo['state']}'\n"
+            f"     * 'district': '{geo.get('district', '')}'\n"
+            f"     * 'place': {json.dumps({'name': geo['name'], 'lat': geo['lat'], 'lon': geo['lon']}, ensure_ascii=False)}\n"
+            f"     * 'text': 'भारत → {geo['state']} → {geo['name']}'\n"
+            f"     * 'hit_word': Narration ka wo word jab '{geo['state']}' bola jaye\n"
+            f"     * 'hit2_word': Narration ka wo word jab '{geo['name'].split()[0]}' bola jaye\n"
+            f"     * Narration me rajya aur jagah ka naam zaroor aana chahiye (jaise '{geo['state']} ke {geo['name']} mein Bhairav ne sthapana ki!')\n"
             f"   - Scene 1 Stamp: 'भाग {part_num}'\n"
         )
     else:
         part_ctx += (
-            f"2. Scene 1 kind 'card' ya 'title' hoga (PART {part_num} ME MAP NAHI BANANA, SEEDHA ACTION AUR KAHANI SHURU KARO)!\n"
-            f"   - Scene 1 Narration me pichhle part ka recap bridge aur naya sankat seedha aana chahiye:\n"
-            f"     '{part.get('recap_bridge', '')} {part.get('hook_line', '')}'\n"
+            f"2. SCENE 1 (THE HOOK):\n"
+            f"   - KABHI BHI 'पिछले भाग में देखा था' se shuru mat karo!\n"
+            f"   - Scene 1 hamesha ek DAMDAAR, CHOWKANE WALE SAWAL (Curiosity Question Hook) se shuru karo!\n"
             f"   - 3D Pop-Up Paper stage par nayak, hathiyar aur ghatna samne aayegi!\n"
             f"   - Scene 1 Stamp: 'भाग {part_num}'\n"
         )
@@ -614,6 +619,33 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                     comma_pos = s1_tts.find(",")
                     if comma_pos != -1 and comma_pos < len(s1_tts) - 5:
                         scenes[1]["tts_text"] = s1_tts[comma_pos + 1:].strip()
+
+            # Clean any dry recap openers from Scene 0 (e.g. "पिछले भाग में देखा था")
+            bad_recap_patterns = [
+                r"^पिछले भाग में देखा था[,]?\s*",
+                r"^पिछले भाग में हमने देखा था[,]?\s*",
+                r"^पिछले भाग में हमने देखा[,]?\s*",
+                r"^जैसा कि हमने पिछले भाग में देखा[,]?\s*",
+                r"^pichhle bha?g me(in)? dekha tha[,]?\s*",
+                r"^pichhle bha?g me(in)? humne dekha tha[,]?\s*",
+            ]
+            for pat in bad_recap_patterns:
+                scenes[0]["narration"] = re.sub(pat, "", scenes[0].get("narration", ""), flags=re.IGNORECASE).strip()
+                scenes[0]["tts_text"] = re.sub(pat, "", scenes[0].get("tts_text", ""), flags=re.IGNORECASE).strip()
+
+            # Ensure a MAP scene exists in EVERY part when geography lore is known
+            if geo and not any(s.get("kind") == "map" for s in scenes):
+                map_idx = 1 if len(scenes) > 1 else 0
+                scenes[map_idx]["kind"] = "map"
+                scenes[map_idx]["state"] = geo["state"]
+                scenes[map_idx]["district"] = geo.get("district", "")
+                scenes[map_idx]["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                scenes[map_idx]["text"] = f"भारत → {geo['state']} → {geo['name']}"
+                if geo["state"] not in scenes[map_idx].get("tts_text", ""):
+                    scenes[map_idx]["tts_text"] = f"{geo['state']} के {geo['name']} में, " + scenes[map_idx].get("tts_text", "")
+                    scenes[map_idx]["narration"] = f"{geo['state']} ke {geo['name']} mein, " + scenes[map_idx].get("narration", "")
+                scenes[map_idx]["hit_word"] = geo["state"]
+                scenes[map_idx]["hit2_word"] = geo["name"].split()[0]
 
             scenes[0]["stamp"] = f"भाग {part_num}"
             if not is_final:
