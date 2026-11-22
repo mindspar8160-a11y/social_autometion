@@ -89,9 +89,8 @@ VIRAL REELS SCRIPTING RULES (ONE CONTINUOUS STORY IN 3 CONNECTED PARTS):
 3. MAP RULE (NO FORCED MAPS):
    - Faltu me har video me map scene mat thoso! Sirf tab 'map' lagao jab katha me sthan ka bhaugolik sankat ya yatra dikhana anivarya ho. Varna card, quote ya title use karo.
 
-4. VIRAL HOOK TAXONOMY (0-3s, from Social Media Hook-Generator):
-   - 2-Line High-Stakes Formula: Line 1 (Shocking truth / paradox) + Line 2 (Contrast / impossible stakes).
-   - Scroll-stopping pattern interrupt within 3 seconds.
+4. HOOK (0-3s):
+   - Scene 1 seedha katha ke mukhya rochak bindu ya sankat se shuru ho taaki audience ka dhyan turant aakarshit ho.
 
 5. PART 1 (Scenes 1 to 6/7) - THE HOOK & CRISIS:
    - Scene 1: High-stakes curiosity hook (0-3s thumb-stopper, concrete name, year, place, or paradox).

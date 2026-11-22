@@ -10,7 +10,6 @@ from pathlib import Path
 
 from common import ROOT
 import llm
-import yt_growth_engine
 try:
     from hindi_numbers import normalize_hindi_numbers
 except ImportError:
@@ -465,16 +464,9 @@ def clean_plan(plan, seed=None):
         if sc.get("tts_text"):
             sc["narration"] = ensure_hinglish_narration(sc.get("narration", ""), sc["tts_text"])
 
-    # YouTube Growth & Packaging Engine Audits (21 Hook Formulas & Packaging Linter)
-    hook_audit = yt_growth_engine.score_hook(out[0].get("narration") or out[0].get("text", ""))
-    print(f"[PaperFilm] Hook audit: score={hook_audit['score']}/100 band={hook_audit['band']} (weakest={hook_audit['weakest']})")
-
     y = plan.get("youtube") if isinstance(plan.get("youtube"), dict) else {}
-    if y.get("title"):
-        pkg_audit = yt_growth_engine.lint_packaging(y["title"], out[0].get("text", ""))
-        print(f"[PaperFilm] Packaging audit: score={pkg_audit['score']}/100, issues={len(pkg_audit['issues'])}")
-        if len(y["title"]) > yt_growth_engine.HARD_LIMIT:
-            y["title"] = y["title"][:yt_growth_engine.HARD_LIMIT].rstrip()
+    if y.get("title") and len(y["title"]) > 60:
+        y["title"] = y["title"][:60].rstrip()
     return {"youtube": y, "scenes": out}
 
 

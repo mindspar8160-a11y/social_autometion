@@ -169,6 +169,67 @@ const FullScene: React.FC<{s: PFScene; i: number; lf: number; fps: number; width
   return null;
 };
 
+/* ------------------------------------------------------------- SVG Dynamic Motion Wrapper */
+const SvgMotionWrapper: React.FC<{
+  children: React.ReactNode;
+  sceneIndex: number;
+  lf: number;
+  totalFrames: number;
+  fps: number;
+}> = ({ children, sceneIndex, lf, totalFrames, fps }) => {
+  const p = Math.max(0, Math.min(1, lf / Math.max(1, totalFrames)));
+  // 5 diverse cinematic camera motion presets cycling across scenes:
+  const mode = sceneIndex % 5;
+  let scale = 1.0;
+  let tx = 0;
+  let ty = 0;
+
+  if (mode === 0) {
+    // Mode 0: Cinematic Slow Zoom-In (Push-in 0.98 -> 1.15)
+    scale = interpolate(p, [0, 1], [0.98, 1.15], { easing: Easing.bezier(0.25, 0.1, 0.25, 1) });
+    ty = interpolate(p, [0, 1], [6, -8]);
+  } else if (mode === 1) {
+    // Mode 1: Left-to-Right Subtle Parallax Pan with gentle zoom
+    scale = interpolate(p, [0, 1], [1.02, 1.10]);
+    tx = interpolate(p, [0, 1], [-26, 26], { easing: Easing.bezier(0.25, 0.1, 0.25, 1) });
+    ty = Math.sin(p * Math.PI * 2) * 5;
+  } else if (mode === 2) {
+    // Mode 2: Grand Cinematic Zoom-Out (Pull-out 1.16 -> 1.0)
+    scale = interpolate(p, [0, 1], [1.16, 1.0], { easing: Easing.bezier(0.25, 0.1, 0.25, 1) });
+    ty = interpolate(p, [0, 1], [-8, 6]);
+  } else if (mode === 3) {
+    // Mode 3: Right-to-Left Pan with slight rise
+    scale = interpolate(p, [0, 1], [1.0, 1.11]);
+    tx = interpolate(p, [0, 1], [26, -26], { easing: Easing.bezier(0.25, 0.1, 0.25, 1) });
+    ty = interpolate(p, [0, 1], [6, -6]);
+  } else {
+    // Mode 4: Divine Floating / Breathing Pulse (gentle floating)
+    const breath = Math.sin(p * Math.PI * 2) * 0.05;
+    scale = 1.05 + breath;
+    ty = Math.cos(p * Math.PI * 2) * 8;
+    tx = Math.sin(p * Math.PI * 2) * 6;
+  }
+
+  // Entrance spring pop
+  const enterScale = interpolate(Math.min(1, lf / 12), [0, 1], [0.88, 1.0], { easing: Easing.bezier(0.16, 1, 0.3, 1) });
+
+  return (
+    <div
+      style={{
+        transform: `translate(${tx}px, ${ty}px) scale(${scale * enterScale})`,
+        transformOrigin: "50% 65%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        filter: "drop-shadow(0 14px 28px rgba(40,25,10,0.18))",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 /* ------------------------------------------------------------- scene item */
 const W = 900;
 const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: number; seed: number}> = ({s, i, lf, fps, hitF, seed}) => {
@@ -237,7 +298,12 @@ const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: numb
     return fallbacks[i % fallbacks.length];
   };
 
-  const cutout = getCutout();
+  const totalFrames = Math.max(1, Math.round(s.durationSec * fps));
+  const cutout = (
+    <SvgMotionWrapper sceneIndex={i} lf={lf} totalFrames={totalFrames} fps={fps}>
+      {getCutout()}
+    </SvgMotionWrapper>
+  );
 
   if (s.kind === "number") {
     const v = (s.number ?? 0) * easeIO(clamp((lf - hitF) / (fps * 1.0)));

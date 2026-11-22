@@ -143,6 +143,45 @@ export const MapItem: React.FC<{s: PFScene; lf: number; fps: number; accent: str
                 <path d="M0,0 C-26,-40 -34,-62 -34,-76 A34,34 0 1 1 34,-76 C34,-62 26,-40 0,0Z" fill="#d8452e" stroke="#9c2c1b" strokeWidth={4} />
                 <circle cx={0} cy={-76} r={13} fill="#fbf5e6" />
               </g>
+              {/* Place Name Badge right below pin */}
+              {pinS > 0.3 && (
+                <g transform={`translate(0, 32)`} opacity={clamp((pinS - 0.3) * 2.5)}>
+                  {/* Drop shadow */}
+                  <rect
+                    x={-Math.max(50, (pl.name.length * 15 + 24) / 2)}
+                    y={-14}
+                    width={Math.max(100, pl.name.length * 15 + 24)}
+                    height={46}
+                    rx={8}
+                    fill="#7a6a4a"
+                    opacity={0.55}
+                    transform="translate(4, 5)"
+                  />
+                  {/* Paper badge */}
+                  <rect
+                    x={-Math.max(50, (pl.name.length * 15 + 24) / 2)}
+                    y={-14}
+                    width={Math.max(100, pl.name.length * 15 + 24)}
+                    height={46}
+                    rx={8}
+                    fill="#fbf5e6"
+                    stroke="#d8452e"
+                    strokeWidth={3}
+                  />
+                  {/* Place Name */}
+                  <text
+                    x={0}
+                    y={18}
+                    textAnchor="middle"
+                    fill="#1d1b1a"
+                    fontFamily="'PF Bold','Mukta',sans-serif"
+                    fontSize={26}
+                    fontWeight="800"
+                  >
+                    {pl.name}
+                  </text>
+                </g>
+              )}
             </g>
           )}
         </g>
@@ -151,6 +190,13 @@ export const MapItem: React.FC<{s: PFScene; lf: number; fps: number; accent: str
       {!full && chip("भारत", lab0, "#fbf5e6", "#1d1b1a", 26)}
       {!full && stName && chip(stLabel, lab1, accent, "#fbf5e6", 26)}
       {!full && pl && chip(pl.name, lab2, "#fbf5e6", "#1d1b1a", 26)}
+      {full && pl && (
+        <div style={{position: "absolute", left: 0, right: 0, bottom: 360, display: "flex", justifyContent: "center", opacity: lab2, transform: `translateY(${(1 - lab2) * 16}px)`}}>
+          <div style={{background: "#fbf5e6", color: "#1d1b1a", fontFamily: "'PF Display','Mukta',serif", fontSize: 58, padding: "8px 38px", borderRadius: 10, boxShadow: "0 8px 20px rgba(0,0,0,.4)", border: "3px solid #d8452e", transform: "rotate(-1deg)"}}>
+            📍 {pl.name}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
