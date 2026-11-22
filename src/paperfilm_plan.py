@@ -228,8 +228,14 @@ Ek kahani ko __N__ chhote scenes me todo. Har scene ek torn paper card jaisa dik
 __CONTEXT__
 
 PROVEN VIRAL FRAMEWORK (HOOK -> VALUE -> FOLLOW -> OPTIMIZE):
-1. AUDIENCE INTENT:
+1. AUDIENCE INTENT & EMOTIONAL STORYTELLING (भावपूर्ण और जीवंत शैली):
    - Hamari audience Sanatan dharm, pauranik rahasya, amar balidan aur divya leelaon ki ASLI sachhai janana chahti hai.
+   - KABHI BHI flat, sookhi ya kitabi bhasha mat likho (jaise 'sena ladi, fir wo chala gaya')!
+   - EMOTION & INTRIGUE CUES: Har line me shabdon ka chunav aisa ho jo sunne wale ke dil me bhav jagaye:
+     * Rahasya / Khauf (Suspense): "Charo taraf gehra sannata tha... par pedo ke peeche se aati wo aawaz aam nahi thi!"
+     * Rochak / Vyangya (Intriguing / Sarcastic Contrast): "Wo aam yoddha nahi tha—na talwar, na dhaal, par aakhon me aisi aag ki samne wala tharthara uthe!"
+     * Josh / Veer Ras (Heroic thrill): "Jab unhone hunkar bhari, toh dushman ki sena me bhagdhad mach gayi!"
+   - PUNCTUATION-DRIVEN EMOTION: TTS aawaz me natural emotion laane ke liye sahi viram-chinh use karo: vismay ke liye `!`, jigyasa ke liye `?`, aur natakiya mod ke liye `—`. (Bracketed tags jaise [whispers] mat likho, balki shabdon se wahi bhav paida karo).
    - Shallow teaser ya fake trailer phrases ("आँखें खोलें", "कदम बढ़ाएँ") KABHI BHI mat likho! Seedha sacchi aur pramanik katha shuru karo!
 
 2. 4-STAGE RETENTION STRUCTURE:
