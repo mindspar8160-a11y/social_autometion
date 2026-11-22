@@ -81,22 +81,34 @@ VIRAL REELS SCRIPTING RULES (ONE CONTINUOUS STORY IN 3 CONNECTED PARTS):
    - emotion: "heroic | suspense | conversational | emotional | divine".
    - accent: "red | teal | mustard | ink".
 
-2. PART 1 (Scenes 1 to 6/7) - THE HOOK & CRISIS:
+2. STAMP RULE (IMPORTANT - NO POPUP OVERLOAD):
+   - Sirf Scene 1 me 'भाग X' ka stamp lagao (jaise: 'भाग 1').
+   - Beech ke scenes (scenes 2, 3, 4, 5) me 'भाग X' ya repetitive stamp MAT LAGAO! Khali chhod do ("stamp": null ya omit karo).
+   - Aakhri scene me 'अगला भाग' (Part 1, 2) ya 'कथा सम्पूर्ण' (Part 3) lagao.
+
+3. MAP RULE (NO FORCED MAPS):
+   - Faltu me har video me map scene mat thoso! Sirf tab 'map' lagao jab katha me sthan ka bhaugolik sankat ya yatra dikhana anivarya ho. Varna card, quote ya title use karo.
+
+4. VIRAL HOOK TAXONOMY (0-3s, from Social Media Hook-Generator):
+   - 2-Line High-Stakes Formula: Line 1 (Shocking truth / paradox) + Line 2 (Contrast / impossible stakes).
+   - Scroll-stopping pattern interrupt within 3 seconds.
+
+5. PART 1 (Scenes 1 to 6/7) - THE HOOK & CRISIS:
    - Scene 1: High-stakes curiosity hook (0-3s thumb-stopper, concrete name, year, place, or paradox).
    - Scenes 2 to 5/6: Katha ki shuruat, nayak ka sankalp, sankat ka aagaz.
    - Scene AAKHRI (Ending): Ek TEEVRA JIGYASA WALA SAWAL (High-Stakes Curiosity Question Hook) jo viewer ko Part 2 dekhne par majboor kar de! (jaise: '...Lekin kya paatal ka wo vishal jeev amrit dega, ya sab nigaal jayega?'). Stamp: 'अगला भाग'.
 
-3. PART 2 (Scenes 1 to 6/7) - THE STRUGGLE & OBSTACLE:
+6. PART 2 (Scenes 1 to 6/7) - THE STRUGGLE & OBSTACLE:
    - Scene 1: Part 1 ke aakhri sawal se seedha shuru ho (KABHI BHI 'pichhle bhag me dekha tha' mat likho).
    - Scenes 2 to 5/6: Kathin sangharsh, balidan, ya kathin pariksha (Cause-and-Effect flow).
    - Scene AAKHRI (Ending): Doosra TEEVRA JIGYASA WALA SAWAL jo viewer ko Part 3 dekhne ke liye uttejit kare! (jaise: '...Lekin kya suryoday se pehle amrit pahunch payega, ya saansein tham jayengi?'). Stamp: 'अगला भाग'.
 
-4. PART 3 (Scenes 1 to 6/7) - THE CLIMAX & SACRED VICTORY:
+7. PART 3 (Scenes 1 to 6/7) - THE CLIMAX & SACRED VICTORY:
    - Scene 1: Antim charam seema aur divya chamatkar ka aagaz.
    - Scenes 2 to 5/6: Alaukik chamatkar, nayak/mata ki amar vijay, bhakton ko mukti ka aashirwaad.
    - Scene AAKHRI (Ending): MATA YA DEVTA KA NAAM + KATHA SAMPURNA + DIVINE JAIKARA! (jaise: 'Mata ke is divya chamatkar ne sabko jhuka diya. Boliye Jai Maa Khodiyar!' / 'Boliye Har Har Mahadev!'). Stamp: 'कथा सम्पूर्ण'.
 
-5. BANNED PHRASES:
+8. BANNED PHRASES:
    - KABHI BHI 'dekhiye agle video me' ya 'dekhiye agle episode me' mat bolo.
    - KABHI BHI 'iska rahasya janiye' ya 'aankhein kholein' jaise cheap filler mat likho.
 

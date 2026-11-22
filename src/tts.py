@@ -291,10 +291,10 @@ async def _synth_edge_async(text, cfg, out):
         "बोले" in raw_text or "कहा" in raw_text or "पूछा" in raw_text
     )
 
-    base_rate_val = 15   # default rate +15%
+    base_rate_val = 5    # default rate +5% (calm, emotional, clear storytelling)
     base_pitch_val = -2  # default pitch -2Hz
     try:
-        base_rate_val = int(str(cfg.get("rate", "+15%")).replace("%", "").replace("+", ""))
+        base_rate_val = int(str(cfg.get("rate", "+5%")).replace("%", "").replace("+", ""))
     except Exception:
         pass
     try:
@@ -304,23 +304,23 @@ async def _synth_edge_async(text, cfg, out):
 
     # 1. Action / Intense / Urgent / Fast / Fight / Climax / Heroic:
     if any(k in combined_cues for k in ["heroic", "urgent", "action", "intense", "fast", "shocking", "fight", "climax", "war"]):
-        rate_val = base_rate_val + 3    # +18% (punchy, high velocity)
+        rate_val = base_rate_val + 3    # +8% (clear, dignified punch)
         pitch_val = base_pitch_val + 2  # 0Hz (resonant, commanding)
     # 2. Suspenseful / Mysterious / Secret / Whisper:
     elif any(k in combined_cues for k in ["[whisper", "whisper", "suspense", "mysterious", "secret", "deep", "khauf", "rahasya"]):
-        rate_val = base_rate_val - 4    # +11% (slower, gripping suspense)
+        rate_val = base_rate_val - 3    # +2% (slower, gripping suspense)
         pitch_val = base_pitch_val - 2  # -4Hz (deep chest mystery)
     # 3. Conversational / Sarcastic / Intriguing / Giggles:
     elif any(k in combined_cues for k in ["[sarcastically", "[giggle", "[laugh", "sarcastic", "conversational", "rochak", "vyangya"]):
-        rate_val = base_rate_val - 2    # +13% (natural conversational pace)
+        rate_val = base_rate_val - 1    # +4% (natural conversational pace)
         pitch_val = base_pitch_val + 1  # -1Hz (engaging, lively inflection)
     # 4. Thoughtful / Emotional / Sorrow / Sad / Melancholic:
     elif any(k in combined_cues for k in ["[sad", "[emotional", "thoughtful", "emotional", "sorrow", "karuna", "bhavuk", "sad"]):
-        rate_val = base_rate_val - 5    # +10% (tender, poignant)
+        rate_val = base_rate_val - 4    # +1% (tender, poignant, slow emotion)
         pitch_val = base_pitch_val - 3  # -5Hz (heavy, warm sorrow)
     # 5. Divine / Devotional / Peaceful / Calm:
     elif any(k in combined_cues for k in ["[divine", "devotional", "divine", "peaceful", "calm", "wisdom", "bhakti", "sacred"]):
-        rate_val = base_rate_val - 3    # +12% (stately, serene reverence)
+        rate_val = base_rate_val - 2    # +3% (stately, serene reverence)
         pitch_val = base_pitch_val - 1  # -3Hz (dignified calm)
     # 6. Dialogue (direct quoted speech):
     elif is_dialogue:

@@ -422,6 +422,16 @@ def clean_plan(plan, seed=None):
     out[0].pop("items", None)
     out[0].pop("number", None)
 
+    # Stamp deduplication: only 1 'भाग X' stamp allowed (on Scene 0)
+    seen_part_stamp = False
+    for sc in out:
+        st = sc.get("stamp", "")
+        if "भाग" in st and "अगला" not in st and "सम्पूर्ण" not in st:
+            if seen_part_stamp:
+                sc.pop("stamp", None)
+            else:
+                seen_part_stamp = True
+
     # Clean up any subscribe / channel promotion mentions across all scenes
     for sc in out:
         for k in ["narration", "tts_text", "text", "sub"]:
@@ -501,16 +511,10 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
         plan = clean_plan(plan, seed)
         scenes = plan["scenes"]
 
-        # Map scene enforcement
-        if geo and len(scenes) > 1:
-            map_idx = 1
-            for idx, sc in enumerate(scenes):
+        # Map scene: only enrich if script naturally created a map scene
+        if geo:
+            for sc in scenes:
                 if sc.get("kind") == "map":
-                    map_idx = idx
-                    break
-            for idx, sc in enumerate(scenes):
-                if idx == map_idx:
-                    sc["kind"] = "map"
                     sc["state"] = geo["state"]
                     if geo.get("district"):
                         sc["district"] = geo["district"]
@@ -518,12 +522,13 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                     sc["text"] = f"भारत → {st_hi} → {geo['name']}"
                     sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
                     sc["hit2_word"] = geo["name"].split()[0]
-                elif sc.get("kind") == "map":
-                    sc["kind"] = "card"
-                    sc["text"] = re.sub(r"\s*→\s*", " ", sc.get("text", "")).strip()
 
-        # Ending stamps and stamps enforcement
+        # STAMPS RULE: Only Scene 0 (Hook) gets 'भाग X' once!
+        # Intermediate scenes (1 to N-2) MUST NOT have 'भाग X' or repetitive popups.
         scenes[0]["stamp"] = f"भाग {part_num}"
+        for sc in scenes[1:-1]:
+            if sc.get("stamp") and ("भाग" in sc["stamp"] or sc["stamp"].startswith("भाग")):
+                del sc["stamp"]
         if is_final:
             scenes[-1]["stamp"] = "कथा सम्पूर्ण"
         else:
@@ -611,26 +616,10 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
             # Enforce series branding on scenes and metadata
             scenes = plan["scenes"]
 
-            # MAP SCENE ENFORCEMENT (HAR BHAAG ME MAP SCENE SCENE 1 PAR AAYEGA):
-            st_hi = {
-                "Maharashtra": "महाराष्ट्र", "Gujarat": "गुजरात", "Rajasthan": "राजस्थान",
-                "Madhya Pradesh": "मध्य प्रदेश", "Uttar Pradesh": "उत्तर प्रदेश",
-                "Kerala": "केरल", "Karnataka": "कर्नाटक", "Odisha": "ओडिशा",
-                "Andhra Pradesh": "आंध्र प्रदेश", "Jammu and Kashmir": "जम्मू-कश्मीर",
-                "Haryana": "हरियाणा", "Punjab": "पंजाब", "Bihar": "बिहार",
-            }.get(geo["state"] if geo else "", geo["state"] if geo else "")
-
-            if geo and len(scenes) > 1:
-                # Find if any scene is already map, or set Scene 1 as map
-                map_idx = 1
-                for idx, sc in enumerate(scenes):
+            # Map scene: only enrich if script naturally created a map scene
+            if geo:
+                for sc in scenes:
                     if sc.get("kind") == "map":
-                        map_idx = idx
-                        break
-
-                for idx, sc in enumerate(scenes):
-                    if idx == map_idx:
-                        sc["kind"] = "map"
                         sc["state"] = geo["state"]
                         if geo.get("district"):
                             sc["district"] = geo["district"]
@@ -638,9 +627,6 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                         sc["text"] = f"भारत → {st_hi} → {geo['name']}"
                         sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
                         sc["hit2_word"] = geo["name"].split()[0]
-                    elif sc.get("kind") == "map":
-                        sc["kind"] = "card"
-                        sc["text"] = re.sub(r"\s*→\s*", " ", sc.get("text", "")).strip()
 
             def _clean_stutters(text: str) -> str:
                 if not text:
@@ -718,6 +704,9 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                 sc["tts_text"] = _clean_fillers(sc.get("tts_text", sc["narration"]))
 
             scenes[0]["stamp"] = f"भाग {part_num}"
+            for sc in scenes[1:-1]:
+                if sc.get("stamp") and ("भाग" in sc["stamp"] or sc["stamp"].startswith("भाग")):
+                    del sc["stamp"]
             if not is_final:
                 scenes[-1]["stamp"] = "अगला भाग"
             else:
