@@ -93,33 +93,58 @@ def upload_temp_video(video_path: Path) -> str:
     raise RuntimeError("Failed to obtain a public video URL for Buffer upload.")
 
 
-def get_instagram_channel(api_key: str, preferred_channel_id: Optional[str] = None) -> Tuple[str, str]:
-    """Queries Buffer account channels and returns (channel_id, channel_name)."""
+def _gql(api_key: str, query: str, variables: Optional[dict] = None) -> dict:
+    """Runs one Buffer GraphQL request and returns the 'data' dict (raises on any error)."""
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}",
     }
-    query = """
-    query GetChannels {
-      account {
-        channels {
-          id
-          name
-          service
-          
-        }
-      }
-    }
-    """
-    res = requests.post(BUFFER_GRAPHQL_ENDPOINT, json={"query": query}, headers=headers, timeout=20)
+    res = requests.post(
+        BUFFER_GRAPHQL_ENDPOINT,
+        json={"query": query, "variables": variables or {}},
+        headers=headers,
+        timeout=20,
+    )
     if res.status_code != 200:
         raise RuntimeError(f"Buffer API error ({res.status_code}): {res.text}")
 
     data = res.json()
-    if "errors" in data and data["errors"]:
+    if data.get("errors"):
         raise RuntimeError(f"Buffer GraphQL error: {data['errors']}")
+    return data.get("data") or {}
 
-    channels = data.get("data", {}).get("account", {}).get("channels", [])
+
+def get_instagram_channel(api_key: str, preferred_channel_id: Optional[str] = None) -> Tuple[str, str]:
+    """Finds the Instagram channel via organizations -> channels. Returns (channel_id, channel_name)."""
+    # Step 1: organizations
+    orgs_data = _gql(api_key, """
+    query GetOrgs {
+      account {
+        organizations {
+          id
+          name
+        }
+      }
+    }
+    """)
+    orgs = (orgs_data.get("account") or {}).get("organizations") or []
+    if not orgs:
+        raise RuntimeError("No organizations found in your Buffer account.")
+
+    # Step 2: channels of each organization
+    channels: List[Dict[str, Any]] = []
+    for org in orgs:
+        ch_data = _gql(api_key, """
+        query GetChannels($input: ChannelsInput!) {
+          channels(input: $input) {
+            id
+            name
+            service
+          }
+        }
+        """, {"input": {"organizationId": org["id"]}})
+        channels.extend(ch_data.get("channels") or [])
+
     if not channels:
         raise RuntimeError("No channels found in your Buffer account! Please connect your Instagram account on buffer.com first.")
 
@@ -131,7 +156,7 @@ def get_instagram_channel(api_key: str, preferred_channel_id: Optional[str] = No
 
     # Look for Instagram channel
     for ch in channels:
-        if ch.get("service") == "instagram":
+        if str(ch.get("service")).lower() == "instagram":
             return ch["id"], ch.get("name", "Instagram")
 
     # Fallback: if only 1 channel exists
@@ -144,10 +169,6 @@ def get_instagram_channel(api_key: str, preferred_channel_id: Optional[str] = No
 
 def publish_reel(api_key: str, channel_id: str, video_url: str, caption: str) -> Dict[str, Any]:
     """Calls Buffer createPost mutation to publish Instagram Reel immediately."""
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}",
-    }
     mutation = """
     mutation CreateImmediateInstagramReel($input: CreatePostInput!) {
       createPost(input: $input) {
@@ -185,25 +206,13 @@ def publish_reel(api_key: str, channel_id: str, video_url: str, caption: str) ->
         }
     }
 
-    res = requests.post(
-        BUFFER_GRAPHQL_ENDPOINT,
-        json={"query": mutation, "variables": variables},
-        headers=headers,
-        timeout=30,
-    )
-    if res.status_code != 200:
-        raise RuntimeError(f"Buffer createPost HTTP {res.status_code}: {res.text}")
+    data = _gql(api_key, mutation, variables)
 
-    result = res.json()
-    if "errors" in result and result["errors"]:
-        raise RuntimeError(f"Buffer GraphQL Errors: {result['errors']}")
-
-    create_data = result.get("data", {}).get("createPost", {})
+    create_data = data.get("createPost") or {}
     if "message" in create_data:
         raise RuntimeError(f"Buffer Mutation Error: {create_data['message']}")
 
-    post_info = create_data.get("post", {})
-    return post_info
+    return create_data.get("post") or {}
 
 
 def find_candidate_dirs(args: List[str]) -> List[Path]:
@@ -315,7 +324,7 @@ def main():
         sys.exit(0)
 
     # Discover Instagram Channel once
-    pref_id = os.environ.get("BUFFER_CHANNEL_ID")
+    pref_id = (os.environ.get("BUFFER_CHANNEL_ID") or "").strip() or None
     channel_id, channel_name = get_instagram_channel(api_key, pref_id)
     print(f"[Buffer] Target Instagram Channel: {channel_name} (ID: {channel_id})")
 
