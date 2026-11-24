@@ -91,7 +91,8 @@ export const MapItem: React.FC<{s: PFScene; lf: number; fps: number; accent: str
       const a = proj([pl.lon - span + span * 0.4, pl.lat + span * 1.1]) as [number, number], b = proj([pl.lon + span + span * 0.4, pl.lat - span * 1.1]) as [number, number];
       v2 = fit([[a[0], a[1]], [b[0], b[1]]], 10, WIN);
     }
-    const sel = pl ? dSel.find((f) => f.n === s.district) : undefined;
+    const sel = dSel.find((f) => f.n === s.district);
+    if (!pl && sel) v2 = fit(path.bounds(toFeature(sel) as any) as any, 50, WIN); // district only (no exact pin): zoom to the district
     const selD = sel ? path(toFeature(sel) as any) : null;
     const stSel = stFeat ? path(toFeature(stFeat) as any) : null;
     return {stPaths, dPaths, v0, v1, v2, pt, selD, stSel};

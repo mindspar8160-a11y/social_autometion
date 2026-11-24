@@ -33,4 +33,6 @@ export type PFProps = {
   seed: number;
   captions?: boolean;
   sfx?: boolean;
+  look?: string;            // id from kit/looks.ts (python picks one that was not used recently); empty = chosen from seed + story
+  hashtags?: string[];      // shown as chips on the closing pull-back
 };
