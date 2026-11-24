@@ -26,6 +26,11 @@ except ImportError:
     except ImportError:
         def ensure_hinglish_narration(n, t): return n
 
+try:
+    from geo_places import PLACES, STATE_HI_ALL, detect_place, detect_state
+except ImportError:
+    from src.geo_places import PLACES, STATE_HI_ALL, detect_place, detect_state
+
 KINDS = ["title", "card", "number", "quote", "list", "map"]   # "photo" is not used: no images in the pipeline
 ACCENTS = ["red", "teal", "mustard", "ink"]
 DATA_DIR = ROOT / "remotion" / "src" / "cinematic" / "data"
@@ -211,15 +216,26 @@ STATE_HI = {
 }
 
 
-def _detect_geo(topic):
-    hay = (str(topic.get("title", "")) + " " + str(topic.get("summary", "")) + " " + str(topic.get("topic", "")) + " " + str(topic.get("topic_title", ""))).lower()
+# the old 18 hand-written places stay; the big gazetteer (geo_places.py) adds ~65 more (shaktipeeth, jyotirlinga, forts ...)
+for _k, _v in PLACES.items():
+    GEO_LORE.setdefault(_k, _v)
+for _st, _hi in STATE_HI_ALL.items():
+    STATE_HI.setdefault(_st, _hi)
+
+
+def _detect_geo(topic, extra_text=""):
+    """place (exact) -> else a gazetteer place named anywhere in the text -> else just the state -> else None"""
+    if not isinstance(topic, dict):
+        topic = {"title": str(topic)}
+    hay = " ".join(str(topic.get(k, "")) for k in ("title", "summary", "topic", "topic_title")).lower()
     for k, data in GEO_LORE.items():
         if k in hay:
             return data
         for al in data.get("aliases", []):
             if al.lower() in hay:
                 return data
-    return None
+    full = hay + " " + (extra_text or "").lower()
+    return detect_place(full) or detect_state(full)
 
 
 def _load_geo():
@@ -529,6 +545,8 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                     if any(a in sc_text for a in aliases if len(a) > 2):
                         map_scene_idx = idx
                         break
+            if map_scene_idx is None and len(scenes) > 2:
+                map_scene_idx = 1   # no scene names the place: still show the map on scene 2
             if map_scene_idx is not None:
                 for idx, sc in enumerate(scenes):
                     if idx == map_scene_idx:
@@ -536,8 +554,9 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                         sc["state"] = geo["state"]
                         if geo.get("district"):
                             sc["district"] = geo["district"]
-                        sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
-                        sc["text"] = f"भारत → {st_hi} → {geo['name']}"
+                        if geo.get("lat") is not None:
+                            sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                        sc["text"] = f"भारत → {st_hi}" if geo.get("state_only") else f"भारत → {st_hi} → {geo['name']}"
                         sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
                         sc["hit2_word"] = geo["name"].split()[0]
                     elif sc.get("kind") == "map":
@@ -651,6 +670,8 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                         if any(a in sc_text for a in aliases if len(a) > 2):
                             map_scene_idx = idx
                             break
+                if map_scene_idx is None and len(scenes) > 2:
+                    map_scene_idx = 1   # no scene names the place: still show the map on scene 2
                 if map_scene_idx is not None:
                     for idx, sc in enumerate(scenes):
                         if idx == map_scene_idx:
@@ -658,8 +679,9 @@ def make_series_part_plan(topic, part, slot_info, seed=None):
                             sc["state"] = geo["state"]
                             if geo.get("district"):
                                 sc["district"] = geo["district"]
-                            sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
-                            sc["text"] = f"भारत → {st_hi} → {geo['name']}"
+                            if geo.get("lat") is not None:
+                                sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                            sc["text"] = f"भारत → {st_hi}" if geo.get("state_only") else f"भारत → {st_hi} → {geo['name']}"
                             sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
                             sc["hit2_word"] = geo["name"].split()[0]
                         elif sc.get("kind") == "map":
@@ -848,11 +870,14 @@ def make_standalone_45s_plan(topic, custom_script=None, seed=None):
     topic_key = topic.get("topic", "") if isinstance(topic, dict) else ""
     search_text = f"{topic_key} {topic_title} {topic_summary}".lower()
     
-    geo = None
-    for k, v in GEO_LORE.items():
-        if k in search_text or any(al in search_text for al in v.get("aliases", [])):
-            geo = v
-            break
+    geo = _detect_geo(topic if isinstance(topic, dict) else {"title": str(topic)}, str(custom_script or ""))
+    if geo:
+        st_hi0 = STATE_HI.get(geo["state"], geo["state"])
+        prompt += (
+            "\n\nMAP SCENE (zaroori): scene 2 ka kind 'map' rakho. Us scene ki narration me rajya ka naam '" + st_hi0 + "'"
+            + ("" if geo.get("state_only") else " aur jagah ka naam '" + geo["name"] + "'")
+            + " saaf bolo (jaise 'Bharat ke " + st_hi0 + " me...'). Map scene me 'state': '" + geo["state"] + "' likho. Baaki scenes me 'map' kind mat do."
+        )
 
     err = None
     for attempt in range(3):
@@ -879,6 +904,8 @@ def make_standalone_45s_plan(topic, custom_script=None, seed=None):
                         if any(a in sc_text for a in aliases if len(a) > 2):
                             map_scene_idx = idx
                             break
+                if map_scene_idx is None and len(scenes) > 2:
+                    map_scene_idx = 1   # no scene names the place: still show the map on scene 2
                 if map_scene_idx is not None:
                     for idx, sc in enumerate(scenes):
                         if idx == map_scene_idx:
@@ -886,8 +913,9 @@ def make_standalone_45s_plan(topic, custom_script=None, seed=None):
                             sc["state"] = geo["state"]
                             if geo.get("district"):
                                 sc["district"] = geo["district"]
-                            sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
-                            sc["text"] = f"भारत → {st_hi} → {geo['name']}"
+                            if geo.get("lat") is not None:
+                                sc["place"] = {"name": geo["name"], "lat": geo["lat"], "lon": geo["lon"]}
+                            sc["text"] = f"भारत → {st_hi}" if geo.get("state_only") else f"भारत → {st_hi} → {geo['name']}"
                             sc["hit_word"] = st_hi if st_hi in sc.get("tts_text", "") else geo["state"]
                             sc["hit2_word"] = geo["name"].split()[0]
                         elif sc.get("kind") == "map":

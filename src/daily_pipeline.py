@@ -23,6 +23,7 @@ from common import ROOT, load_env, jload, jsave
 import theme_engine, template_engine, style_engine, llm, tts, audio, notify
 from myth_picker import pick_myth_topic
 import paperfilm_plan
+import hashtags, look_picker
 
 THEME_HIST = ROOT / "data" / "theme_history.json"
 slug = lambda s: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
@@ -234,6 +235,10 @@ def run_myth_pipeline(a, voice_cfg, custom_script=None):
         "seed": seed,
         "scenes_count": len(plan["scenes"])
     }
+    try:
+        hashtags.apply_to_meta(meta, topic.get("title", ""), "", paperfilm_plan._detect_geo(topic))
+    except Exception as _e:
+        print(f"[hashtags] skipped: {_e}")
     jsave(out / "meta.json", meta)
     jsave(out / "plan.json", myth_props)
 
@@ -374,7 +379,12 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
     total = sum(sc["durationSec"] for sc in scenes)
     audio.mix(voice, total, work / "audio.mp3")        # voice + calm BGM
 
-    props = {"scenes": scenes, "seed": seed, "captions": True, "sfx": True}
+    story_text = " ".join(f"{sc.get('text', '')} {sc.get('narration', '')}" for sc in scenes)
+    geo = paperfilm_plan._detect_geo(topic, story_text)
+    ht = hashtags.build_hashtags(topic.get("title", ""), story_text, geo)
+    look_id = look_picker.pick_look(story_text, seed)      # different look every video (last 4 are excluded)
+    print(f"🎨 Look: {look_id} | #tags: {' '.join(ht[:6])}")
+    props = {"scenes": scenes, "seed": seed, "captions": True, "sfx": True, "look": look_id, "hashtags": hashtags.chip_tags(ht)}
     jsave(work / "pf_props.json", props)
 
     print("🎬 Rendering PaperFilm via Remotion...")
@@ -431,6 +441,8 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
         "seed": seed,
         "scenes_count": len(scenes)
     }
+    hashtags.apply_to_meta(meta, topic.get("title", ""), story_text, geo)
+    meta["look"] = look_id
     jsave(out / "meta.json", meta)
     jsave(out / "plan.json", props)
 
@@ -576,6 +588,10 @@ def run_cinematic_pipeline(a, voice_cfg, custom_script=None):
         "seed": seed,
         "scenes_count": len(scenes)
     }
+    try:
+        hashtags.apply_to_meta(meta, topic.get("title", ""), "", paperfilm_plan._detect_geo(topic))
+    except Exception as _e:
+        print(f"[hashtags] skipped: {_e}")
     jsave(out / "meta.json", meta)
     jsave(out / "plan.json", props)
 
