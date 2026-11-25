@@ -99,30 +99,78 @@ const sheetPath = (kind: SheetKind, w: number, h: number, seed: number, layer: n
   }
 };
 
-/* ------------------------------------------------------ paper sheet layers */
-const Sheet: React.FC<{w: number; h: number; seed: number; accent: PFAccent; idx: number; tilt?: number; children?: React.ReactNode}> = ({w, h, seed, accent, idx, tilt = 0, children}) => {
+/* ------------------------------------------------------ paper sheet layers (5-Layer 3D Physical Parallax) */
+const Sheet: React.FC<{w: number; h: number; seed: number; accent: PFAccent; idx: number; tilt?: number; lf?: number; fps?: number; children?: React.ReactNode}> = ({w, h, seed, accent, idx, tilt = 0, lf = 0, fps = 30, children}) => {
   const look = useLook();
   const kind = look.sheet;
-  const paths = useMemo(() => [sheetPath(kind, w, h, seed, 1), sheetPath(kind, w, h, seed, 2), sheetPath(kind, w, h, seed, 3)], [kind, w, h, seed]);
+  const paths = useMemo(() => [
+    sheetPath(kind, w, h, seed, 0),
+    sheetPath(kind, w, h, seed, 1),
+    sheetPath(kind, w, h, seed, 2),
+    sheetPath(kind, w, h, seed, 3),
+    sheetPath(kind, w, h, seed, 4),
+  ], [kind, w, h, seed]);
   const a = accOf(look, accent, idx);
-  const shadowC = look.board.dark ? "rgba(0,0,0,.55)" : "rgba(40,25,10,.35)";
-  const layer = (d: string, color: string, dx: number, dy: number, rot: number, blur: number) => (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{position: "absolute", left: dx, top: dy, overflow: "visible", transform: `rotate(${rot}deg)`, filter: `drop-shadow(0 ${blur}px ${blur * 1.3}px ${shadowC})`}}>
+  const shadowC = look.board.dark ? "rgba(0,0,0,.65)" : "rgba(35,20,8,.42)";
+
+  // Subtle natural paper breathing & parallax motion
+  const prog = lf / Math.max(1, fps * 4);
+  const paraX = Math.sin(prog * Math.PI) * 5;
+  const paraY = Math.cos(prog * Math.PI) * 4;
+
+  const layer = (d: string, color: string, dx: number, dy: number, rot: number, blur: number, op = 1, paraFactor = 1) => (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{
+      position: "absolute",
+      left: dx + paraX * paraFactor,
+      top: dy + paraY * paraFactor,
+      overflow: "visible",
+      transform: `rotate(${rot}deg)`,
+      filter: blur > 0 ? `drop-shadow(0 ${blur}px ${blur * 1.4}px ${shadowC})` : undefined,
+      opacity: op,
+    }}>
       <path d={d} fill={color} />
     </svg>
   );
+
   const padTop = kind === "arch" ? 170 : kind === "scroll" ? 92 : kind === "polaroid" ? 70 : 64;
   const padBottom = kind === "scroll" ? 92 : kind === "polaroid" ? 110 : 64;
+
   return (
     <div style={{position: "relative", width: w, height: h, transform: `rotate(${tilt}deg)`}}>
-      {layer(paths[0], a.dark, kind === "polaroid" ? 8 : 16, kind === "polaroid" ? 10 : 20, kind === "polaroid" ? 0.8 : 1.6, 14)}
-      {layer(paths[1], a.main, kind === "polaroid" ? -4 : -8, kind === "polaroid" ? 5 : 9, kind === "polaroid" ? -0.6 : -1.2, 8)}
-      {layer(paths[2], look.sheetFill, 0, 0, 0, 4)}
+      {/* Layer 0: Deep Ambient Shadow Layer (Furthest depth, slow parallax) */}
+      {layer(paths[0], shadowC, 24, 32, 2.0, 26, 0.45, 0.4)}
+      
+      {/* Layer 1: Burnt Terracotta / Dark Craft backing layer */}
+      {layer(paths[1], a.dark, kind === "polaroid" ? 10 : 18, kind === "polaroid" ? 12 : 22, kind === "polaroid" ? 0.9 : 1.6, 16, 0.95, 0.65)}
+      
+      {/* Layer 2: Rich Accent Craft / Saffron Trim */}
+      {layer(paths[2], a.main, kind === "polaroid" ? -5 : -9, kind === "polaroid" ? 6 : 10, kind === "polaroid" ? -0.7 : -1.2, 10, 0.98, 0.85)}
+      
+      {/* Layer 3: Warm Antique Gold / Ochre Deckle Edge Spacer */}
+      {layer(paths[3], look.pal.paper[1] || "#e3d3ab", 3, -4, 0.5, 4, 0.85, 0.95)}
+      
+      {/* Layer 4: Front Kraft Paper Sheet (Full tactile paper texture) */}
+      {layer(paths[4], look.sheetFill, 0, 0, 0, 4, 1.0, 1.0)}
+
       {kind === "scroll" && [-14, h - 62].map((y, k) => <div key={k} style={{position: "absolute", left: -26, top: y, width: w + 52, height: 76, borderRadius: 38, background: `linear-gradient(${k ? 0 : 180}deg, ${look.pal.paper[3]}, ${look.pal.paper[0]} 60%, ${look.pal.paper[2]})`, boxShadow: "0 8px 14px rgba(0,0,0,.28)", border: `4px solid ${look.pal.cream}`}} />)}
       {kind === "ticket" && <div style={{position: "absolute", left: 40, right: 40, top: 40, bottom: 40, border: `4px dashed ${a.main}`, opacity: 0.45, borderRadius: 26}} />}
       {kind === "arch" && <div style={{position: "absolute", left: w / 2 - 34, top: 36, width: 68, height: 68, borderRadius: 34, background: a.main, border: `5px solid ${look.pal.gold}`, boxShadow: "0 5px 10px rgba(0,0,0,.3)"}} />}
       {(kind === "torn" || kind === "polaroid" || kind === "rounded") && <Tape rot={tilt > 0 ? 2 : -3} />}
-      <div style={{position: "absolute", inset: 0, padding: `${padTop}px 64px ${padBottom}px`, boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: "center", color: look.ink}}>{children}</div>
+
+      {/* Layer 5: Foreground Content with Hero Elevation */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        padding: `${padTop}px 64px ${padBottom}px`,
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        color: look.ink,
+        transform: `translate(${paraX * 1.15}px, ${paraY * 1.15}px)`,
+      }}>
+        {children}
+      </div>
     </div>
   );
 };
@@ -276,7 +324,7 @@ const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: numb
 
   if (s.kind === "map") {
     return (
-      <Sheet w={W} h={1180} seed={sd} accent={s.accent || ACCENT_CYCLE[i % 4]} idx={i} tilt={tilt * 0.6}>
+      <Sheet w={W} h={1180} seed={sd} accent={s.accent || ACCENT_CYCLE[i % 4]} idx={i} tilt={tilt * 0.6} lf={lf} fps={fps}>
         <MapItem s={s} lf={lf} fps={fps} accent={a.main} accentDark={a.dark} />
         <MapRoute s={s} lf={lf} fps={fps} text={text(60)} body={text(40, BODY)} />
         {s.stamp && <Stamp text={s.stamp} start={hitF} f={lf} fps={fps} />}
@@ -285,7 +333,12 @@ const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: numb
   }
 
   const totalFrames = Math.max(1, Math.round(s.durationSec * fps));
-  const art = (
+  const aiImageSrc = (s as any).image || (s as any).ai_bg;
+  const art = aiImageSrc ? (
+    <div style={{width: 772, height: 500, margin: "0 auto", borderRadius: 20, overflow: "hidden", boxShadow: "0 14px 28px rgba(35,20,8,0.32)", border: `6px solid ${look.pal.cream}`}}>
+      <Img src={aiImageSrc} style={{width: "100%", height: "100%", objectFit: "cover"}} />
+    </div>
+  ) : (
     <SvgMotionWrapper mode={(i + Math.floor(seed)) % 5} lf={lf} totalFrames={totalFrames}>
       <ArtView plan={plan} lf={lf} fps={fps} />
     </SvgMotionWrapper>
@@ -311,7 +364,7 @@ const Item: React.FC<{s: PFScene; i: number; lf: number; fps: number; hitF: numb
   }
 
   return (
-    <Sheet w={W} h={sheetH} seed={sd} accent={s.accent || ACCENT_CYCLE[i % 4]} idx={i} tilt={tilt}>
+    <Sheet w={W} h={sheetH} seed={sd} accent={s.accent || ACCENT_CYCLE[i % 4]} idx={i} tilt={tilt} lf={lf} fps={fps}>
       {look.titlePos === "top" ? <>{head}{art}{sub}</> : <>{sub ? null : null}{art}{head}{s.sub ? <div style={{...text(46, BODY), marginTop: 14, textAlign: "center", opacity: 0.8}}>{s.sub}</div> : null}</>}
       {stampEl}
     </Sheet>
@@ -511,7 +564,16 @@ export const PaperFilm: React.FC<PFProps> = ({scenes, seed = 7, captions = true,
     <LookCtx.Provider value={look}>
       <AbsoluteFill style={{background: look.board.bg, overflow: "hidden"}}>
         <BoardBG cx={cx} cy={cy} f={f} seed={seed} />
-        <AbsoluteFill style={{background: `radial-gradient(ellipse at 50% 45%, rgba(0,0,0,.05) 25%, rgba(12,8,4,${vig}) 100%)`, pointerEvents: "none"}} />
+
+        {/* Garam Roshni (Warm Golden Volumetric Lighting with subtle breathing flame flicker) */}
+        <AbsoluteFill style={{
+          background: "radial-gradient(circle at 50% 40%, rgba(255, 190, 70, 0.28) 0%, rgba(230, 115, 30, 0.12) 48%, rgba(12, 8, 4, 0.68) 100%)",
+          mixBlendMode: "screen",
+          opacity: 0.88 + Math.sin(f / 22) * 0.12,
+          pointerEvents: "none",
+        }} />
+
+        <AbsoluteFill style={{background: `radial-gradient(ellipse at 50% 45%, rgba(0,0,0,.04) 25%, rgba(12,8,4,${vig}) 100%)`, pointerEvents: "none"}} />
         <div style={{position: "absolute", left: 0, top: 0, width: 0, height: 0, opacity: 1 - fullOp, transform: `translate(${tx}px,${ty}px) scale(${zoom}) rotate(${rot}deg) translate(${-cx}px,${-cy}px)`}}>
           {scenes.map((s, i) => {
             const st = layout.starts[i];
@@ -529,9 +591,19 @@ export const PaperFilm: React.FC<PFProps> = ({scenes, seed = 7, captions = true,
           })}
         </div>
         <Particles f={f} width={width} height={height} seed={seed} />
-        <AbsoluteFill style={{background: "radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(40,25,10,.22) 100%)", pointerEvents: "none"}} />
-        <AbsoluteFill style={{mixBlendMode: "multiply", opacity: look.board.dark ? 0.1 : 0.22, pointerEvents: "none"}}>
-          <svg width="100%" height="100%"><filter id="pfgrain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed={seed} /><feColorMatrix values="0 0 0 0 .35  0 0 0 0 .28  0 0 0 0 .18  0 0 0 .9 0" /></filter><rect width="100%" height="100%" filter="url(#pfgrain)" /></svg>
+        
+        {/* Soft Vignette Overlay */}
+        <AbsoluteFill style={{background: "radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(35,20,8,.32) 100%)", pointerEvents: "none"}} />
+        
+        {/* Tactile Paper Fiber & Grain Texture (SVG feTurbulence) */}
+        <AbsoluteFill style={{mixBlendMode: "multiply", opacity: look.board.dark ? 0.14 : 0.28, pointerEvents: "none"}}>
+          <svg width="100%" height="100%">
+            <filter id="pfgrain">
+              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed={seed} />
+              <feColorMatrix values="0 0 0 0 .38  0 0 0 0 .28  0 0 0 0 .16  0 0 0 .95 0" />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#pfgrain)" />
+          </svg>
         </AbsoluteFill>
         {isFull(sc) && fullOp > 0 && <AbsoluteFill style={{opacity: fullOp}}><FullScene s={sc} i={cur} lf={lf} fps={fps} width={width} height={height} /></AbsoluteFill>}
         {captions && capOp > 0 && <div style={{opacity: capOp}}><Captions s={sc} lf={lf} fps={fps} /></div>}
