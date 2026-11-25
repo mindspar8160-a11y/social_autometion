@@ -7,7 +7,12 @@ apply_to_meta()   -> rewrites meta['title'] / ['description'] / ['tags'] (title 
 """
 import re
 
-BASE = ["#Shorts", "#HinduMythology", "#SanatanDharma", "#IndianMythology", "#Hinduism", "#MindSpark", "#Viral", "#Hindi"]
+BASE = [
+    "#Shorts", "#Viral", "#Trending", "#Reels", "#YouTubeShorts",
+    "#HinduMythology", "#SanatanDharma", "#IndianMythology", "#Hinduism",
+    "#Mahadev", "#HarHarMahadev", "#Shiva", "#Bhakti", "#IndianHistory",
+    "#Bharat", "#Spiritual", "#Devotional", "#MindSpark", "#HindiStories"
+]
 
 # trigger words (Hindi / Hinglish / English)  ->  hashtags
 THEMES = [
@@ -65,14 +70,14 @@ def build_hashtags(title, story_text="", geo=None):
     for words, tags in THEMES:
         if any(w.lower() in hay for w in words):
             topic.extend(tags[:3])
-    topic = _uniq(topic)[:9]
-    return _uniq(topic + BASE)[:13]
+    topic = _uniq(topic)[:15]
+    return _uniq(topic + BASE)[:25]
 
 
 def chip_tags(tags):
-    """4 chips for the closing pull-back: 2 topic tags + 2 channel tags."""
-    topic = [t for t in tags if t not in BASE][:2]
-    return _uniq(topic + ["#HinduMythology", "#MindSpark"])[:4]
+    """Up to 6 chips for the closing pull-back: topic tags + viral tags."""
+    topic = [t for t in tags if t not in BASE][:4]
+    return _uniq(topic + ["#Shorts", "#Viral", "#Mahadev", "#HinduMythology"])[:6]
 
 
 def _strip_tags(text):
@@ -83,12 +88,12 @@ def apply_to_meta(meta, title, story_text="", geo=None):
     tags = build_hashtags(title, story_text, geo)
     topic = [t for t in tags if t not in BASE]
     base_title = _strip_tags(meta.get("title") or f"{title} | MindSpark")
-    base_title = base_title[:72].rstrip(" |-")
-    head = " ".join(["#Shorts"] + topic[:1])
-    meta["title"] = f"{base_title} {head}"[:100]
+    base_title = base_title[:65].rstrip(" |-")
+    head_tags = " ".join(["#Shorts", "#Viral"] + topic[:2])
+    meta["title"] = f"{base_title} {head_tags}"[:100]
     desc = _strip_tags(meta.get("description") or "").strip()
-    # title carries 2 hashtags, description carries up to 11 more (<= 15 total keeps them all active)
-    desc_tags = [t for t in tags if t.lower() not in head.lower().split()][:11]
+    # High-density viral hashtags in description
+    desc_tags = [t for t in tags if t.lower() not in head_tags.lower().split()][:20]
     meta["description"] = (desc + "\n\n" if desc else "") + " ".join(desc_tags) + "\n\n🔔 Subscribe MindSpark for daily Hindi mythology shorts."
     words = []
     for t in tags + [x.lstrip("#") for x in (meta.get("tags") or [])]:
@@ -97,12 +102,13 @@ def apply_to_meta(meta, title, story_text="", geo=None):
         spaced = re.sub(r"(?<=[a-z])(?=[A-Z])", " ", w)
         if spaced != w:
             words.append(spaced.lower())
-    words += ["hindi mythology", "hindu mythology stories", "pauranik katha", "bharat ki kahaniyan", "shorts"]
+    words += ["hindi mythology", "hindu mythology stories", "pauranik katha", "bharat ki kahaniyan", "shorts", "reels", "viral", "trending"]
     out, total = [], 0
     for w in _uniq(words):
-        if total + len(w) + 1 > 450:
+        if total + len(w) + 1 > 480:
             break
         out.append(w)
         total += len(w) + 1
     meta["tags"] = out
+    meta["hashtags_list"] = tags
     return tags

@@ -268,6 +268,13 @@ def run_myth_pipeline(a, voice_cfg, custom_script=None):
     except Exception as e:
         print(f"[Pipeline] voice summary skipped: {e}")
 
+    # Add viral hashtags to caption
+    try:
+        all_ht = meta.get("hashtags_list") or hashtags.build_hashtags(topic.get("title", ""), story_text, geo)
+        caption += f"\n\n🔥 *Viral Tags:*\n{' '.join(all_ht[:18])}"
+    except Exception as _e:
+        print(f"[Pipeline] caption hashtags skipped: {_e}")
+
     if not getattr(a, "no_telegram", False) and os.environ.get("NO_TELEGRAM") != "1":
         notify.send(final, caption, video_dir=out)
     else:
@@ -481,6 +488,13 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
     except Exception as e:
         print(f"[Pipeline] voice summary skipped: {e}")
 
+    # Add viral hashtags to caption
+    try:
+        all_ht = meta.get("hashtags_list") or hashtags.build_hashtags(topic.get("title", ""), story_text, geo)
+        caption += f"\n\n🔥 *Viral Tags:*\n{' '.join(all_ht[:18])}"
+    except Exception as _e:
+        print(f"[Pipeline] caption hashtags skipped: {_e}")
+
     if not getattr(a, "no_telegram", False) and os.environ.get("NO_TELEGRAM") != "1":
         notify.send(final, caption, video_dir=out)
     else:
@@ -620,6 +634,13 @@ def run_cinematic_pipeline(a, voice_cfg, custom_script=None):
             caption += f"\n🎙️ {vline}"
     except Exception as e:
         print(f"[Pipeline] voice summary skipped: {e}")
+
+    # Add viral hashtags to caption
+    try:
+        all_ht = meta.get("hashtags_list") or hashtags.build_hashtags(topic.get("title", ""), story_text, geo)
+        caption += f"\n\n🔥 *Viral Tags:*\n{' '.join(all_ht[:18])}"
+    except Exception as _e:
+        print(f"[Pipeline] caption hashtags skipped: {_e}")
 
     if not getattr(a, "no_telegram", False) and os.environ.get("NO_TELEGRAM") != "1":
         notify.send(final, caption, video_dir=out)
@@ -905,6 +926,13 @@ def main():
             caption += f"\n🎙️ {vline}"
     except Exception as e:
         print(f"[Pipeline] voice summary skipped: {e}")
+
+    # Add viral hashtags to caption
+    try:
+        all_ht = meta.get("hashtags_list") or hashtags.build_hashtags(topic.get("title", ""), story_text, geo)
+        caption += f"\n\n🔥 *Viral Tags:*\n{' '.join(all_ht[:18])}"
+    except Exception as _e:
+        print(f"[Pipeline] caption hashtags skipped: {_e}")
     if not getattr(a, "no_telegram", False) and os.environ.get("NO_TELEGRAM") != "1":
         notify.send(final, caption, video_dir=out)
     else:
