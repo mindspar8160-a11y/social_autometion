@@ -275,7 +275,7 @@ def run_myth_pipeline(a, voice_cfg, custom_script=None):
     print("DONE:", final)
 
 
-def _run_logged(cmd, cwd, tail_lines=14):
+def _run_logged(cmd, cwd, tail_lines=60):
     """Run a command, stream output safely without pipe deadlocks, and raise on failure."""
     import sys
     proc = subprocess.Popen(cmd, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -299,7 +299,7 @@ def _run_logged(cmd, cwd, tail_lines=14):
                         tail = tail[-tail_lines:]
     proc.wait()
     if proc.returncode != 0:
-        raise RuntimeError("render failed (exit %s): %s" % (proc.returncode, " || ".join(tail)[-700:]))
+        raise RuntimeError("render failed (exit %s): %s" % (proc.returncode, " || ".join(tail)[-1200:]))
 
 
 def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
@@ -391,9 +391,10 @@ def run_paperfilm_pipeline(a, voice_cfg, custom_script=None):
     rendered_mp4 = work / "rendered.mp4"
     npx = shutil.which("npx.cmd") or shutil.which("npx") or "npx.cmd"
     _run_logged([
-        npx, "remotion", "render", "src/cinematic/entry.tsx", "PaperFilm", str(rendered_mp4),
+        npx, "remotion", "render", "src/index.ts", "PaperFilm", str(rendered_mp4),
         f"--props={(work / 'pf_props.json').resolve().as_posix()}",
-        "--concurrency=1"
+        "--concurrency=1",
+        "--gl=angle"
     ], cwd=ROOT / "remotion")
 
     # final: video (+ its whoosh/thump sfx track) + voice/BGM, ~16 MB for Telegram
@@ -539,9 +540,10 @@ def run_cinematic_pipeline(a, voice_cfg, custom_script=None):
     rendered_mp4 = work / "rendered.mp4"
     npx = shutil.which("npx.cmd") or shutil.which("npx") or "npx.cmd"
     _run_logged([
-        npx, "remotion", "render", "src/cinematic/entry.tsx", "CinematicArc", str(rendered_mp4),
+        npx, "remotion", "render", "src/index.ts", "CinematicArc", str(rendered_mp4),
         f"--props={(work / 'ca_props.json').resolve().as_posix()}",
-        "--concurrency=1"
+        "--concurrency=1",
+        "--gl=angle"
     ], cwd=ROOT / "remotion")
 
     final = out / "final.mp4"
