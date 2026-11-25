@@ -336,6 +336,12 @@ async def _synth_edge_async(text, cfg, out):
 
     # Strip bracketed tags (e.g. [whispers], [sarcastically]) so edge_tts only gets clean natural words:
     clean_spoken_text = strip_tags(raw_text)
+
+    # Auto-switch to Gujarati voice if text contains Gujarati unicode characters
+    has_gujarati = any(0x0A80 <= ord(c) <= 0x0AFF for c in clean_spoken_text)
+    if has_gujarati and voice.startswith("hi-IN"):
+        voice = "gu-IN-NiranjanNeural"
+
     comm = edge_tts.Communicate(clean_spoken_text, voice, rate=rate, pitch=pitch, volume=vol)
     with open(out, "wb") as f:
         async for ch in comm.stream():
@@ -750,8 +756,11 @@ def _synth_pocket_tts(text, cfg, out):
     """Zero-shot fast voice cloning using Pocket-TTS Hindi.
     Defaults to AI4Bharat Sample 4 or Raju reference audio."""
     global _POCKET_MODEL, _POCKET_STATES
-    from pocket_tts import TTSModel
-    import scipy.io.wavfile
+    try:
+        from pocket_tts import TTSModel
+        import scipy.io.wavfile
+    except ImportError as ie:
+        raise RuntimeError(f"pocket_tts not available: {ie}")
     clean = strip_tags(text)
     clean = _ensure_devanagari_hindi(clean)
 

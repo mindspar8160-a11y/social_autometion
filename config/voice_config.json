@@ -1,8 +1,7 @@
 {
   "providers": [
     "edge-tts",
-    "coquixttsv2",
-    "ai4bharat"
+    "gemini_tts"
   ],
   "provider": "edge-tts",
   "selected_voice_id": "hi-IN-MadhurNeural",
