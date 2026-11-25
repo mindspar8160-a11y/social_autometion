@@ -127,4 +127,7 @@ def approve(d, dry_run=False):
 if __name__ == "__main__":
     load_env()
     for p in sys.argv[1:]:
-        print(p, "->", approve(p))
+        try:
+            print(p, "->", approve(p))
+        except Exception as e:
+            print(f"[YouTube Upload] ⚠️ Skipped/Failed for {p}: {e}")

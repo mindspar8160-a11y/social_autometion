@@ -31,7 +31,7 @@
   "tempo": 1.0,
   "lead": 0.05,
   "tail": 0.2,
-  "tail_last": 0.35,
+  "tail_last": 2.5,
   "squeeze_pauses": 0.0,
   "filter_profile": "clean_natural_broadcast",
   "filter_chain": "loudnorm=I=-16:TP=-1.5:LRA=11",

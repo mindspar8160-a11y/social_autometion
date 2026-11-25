@@ -30,7 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / "data" / "tts_cache"
 USAGE_FILE = ROOT / "data" / "tts_usage.json"
 
-LEAD, TAIL, TAIL_LAST = 0.12, 0.30, 0.50
+LEAD, TAIL, TAIL_LAST = 0.12, 0.30, 2.50
 
 # Har scene ke baad yahan likha jata hai ki kaunsa provider/voice actually use hua (Telegram caption me dikhta hai)
 _STATE = {"provider": None, "voice": None, "cached": False, "fails": []}
