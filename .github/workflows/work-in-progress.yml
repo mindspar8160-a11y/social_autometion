@@ -6,11 +6,11 @@ on:
       action:
         description: "Select Action:"
         required: true
-        default: "pause"
+        default: "resume"
         type: choice
         options:
-          - "pause"
           - "resume"
+          - "pause"
 
 permissions:
   actions: write
@@ -32,9 +32,10 @@ jobs:
           ACTION: ${{ github.event.inputs.action }}
         run: |
           echo "Selected Action: $ACTION"
-          
-          # List of target workflows to pause / resume
+
+          # Pause/resume hone wali workflows (daily.yml bhi included)
           TARGET_WORKFLOWS=(
+            "daily.yml"
             "bot.yml"
             "harvest_topics.yml"
             "apply-vox.yml"
@@ -44,9 +45,27 @@ jobs:
             "ig-login.yml"
           )
 
-          if [ "$ACTION" = "pause" ]; then
-            echo "🛑 PAUSING ALL WORKFLOWS (Work in Progress Mode)..."
-            
+          notify() {
+            if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                -d "chat_id=${TELEGRAM_CHAT_ID}" \
+                --data-urlencode "text=$1" > /dev/null || true
+            fi
+          }
+
+          if [ "$ACTION" = "resume" ]; then
+            echo "▶️ RESUMING ALL WORKFLOWS..."
+            for wf in "${TARGET_WORKFLOWS[@]}"; do
+              if [ -f ".github/workflows/$wf" ]; then
+                echo "Enabling workflow: $wf"
+                gh workflow enable "$wf" || true
+              fi
+            done
+            notify "✅ Work in Progress Mode DEACTIVATED! Saare workflows (daily.yml samet) wapas ACTIVE hain."
+            echo "✅ All workflows resumed successfully."
+
+          elif [ "$ACTION" = "pause" ]; then
+            echo "🛑 PAUSING ALL WORKFLOWS..."
             for wf in "${TARGET_WORKFLOWS[@]}"; do
               if [ -f ".github/workflows/$wf" ]; then
                 echo "Disabling workflow: $wf"
@@ -54,7 +73,6 @@ jobs:
               fi
             done
 
-            # Cancel any currently active / running runs (except current run)
             echo "Cancelling any running jobs..."
             RUNS=$(gh run list --status in_progress --json databaseId -q '.[].databaseId' || true)
             for r in $RUNS; do
@@ -64,33 +82,6 @@ jobs:
               fi
             done
 
-            # Send Telegram Notification
-            if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
-              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-                -d "chat_id=${TELEGRAM_CHAT_ID}" \
-                -d "text=🚧 *Work in Progress Mode ACTIVATED!*%0A%0ASaare automatic workflows aur cron runs pause/disable kar diye gaye hain.%0A%0AAb koi bhi video ya process automatic nahi chalega jab tak aap 'Work in Progress' workflow me 'resume' select karke manually na chalayein." \
-                -d "parse_mode=Markdown" > /dev/null || true
-            fi
-            
+            notify "🚧 Work in Progress Mode ACTIVATED! Saare automatic workflows (daily.yml samet) pause kar diye gaye hain. Resume ke liye is workflow me 'resume' select karke chalao."
             echo "✅ All workflows paused successfully."
-
-          elif [ "$ACTION" = "resume" ]; then
-            echo "▶️ RESUMING ALL WORKFLOWS..."
-
-            for wf in "${TARGET_WORKFLOWS[@]}"; do
-              if [ -f ".github/workflows/$wf" ]; then
-                echo "Enabling workflow: $wf"
-                gh workflow enable "$wf" || true
-              fi
-            done
-
-            # Send Telegram Notification
-            if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
-              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-                -d "chat_id=${TELEGRAM_CHAT_ID}" \
-                -d "text=✅ *Work in Progress Mode DEACTIVATED!*%0A%0ASaare workflows aur scheduled runs wapas ACTIVE kar diye gaye hain." \
-                -d "parse_mode=Markdown" > /dev/null || true
-            fi
-
-            echo "✅ All workflows resumed successfully."
           fi
