@@ -836,7 +836,8 @@ VIRAL REELS SCRIPTING FRAMEWORK (FULL 45-50 SEC STANDALONE VIDEO):
    - KOI BHI PART NAHI: KABHI BHI 'भाग 1', 'भाग 2', 'अगला भाग', 'dekhiye agle video' mat likho! Poori kahani isi ek video me samapt hogi.
    - ZERO DUPLICATION: Hook aur Scene 2 me koi shabd ya naam dohrana nahi hai.
    - KABHI BHI "जानिए इसका रहस्य", "रहस्य जानिए" jaise filler phrases mat likho.
-   - Shuddh Devanagari Hindi for tts_text, Hinglish for narration. Numbers aur Saal bilkul shabdon me likho (jaise 'सन सोलह सौ साठ').
+   - SHUDDH SARAL HINDI FOR TTS: tts_text me shuddh, saral aur swabhavik Hindi likho. KABHI BHI do shabdon ko aapas me mat chipkao (jaise 'मस्तकाटकर' bilkul galat hai, 'मस्तक काटकर' alag-alag likho; 'इस्थान' galat hai, 'इस स्थान' likho; 'क्यौं' galat hai, 'क्यों' likho). Har shabd ke beech proper space do taaki voice ekdum saaf aur spasht uccharan kare.
+   - Numbers aur Saal bilkul shabdon me likho (jaise 'सन सोलह सौ साठ').
 
 OUTPUT: sirf ek JSON object (koi markdown nahi, koi explanation nahi):
 {

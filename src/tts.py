@@ -879,11 +879,8 @@ def _tighten(raw, out, tempo, lead, tail, squeeze=0.0, normalize=True, filter_ch
     elif normalize:
         af += ",loudnorm=I=-16:TP=-1.5:LRA=11"
     if squeeze and squeeze > 0:
-        # shorten mid-sentence pauses longer than `squeeze` sec down to 0.18s
-        af += f",silenceremove=stop_periods=-1:stop_duration={squeeze}:stop_threshold=-38dB:stop_silence=0.18"
-    else:
-        # Default safety: eliminate awkward dead pauses longer than 0.30s down to natural 0.18s
-        af += ",silenceremove=stop_periods=-1:stop_duration=0.30:stop_threshold=-38dB:stop_silence=0.18"
+        # Only squeeze if explicitly requested, with a safe gentle threshold (-48dB) so Hindi consonants are never swallowed
+        af += f",silenceremove=stop_periods=-1:stop_duration={squeeze}:stop_threshold=-48dB:stop_silence=0.20"
     if abs(tempo - 1.0) > 0.01:
         af += f",atempo={tempo:.3f}"
     af += f",adelay={int(lead * 1000)}:all=1,apad=pad_dur={tail},asetpts=PTS-STARTPTS"
