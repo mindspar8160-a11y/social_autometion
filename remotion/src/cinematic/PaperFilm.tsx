@@ -476,18 +476,6 @@ const Particles: React.FC<{f: number; width: number; height: number; seed: numbe
   );
 };
 
-const HashChips: React.FC<{tags: string[]; q: number}> = ({tags, q}) => {
-  const look = useLook();
-  if (!tags.length || q <= 0) return null;
-  return (
-    <div style={{position: "absolute", left: 40, right: 40, bottom: 310, display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center", opacity: q, transform: `translateY(${(1 - q) * 30}px)`}}>
-      {tags.slice(0, 6).map((t, k) => (
-        <span key={k} style={{fontFamily: BOLD, fontSize: 50, color: isLight(look.accents[k % look.accents.length].main) ? look.ink : look.sheetFill, background: look.accents[k % look.accents.length].main, padding: "6px 28px", borderRadius: 40, border: `5px solid ${look.sheetFill}`, boxShadow: "0 8px 16px rgba(0,0,0,.35)", transform: `rotate(${(k % 2 ? 1 : -1) * 1.5}deg)`}}>{t.startsWith("#") ? t : "#" + t}</span>
-      ))}
-    </div>
-  );
-};
-
 /* ---------------------------------------------------------------- the film */
 export const sceneFramesPF = (s: PFScene, fps = 30) => Math.max(15, Math.round(s.durationSec * fps));
 export const totalFramesPF = (scenes: PFScene[], fps = 30) => scenes.reduce((a, s) => a + sceneFramesPF(s, fps), 0);
@@ -607,7 +595,6 @@ export const PaperFilm: React.FC<PFProps> = ({scenes, seed = 7, captions = true,
         </AbsoluteFill>
         {isFull(sc) && fullOp > 0 && <AbsoluteFill style={{opacity: fullOp}}><FullScene s={sc} i={cur} lf={lf} fps={fps} width={width} height={height} /></AbsoluteFill>}
         {captions && capOp > 0 && <div style={{opacity: capOp}}><Captions s={sc} lf={lf} fps={fps} /></div>}
-        <HashChips tags={hashtags} q={chipQ} />
         {sfx && scenes.map((s, k) => {
           const st = layout.starts[k];
           return (
