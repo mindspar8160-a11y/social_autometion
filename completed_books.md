@@ -79,3 +79,4 @@
 | 73 | 2026-11-22 | 2026-11-22_143037_pf_shakti_peeth_maihar_sharda | Unknown | Productivity & Wisdom | https://youtu.be/Xqhe9CWLp-s |
 | 74 | 2026-11-22 | 2026-11-22_144909_pf_shakti_peeth_jogadya_kshirgram | Unknown | Productivity & Wisdom | https://youtu.be/dllHbDTZVxI |
 | 75 | 2026-11-26 | 2026-11-26_041104_pf_ganesha_mahabharat_lekhan | Unknown | Productivity & Wisdom | https://youtu.be/WJNCI-TP5Ak |
+| 76 | 2026-11-26 | 2026-11-26_115644_pf_shakti_peeth_bahula | Unknown | Productivity & Wisdom | https://youtu.be/ADvTBn6nJYM |
