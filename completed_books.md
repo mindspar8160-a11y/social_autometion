@@ -81,3 +81,4 @@
 | 75 | 2026-11-26 | 2026-11-26_041104_pf_ganesha_mahabharat_lekhan | Unknown | Productivity & Wisdom | https://youtu.be/WJNCI-TP5Ak |
 | 76 | 2026-11-26 | 2026-11-26_115644_pf_shakti_peeth_bahula | Unknown | Productivity & Wisdom | https://youtu.be/ADvTBn6nJYM |
 | 77 | 2026-11-26 | 2026-11-26_131236_pf_savitri_satyavan | Unknown | Productivity & Wisdom | https://youtu.be/TNHn_P0O03k |
+| 78 | 2026-11-26 | 2026-11-26_155712_pf_lepakshi_hanging_pillar_andhra | Unknown | Productivity & Wisdom | https://youtu.be/VV6nWOTzgN0 |
