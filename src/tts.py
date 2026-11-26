@@ -796,7 +796,78 @@ def _synth_pocket_tts(text, cfg, out):
     return []
 
 
+_VOICESTUDIO_MODEL = None
+
+
+def _synth_voicestudio(text, cfg, out):
+    """VoiceStudio / OmniVoice engine (debpalash/voicestudio).
+    Sample 1: Voice Design Mode (Sanatan Divine Storyteller)
+    Instruct: 'male, indian accent, middle-aged, low pitch'."""
+    global _VOICESTUDIO_MODEL
+    clean = strip_tags(text)
+    clean = _ensure_devanagari_hindi(clean)
+
+    try:
+        from omnivoice.models.omnivoice import OmniVoice
+        from omnivoice.utils.audio import save_audio
+    except ImportError:
+        import sys
+        for p in [ROOT / "temp_voicestudio", ROOT / "voicestudio"]:
+            if p.exists() and str(p) not in sys.path:
+                sys.path.insert(0, str(p))
+        from omnivoice.models.omnivoice import OmniVoice
+        from omnivoice.utils.audio import save_audio
+
+    if _VOICESTUDIO_MODEL is None:
+        import torch
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        dtype = torch.float16 if device == "cuda" else torch.float32
+        print(f"[VoiceStudio] Loading OmniVoice model on {device}...")
+        _VOICESTUDIO_MODEL = OmniVoice.from_pretrained(
+            "k2-fsa/OmniVoice",
+            device_map=device,
+            dtype=dtype,
+            allow_tokenizer_fallback=True
+        )
+        print("[VoiceStudio] OmniVoice model ready.")
+
+    instruct = cfg.get("instruct") or cfg.get("style") or "male, indian accent, middle-aged, low pitch"
+    valid_items = {
+        "american accent", "australian accent", "british accent", "canadian accent",
+        "child", "chinese accent", "elderly", "female", "high pitch", "indian accent",
+        "japanese accent", "korean accent", "low pitch", "male", "middle-aged",
+        "moderate pitch", "portuguese accent", "russian accent", "teenager",
+        "very high pitch", "very low pitch", "whisper", "young adult"
+    }
+    tokens = [i.strip().lower() for i in instruct.split(",") if i.strip().lower() in valid_items]
+    if not tokens:
+        tokens = ["male", "indian accent", "middle-aged", "low pitch"]
+    final_instruct = ", ".join(tokens)
+
+    lang = cfg.get("language") or "hi"
+    speed = float(cfg.get("speed", 1.0))
+
+    tmp_wav = Path(out).with_suffix(".vs.wav")
+    audios = _VOICESTUDIO_MODEL.generate(
+        text=clean,
+        language=lang,
+        instruct=final_instruct,
+        num_step=16,
+        speed=speed,
+        denoise=True
+    )
+    save_audio(str(tmp_wav), audios[0], _VOICESTUDIO_MODEL.sampling_rate)
+
+    af = "loudnorm=I=-16:TP=-1.5:LRA=10,asetpts=PTS-STARTPTS"
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(tmp_wav),
+                    "-af", af, "-ar", "44100", "-ac", "2", "-b:a", "192k", str(out)], check=True)
+    if tmp_wav.exists():
+        tmp_wav.unlink()
+    return []
+
+
 PROVIDERS = {
+    "voicestudio": _synth_voicestudio, "omnivoice": _synth_voicestudio, "voicestudio_design": _synth_voicestudio,
     "coquixttsv2": _synth_pocket_tts, "coqui_xtts": _synth_pocket_tts, "xtts": _synth_pocket_tts,
     "ai4bharat": _synth_pocket_tts, "ai4bharat_sample4": _synth_pocket_tts, "pocket_tts": _synth_pocket_tts,
     "xtts_local": _synth_pocket_tts, "xtts_clone": _synth_pocket_tts, "voice_clone": _synth_pocket_tts,

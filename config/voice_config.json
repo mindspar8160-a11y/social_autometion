@@ -1,13 +1,16 @@
 {
   "providers": [
+    "voicestudio",
     "edge-tts",
     "gemini_tts"
   ],
-  "provider": "edge-tts",
-  "selected_voice_id": "hi-IN-MadhurNeural",
-  "selected_voice_name": "Microsoft Madhur (Deep & Fast Hindi Storyteller)",
-  "voice": "hi-IN-MadhurNeural",
+  "provider": "voicestudio",
+  "selected_voice_id": "voicestudio_sanatan_design",
+  "selected_voice_name": "VoiceStudio OmniVoice (Sanatan Divine Storyteller)",
+  "voice": "male, indian accent, middle-aged, low pitch",
+  "instruct": "male, indian accent, middle-aged, low pitch",
   "voices": {
+    "voicestudio": "male, indian accent, middle-aged, low pitch",
     "edge-tts": "hi-IN-MadhurNeural",
     "raju_clone": "hi-IN-MadhurNeural",
     "coquixttsv2": "raju_1_sample",
@@ -15,7 +18,7 @@
     "gemini_tts": "Charon",
     "google_chirp": "hi-IN-Chirp3-HD-Charon"
   },
-  "style": "deep authoritative divine storytelling, crisp, punchy, calm and emotional",
+  "style": "male, indian accent, middle-aged, low pitch",
   "language": "hi",
   "language_code": "hi-IN",
   "fallback_voice": "hi-IN-MadhurNeural",
