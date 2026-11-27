@@ -84,3 +84,4 @@
 | 78 | 2026-11-26 | 2026-11-26_160706_pf_chotila_chamunda_pahad | Unknown | Productivity & Wisdom | https://youtu.be/Em3W0e2rtWw |
 | 79 | 2026-11-27 | 2026-11-27_041041_pf_tryambakeshwar_trimurti_lingam | Unknown | Productivity & Wisdom | https://youtu.be/SzXKvdoDtT8 |
 | 80 | 2026-11-27 | 2026-11-27_115839_pf_meldi_mata_parcha | Unknown | Productivity & Wisdom | https://youtu.be/_jn9YGZK1IA |
+| 81 | 2026-11-27 | 2026-11-27_130716_pf_shakti_peeth_bhramari_trisrota | Unknown | Productivity & Wisdom | https://youtu.be/7As7amK6YNA |
