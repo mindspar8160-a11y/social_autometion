@@ -253,21 +253,107 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     return ass_path
 
 
+def _generate_video_via_free_spaces(
+    prompt: str,
+    img_path: Path,
+    raw_vid_path: Path,
+    hf_token: str = "",
+) -> Path | None:
+    """Try 100% free HuggingFace Video Spaces (LTX-Video-Distilled & AnimateDiff-Lightning)."""
+    import shutil
+    from gradio_client import Client, handle_file
+
+    kwargs = {"token": hf_token} if hf_token else {}
+
+    # 1. Lightricks/ltx-video-distilled (Image-to-Video if image exists, else Text-to-Video)
+    try:
+        client = Client("Lightricks/ltx-video-distilled", **kwargs)
+        if img_path.exists():
+            print("[HF-Video] Trying free Space: Lightricks/ltx-video-distilled (I2V)...")
+            res = client.predict(
+                prompt,
+                "worst quality, inconsistent motion, blurry, jittery, distorted",
+                handle_file(str(img_path)),
+                None,
+                768,
+                512,
+                "image-to-video",
+                3,
+                9,
+                42,
+                True,
+                1,
+                True,
+                api_name="/image_to_video",
+            )
+        else:
+            print("[HF-Video] Trying free Space: Lightricks/ltx-video-distilled (T2V)...")
+            res = client.predict(
+                prompt,
+                "worst quality, inconsistent motion, blurry, jittery, distorted",
+                None,
+                None,
+                768,
+                512,
+                "text-to-video",
+                3,
+                9,
+                42,
+                True,
+                1,
+                True,
+                api_name="/text_to_video",
+            )
+        vid_info = res[0] if isinstance(res, (tuple, list)) else res
+        src_vid = vid_info.get("video") if isinstance(vid_info, dict) else str(vid_info)
+        if src_vid and Path(src_vid).exists() and Path(src_vid).stat().st_size > 20000:
+            shutil.copyfile(src_vid, raw_vid_path)
+            return raw_vid_path
+    except Exception as e:
+        print(f"[HF-Video] Free Space ltx-video-distilled failed: {e}")
+
+    # 2. ByteDance/AnimateDiff-Lightning (Text-to-Video)
+    try:
+        client = Client("ByteDance/AnimateDiff-Lightning", **kwargs)
+        print("[HF-Video] Trying free Space: ByteDance/AnimateDiff-Lightning (T2V)...")
+        res = client.predict(
+            prompt[:300],
+            "epiCRealism",
+            "guoyww/animatediff-motion-lora-zoom-in",
+            "4",
+            api_name="/generate_image",
+        )
+        src_vid = res.get("video") if isinstance(res, dict) else str(res)
+        if src_vid and Path(src_vid).exists() and Path(src_vid).stat().st_size > 20000:
+            shutil.copyfile(src_vid, raw_vid_path)
+            return raw_vid_path
+    except Exception as e:
+        print(f"[HF-Video] Free Space AnimateDiff-Lightning failed: {e}")
+
+    return None
+
+
 def generate_scene_video(
     prompt: str,
     img_path: Path,
     raw_vid_path: Path,
     token: str | None = None,
 ) -> Path | None:
-    """Try generating real AI video motion via HuggingFace InferenceClient (requires HF_TOKEN)."""
+    """Try generating real AI video motion via free HF Spaces first, then InferenceClient."""
     tok = _get_hf_token(token)
-    if not tok:
-        return None
-    client = InferenceClient(token=tok)
     motion_prompt = (
         f"Smooth cinematic camera movement, subtle character and cloth motion, "
         f"flickering warm firelight and glowing atmosphere: {prompt[:300]}"
     )
+
+    # 0. Try 100% free HuggingFace Spaces first (works with free HF_TOKEN or anonymous quota)
+    free_vid = _generate_video_via_free_spaces(motion_prompt, img_path, raw_vid_path, hf_token=tok)
+    if free_vid:
+        return free_vid
+
+    if not tok:
+        return None
+    client = InferenceClient(token=tok)
 
     # 1. Try Image-to-Video if we have a reference image
     if img_path.exists():
