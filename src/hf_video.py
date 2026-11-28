@@ -463,7 +463,7 @@ def _render_via_vox_remotion(
         encoding="utf-8",
     )
 
-    rendered_mp4 = work_dir / "vox_rendered.mp4"
+    rendered_mp4 = (work_dir / "vox_rendered.mp4").resolve()
     npx = shutil.which("npx.cmd") or shutil.which("npx") or "npx.cmd"
     try:
         print("🎬 Rendering 3-layer VoxEditorial Motion Graphics via Remotion...")
