@@ -51,6 +51,8 @@ const LAYOUTS = [
   "newspaper_oped",
   "kinetic_split",
   "polaroid_stack",
+  "detective_board",
+  "dramatic_climax",
 ] as const;
 
 const splitChunks = (text: string, maxWords = 4): string[] => {
@@ -207,7 +209,21 @@ const SceneSlide: React.FC<{
     ty = interpolate(enter, [0, 1], [70, 0]);
   }
 
-  const mediaScale = interpolate(frame, [0, durationInFrames], [1.0, 1.1], {extrapolateRight: "clamp"});
+  // 2.5D Parallax + Camera Shake + Embers / Light Leak
+  const parallaxBgX = interpolate(frame, [0, durationInFrames], [0, isLast ? 0 : -18]);
+  const parallaxFgX = interpolate(frame, [0, durationInFrames], [0, isLast ? 0 : 14]);
+  const isClimax = layout === "dramatic_climax";
+  const shakeActive = isClimax && frame < 10;
+  const shakeX = shakeActive ? Math.sin(frame * 2.8) * 12 : 0;
+  const shakeY = shakeActive ? Math.cos(frame * 3.4) * 9 : 0;
+  const punchScale = shakeActive ? 1.04 : 1;
+
+  // Typewriter reveal for archive/date tag
+  const typeText = `ARCHIVE #${(seed % 900) + 100} • MINDSPARK`;
+  const typedCount = Math.min(typeText.length, Math.floor(interpolate(frame, [2, 24], [0, typeText.length], {extrapolateLeft: "clamp", extrapolateRight: "clamp"})));
+  const typeCursor = frame % 14 < 7 ? "▌" : "";
+
+  const mediaScale = interpolate(frame, [0, durationInFrames], [1.0, 1.12], {extrapolateRight: "clamp"});
   const highlightPct = interpolate(frame, [3, 18], [0, 100], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -300,14 +316,14 @@ const SceneSlide: React.FC<{
         </div>
       </div>
 
-      {/* MIDGROUND: 6 Distinct Visual Layouts */}
+      {/* MIDGROUND: 7+ Distinct High-Retention Motion Graphics Layouts */}
       <div
         style={{
           position: "relative",
           flex: 1,
           marginTop: 6,
           marginBottom: 20,
-          transform: `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(${boxScale})`,
+          transform: `translate(${tx + shakeX + parallaxBgX * 0.3}px, ${ty + shakeY}px) rotate(${rot}deg) scale(${boxScale * punchScale})`,
           zIndex: 2,
         }}
       >
@@ -316,21 +332,26 @@ const SceneSlide: React.FC<{
             <div style={{position: "absolute", inset: 0, transform: "translate(14px, 14px)", backgroundColor: accent}} />
             <div style={{position: "relative", width: "100%", height: "100%", border: "5px solid #18181B", overflow: "hidden", backgroundColor: "#bcd3cf"}}>
               <MapItem s={mapScene} lf={frame} fps={fps} accent="#D92D20" accentDark="#991B1B" w={972} h={1080} />
-              {/* Floating Cutout Inset of AI Media */}
+              {/* Polaroid Cutout Inset + Typewriter Location Tag */}
               <div
                 style={{
                   position: "absolute",
-                  right: 24,
-                  bottom: 24,
+                  right: 22,
+                  bottom: 22,
                   width: 320,
-                  height: 400,
+                  backgroundColor: "#FFFFFF",
+                  padding: "12px 12px 36px 12px",
                   border: "4px solid #18181B",
                   boxShadow: "10px 10px 0px #18181B",
-                  overflow: "hidden",
-                  transform: "rotate(2deg)",
+                  transform: `translateX(${parallaxFgX}px) rotate(2deg)`,
                 }}
               >
-                <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+                <div style={{width: "100%", height: 340, overflow: "hidden", border: "2px solid #18181B", position: "relative"}}>
+                  <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+                </div>
+                <div style={{marginTop: 8, fontSize: 17, fontWeight: 900, fontFamily: "monospace", color: "#18181B"}}>
+                  {typeText.slice(0, typedCount)}{typeCursor}
+                </div>
               </div>
             </div>
           </div>
@@ -403,15 +424,81 @@ const SceneSlide: React.FC<{
               gap: 16,
             }}
           >
-            <div style={{borderBottom: "2px solid #18181B", paddingBottom: 8, display: "flex", justifyContent: "space-between", fontSize: 22, fontWeight: 800, color: "#52525B"}}>
+            <div style={{borderBottom: "2px solid #18181B", paddingBottom: 8, display: "flex", justifyContent: "space-between", fontSize: 21, fontWeight: 800, color: "#52525B", fontFamily: "monospace"}}>
               <span>भारत इतिहास अभिलेख</span>
-              <span>ARCHIVE #{seed % 900 + 100}</span>
+              <span>{typeText.slice(0, typedCount)}{typeCursor}</span>
             </div>
             <div style={{flex: 1, position: "relative", border: "3px solid #18181B", overflow: "hidden"}}>
               <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} filter="contrast(1.08) sepia(0.12)" />
+              {/* Spotlight Focus vignette */}
+              <AbsoluteFill
+                style={{
+                  background: "radial-gradient(circle at 50% 45%, transparent 32%, rgba(0,0,0,0.48) 95%)",
+                  pointerEvents: "none",
+                }}
+              />
             </div>
-            <div style={{backgroundColor: "rgba(245,158,11,0.28)", borderLeft: `6px solid ${accent}`, padding: "10px 16px", fontSize: 28, fontWeight: 800, color: "#18181B"}}>
+            <div style={{position: "relative", backgroundColor: "rgba(245,158,11,0.32)", borderLeft: `6px solid ${accent}`, padding: "10px 16px", fontSize: 28, fontWeight: 800, color: "#18181B"}}>
               “{spoken.slice(0, 72)}{spoken.length > 72 ? "…" : ""}”
+            </div>
+          </div>
+        )}
+
+        {layout === "detective_board" && (
+          <div
+            style={{
+              position: "relative",
+              width: "100%",
+              height: "100%",
+              backgroundColor: "#D6B88C",
+              border: "5px solid #18181B",
+              boxShadow: "12px 12px 0px #18181B",
+              padding: 26,
+              overflow: "hidden",
+            }}
+          >
+            {/* Animated Red Thread SVG connecting two pinned notes */}
+            <svg width="100%" height="100%" style={{position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none"}}>
+              <line
+                x1="180" y1="120" x2="760" y2="740"
+                stroke="#D92D20" strokeWidth="6" strokeDasharray="1000"
+                strokeDashoffset={interpolate(frame, [4, 24], [1000, 0], {extrapolateLeft: "clamp", extrapolateRight: "clamp"})}
+              />
+              <circle cx="180" cy="120" r="12" fill="#D92D20" stroke="#18181B" strokeWidth="3" />
+              <circle cx="760" cy="740" r="12" fill="#D92D20" stroke="#18181B" strokeWidth="3" />
+            </svg>
+            <div style={{position: "relative", width: "84%", height: "72%", margin: "18px auto 0 auto", border: "4px solid #18181B", backgroundColor: "#FFF", padding: 14, transform: "rotate(-1.5deg)", boxShadow: "8px 8px 0px rgba(0,0,0,0.3)"}}>
+              <div style={{width: "100%", height: "100%", position: "relative", overflow: "hidden"}}>
+                <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+              </div>
+            </div>
+            <div style={{position: "absolute", bottom: 26, left: 32, backgroundColor: "#FEF08A", border: "3px solid #18181B", padding: "12px 18px", fontSize: 26, fontWeight: 900, transform: "rotate(2deg)", boxShadow: "6px 6px 0px #18181B", zIndex: 4}}>
+              📌 {heading.slice(0, 34)}
+            </div>
+          </div>
+        )}
+
+        {layout === "dramatic_climax" && (
+          <div style={{position: "relative", width: "100%", height: "100%"}}>
+            {/* RGB Split / CRT Glitch offset layers */}
+            <div style={{position: "absolute", inset: 0, transform: `translate(${shakeActive ? -10 : 10}px, 10px)`, backgroundColor: "#D92D20"}} />
+            <div style={{position: "relative", width: "100%", height: "100%", border: "5px solid #18181B", overflow: "hidden", backgroundColor: "#000"}}>
+              <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale * 1.03} filter="contrast(1.16) saturate(1.15)" />
+              {/* CRT Scanlines */}
+              <AbsoluteFill
+                style={{
+                  backgroundImage: "repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0px, rgba(0,0,0,0.22) 2px, transparent 2px, transparent 6px)",
+                  pointerEvents: "none",
+                }}
+              />
+              {/* Warm golden light flare */}
+              <AbsoluteFill
+                style={{
+                  background: "radial-gradient(circle at 20% 20%, rgba(245,158,11,0.32), transparent 55%)",
+                  mixBlendMode: "screen",
+                  pointerEvents: "none",
+                }}
+              />
             </div>
           </div>
         )}
