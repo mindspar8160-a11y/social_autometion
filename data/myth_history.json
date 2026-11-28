@@ -2862,5 +2862,13 @@
     "seed": 435957,
     "engine": "paperfilm",
     "video_key": "2026-11-28_075401_pf_rani_durgavati_gondwana"
+  },
+  {
+    "topic_id": "harbhuji_sankhla_jodhpur",
+    "topic_title": "हड़भूजी सांखला: राव जोधा को कटार और जोधपुर का राज्य दिया",
+    "date": "2026-11-28",
+    "seed": 849028,
+    "engine": "hf_ai",
+    "video_key": "2026-11-28_115413_hf_harbhuji_sankhla_jodhpur"
   }
 ]
