@@ -23,7 +23,7 @@ from common import ROOT, load_env, jload, jsave
 import theme_engine, template_engine, style_engine, llm, tts, audio, notify
 from myth_picker import pick_myth_topic
 import paperfilm_plan
-import hashtags, look_picker, hf_video
+import hashtags, look_picker, geo_places
 
 THEME_HIST = ROOT / "data" / "theme_history.json"
 slug = lambda s: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
@@ -309,10 +309,10 @@ def _run_logged(cmd, cwd, tail_lines=60):
         raise RuntimeError("render failed (exit %s): %s" % (proc.returncode, " || ".join(tail)[-1200:]))
 
 
-def run_hf_ai_pipeline(a, voice_cfg, custom_script=None):
-    """Mythology Short rendered with HuggingFace AI scene images (FLUX.1-schnell) + Ken Burns + Devanagari subs."""
+def run_vox_pipeline(a, voice_cfg, custom_script=None):
+    """Mythology Short rendered with pure SVG VoxEditorial + India Map (MapItem) via Remotion."""
     print("=" * 60)
-    print("🎨 MINDSPARK AI MYTHOLOGY SHORTS PIPELINE (HF_AI engine)")
+    print("🎨 MINDSPARK SVG VOX EDITORIAL SHORTS PIPELINE (Vox engine)")
     print("=" * 60)
 
     seed = int(datetime.datetime.now().timestamp() * 1000) % 1000000
@@ -329,11 +329,10 @@ def run_hf_ai_pipeline(a, voice_cfg, custom_script=None):
     else:
         forced = getattr(a, "topic", None) or getattr(a, "book", None)
         topic = pick_myth_topic(forced=forced)
-        print(f"📖 Myth Topic (HF AI Short): {topic['title']}")
+        print(f"📖 Myth Topic (SVG Vox Short): {topic['title']}")
         plan = paperfilm_plan.make_standalone_45s_plan(topic, seed=seed)
 
     scenes = plan["scenes"]
-    # Keep ALL scenes so the full story completes cleanly without cutting off the middle
 
     # Ensure the final scene always has a Subscribe CTA
     last_sc = scenes[-1]
@@ -345,7 +344,7 @@ def run_hf_ai_pipeline(a, voice_cfg, custom_script=None):
 
     unique_ts = datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
     topic_slug = topic.get("topic") or slug(topic.get("title", "")) or f"story_{seed}"
-    key = f"{unique_ts}_hf_{topic_slug}"
+    key = f"{unique_ts}_vox_{topic_slug}"
     work = ROOT / "data" / "work" / key
     out = ROOT / "data" / "output" / key
     work.mkdir(parents=True, exist_ok=True)
@@ -362,28 +361,70 @@ def run_hf_ai_pipeline(a, voice_cfg, custom_script=None):
     ht = hashtags.build_hashtags(topic.get("title", ""), story_text, geo)
     chips = hashtags.chip_tags(ht)
 
+    vox_scenes = []
+    for sc in scenes:
+        entry = {
+            "heading": sc.get("heading") or sc.get("title") or topic["title"],
+            "title": sc.get("title") or "",
+            "narration": sc.get("narration") or "",
+            "tts_text": sc.get("tts_text") or sc.get("narration") or "",
+            "durationSec": max(1.0, float(sc.get("durationSec") or sc.get("voiceSec") or sc.get("sec") or 5.0)),
+        }
+        if sc.get("words"):
+            entry["words"] = sc["words"]
+        sc_geo = geo_places.find_place(f"{entry['heading']} {entry['tts_text']} {entry['narration']}")
+        if sc_geo:
+            if sc_geo.get("state"):
+                entry["state"] = sc_geo["state"]
+            if sc_geo.get("lat") and sc_geo.get("lon"):
+                entry["place"] = {
+                    "name": sc_geo.get("name") or sc_geo.get("state") or "",
+                    "lat": sc_geo["lat"],
+                    "lon": sc_geo["lon"],
+                }
+        vox_scenes.append(entry)
+
+    props_path = (work / "vox_props.json").resolve()
+    jsave(props_path, {
+        "topicTitle": topic["title"],
+        "scenes": vox_scenes,
+        "seed": seed,
+        "geo": geo,
+        "hashtags": chips,
+    })
+
+    rendered_mp4 = (work / "vox_rendered.mp4").resolve()
     final = out / "final.mp4"
-    print(f"🖼️ Generating {len(scenes)} scenes (VoxEditorial + PaperCut + Map + AI Motion)...")
-    hf_video.render_hf_video(
-        scenes, work, work / "audio.mp3", final,
-        topic_title=topic.get("title", ""),
-        geo=geo,
-        hashtags=chips,
-        seed=seed,
-    )
-    print(f"📦 Final HF_AI video: {final.stat().st_size / 1048576:.1f} MB ({total:.1f}s)")
+    npx = shutil.which("npx.cmd") or shutil.which("npx") or "npx.cmd"
+    print("🎬 Rendering pure SVG VoxEditorial via Remotion...")
+    _run_logged([
+        npx, "remotion", "render", "src/index.ts", "VoxEditorial", str(rendered_mp4),
+        f"--props={props_path.as_posix()}",
+        "--concurrency=1",
+        "--gl=angle",
+    ], cwd=ROOT / "remotion")
+
+    subprocess.run([
+        "ffmpeg", "-y", "-loglevel", "error",
+        "-i", str(rendered_mp4), "-i", str(work / "audio.mp3"),
+        "-map", "0:v", "-map", "1:a",
+        "-c:v", "libx264", "-preset", "medium", "-b:v", "3500k",
+        "-maxrate", "4500k", "-bufsize", "7000k",
+        "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+        "-c:a", "aac", "-b:a", "128k", "-shortest",
+        str(final),
+    ], check=True)
+    print(f"📦 Final SVG VoxEditorial video: {final.stat().st_size / 1048576:.1f} MB ({total:.1f}s)")
 
     w, h = verify_resolution(final)
     print(f"📏 Output video dimensions: {w}x{h}")
     if (w, h) != (1080, 1920):
         raise RuntimeError(f"Format violation: Video resolution is {w}x{h}, expected 1080x1920!")
 
-    story_text = " ".join(f"{sc.get('tts_text', '')} {sc.get('narration', '')}" for sc in scenes)
-    geo = paperfilm_plan._detect_geo(topic, story_text)
     y = plan.get("youtube", {})
     meta = {
         "mode": "myth",
-        "engine": "hf_ai",
+        "engine": "vox",
         "topic": topic["title"],
         "title": y.get("title", f"{topic['title']} | MindSpark"),
         "description": y.get("description", ""),
@@ -394,7 +435,7 @@ def run_hf_ai_pipeline(a, voice_cfg, custom_script=None):
     }
     hashtags.apply_to_meta(meta, topic.get("title", ""), story_text, geo)
     jsave(out / "meta.json", meta)
-    jsave(out / "plan.json", {"scenes": scenes, "seed": seed, "engine": "hf_ai"})
+    jsave(out / "plan.json", {"scenes": vox_scenes, "seed": seed, "engine": "vox"})
 
     topic_id = topic.get("topic") or slug(topic.get("title", "")) or f"topic_{seed}"
     myth_hist = jload(ROOT / "data" / "myth_history.json", [])
@@ -403,14 +444,14 @@ def run_hf_ai_pipeline(a, voice_cfg, custom_script=None):
         "topic_title": topic["title"],
         "date": str(datetime.date.today()),
         "seed": seed,
-        "engine": "hf_ai",
+        "engine": "vox",
         "video_key": key,
     })
     jsave(ROOT / "data" / "myth_history.json", myth_hist)
 
     caption = (
         f"🔱 *{meta['title']}*\n\n"
-        f"🎨 *MindSpark HF-AI Shorts (FLUX + 4C Cool Voiceover)*\n"
+        f"🎨 *MindSpark SVG VoxEditorial Shorts*\n"
         f"📖 *Topic:* {topic['title']}\n"
         f"⏱️ *Duration:* {total:.1f}s | 9:16 Vertical"
     )
@@ -778,8 +819,8 @@ def main():
     ap.add_argument("--series", action="store_true", default=False, help="Use 3-part rotation series engine")
     ap.add_argument("--mode", choices=["book", "myth"], default="myth", help="Pipeline mode: 'myth' (default) or 'book'")
     ap.add_argument("--myth", action="store_true", help="Shortcut for --mode myth")
-    ap.add_argument("--engine", choices=["hf_ai", "paperfilm", "myth", "cinematic", "random"], default=os.environ.get("MYTH_ENGINE", "hf_ai"),
-                    help="Myth video engine: 'hf_ai' (HuggingFace AI images + Ken Burns, default), 'paperfilm', 'myth', 'cinematic', or 'random'")
+    ap.add_argument("--engine", choices=["vox", "paperfilm", "myth", "cinematic", "random"], default=os.environ.get("MYTH_ENGINE", "vox"),
+                    help="Myth video engine: 'vox' (pure SVG VoxEditorial + MapItem, default), 'paperfilm', 'myth', 'cinematic', or 'random'")
     ap.add_argument("--template")
     ap.add_argument("--style", help="Force Vox style ID (v001 ... v212)")
     ap.add_argument("--headless", action="store_true", help="CI mode (kept for clarity)")
@@ -811,17 +852,9 @@ def main():
             chosen_engine = random.choice(available_engines)
             print(f"🎲 Random engine selected: {chosen_engine.upper()} (from {available_engines})")
 
-        if chosen_engine == "hf_ai":
-            try:
-                run_hf_ai_pipeline(a, voice_cfg, custom_script=custom_script)
-                return
-            except Exception as e:
-                import traceback
-                tb = traceback.format_exc()
-                print(f"::error::HF_AI engine failed ({type(e).__name__}: {e})")
-                print(tb)
-                print("⚠️ falling back to PaperFilm engine")
-                chosen_engine = "paperfilm"
+        if chosen_engine == "vox":
+            run_vox_pipeline(a, voice_cfg, custom_script=custom_script)
+            return
 
         if chosen_engine == "cinematic":
             try:

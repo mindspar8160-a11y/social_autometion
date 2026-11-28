@@ -1,12 +1,9 @@
 import React from "react";
 import {
   AbsoluteFill,
-  Img,
-  OffthreadVideo,
   Sequence,
   interpolate,
   spring,
-  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
@@ -19,8 +16,6 @@ export interface VoxEditorialScene {
   narration: string;
   tts_text?: string;
   durationSec: number;
-  mediaSrc: string;
-  isVideo?: boolean;
   layout?: string;
   words?: Array<{w: string; s: number; e: number}>;
   state?: string;
@@ -64,6 +59,157 @@ const splitChunks = (text: string, maxWords = 4): string[] => {
     out.push(words.slice(i, i + maxWords).join(" "));
   }
   return out;
+};
+
+type SvgMotif =
+  | "temple"
+  | "warrior"
+  | "bow_arrow"
+  | "diya_fire"
+  | "sun_chakra"
+  | "mountain_river"
+  | "scroll_granth"
+  | "lotus";
+
+function pickSvgMotif(text: string, idx: number): SvgMotif {
+  const t = text.toLowerCase();
+  if (/मंदिर|शक्तिपीठ|ज्योतिर्लिंग|धाम|पुरी|temple|shrine|द्वार/.test(t)) return "temple";
+  if (/युद्ध|तलवार|सेना|मुगल|रण|वीर|रानी|राणा|योद्धा|sword|war|battle/.test(t)) return "warrior";
+  if (/बाण|धनुष|तीर|कर्ण|अर्जुन|राम|bow|arrow/.test(t)) return "bow_arrow";
+  if (/अग्नि|आग|दीपक|ज्वाला|बलिदान|जौहर|भस्म|fire|flame/.test(t)) return "diya_fire";
+  if (/पर्वत|हिमालय|नदी|गंगा|समुद्र|लहर|mountain|river/.test(t)) return "mountain_river";
+  if (/ग्रंथ|वेद|गीता|शास्त्र|कथा|इतिहास|scroll|book/.test(t)) return "scroll_granth";
+  if (/कमल|देवी|माता|सती|लक्ष्मी|सरस्वती|lotus/.test(t)) return "lotus";
+  const pool: SvgMotif[] = ["sun_chakra", "temple", "diya_fire", "scroll_granth", "lotus", "mountain_river"];
+  return pool[idx % pool.length];
+}
+
+const SvgEditorialArt: React.FC<{
+  text: string;
+  index: number;
+  accent: string;
+  frame: number;
+  scale?: number;
+}> = ({text, index, accent, frame, scale = 1}) => {
+  const motif = pickSvgMotif(text, index);
+  const pulse = 1 + Math.sin(frame / 10) * 0.04;
+  const spin = (frame * 1.4) % 360;
+  const floatY = Math.sin(frame / 12) * 8;
+
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        background: "linear-gradient(160deg, #1E1B18 0%, #2C241E 55%, #18181B 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <svg
+        viewBox="0 0 600 600"
+        style={{width: "92%", height: "92%", transform: `scale(${scale})`}}
+      >
+        {/* Ambient radial sun/mandala halo */}
+        <circle cx="300" cy="290" r={195 * pulse} fill={accent} opacity={0.18} />
+        <circle cx="300" cy="290" r={140} fill="none" stroke="#F59E0B" strokeWidth="3" strokeDasharray="12 10" transform={`rotate(${spin} 300 290)`} opacity={0.55} />
+
+        {motif === "temple" && (
+          <g transform={`translate(0, ${floatY * 0.4})`} stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
+            <rect x="130" y="450" width="340" height="45" fill="#E7DFCF" />
+            <rect x="160" y="410" width="280" height="40" fill="#FBF7EE" />
+            <polygon points="200,410 300,140 400,410" fill="#F59E0B" />
+            <polygon points="235,410 300,210 365,410" fill="#FBF7EE" />
+            <path d="M270,410 L270,320 A30,30 0 0 1 330,320 L330,410 Z" fill="#18181B" />
+            <circle cx="300" cy="122" r="18" fill="#FBBF24" />
+            <line x1="300" y1="65" x2="300" y2="105" stroke="#FBBF24" strokeWidth="6" />
+            <polygon points="300,68 355,84 300,100" fill={accent} />
+          </g>
+        )}
+
+        {motif === "warrior" && (
+          <g transform={`translate(0, ${floatY * 0.5})`} stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
+            {/* Crossed Swords & Shield */}
+            <line x1="160" y1="430" x2="440" y2="150" stroke="#E5E7EB" strokeWidth="18" strokeLinecap="round" />
+            <line x1="440" y1="430" x2="160" y2="150" stroke="#E5E7EB" strokeWidth="18" strokeLinecap="round" />
+            <circle cx="300" cy="295" r="105" fill={accent} />
+            <circle cx="300" cy="295" r="72" fill="#F59E0B" />
+            <circle cx="300" cy="295" r="28" fill="#FBF7EE" />
+          </g>
+        )}
+
+        {motif === "bow_arrow" && (
+          <g transform={`translate(0, ${floatY * 0.5})`} stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
+            <path d="M210,120 Q390,290 210,460" fill="none" stroke="#F59E0B" strokeWidth="18" strokeLinecap="round" />
+            <line x1="210" y1="120" x2="210" y2="460" stroke="#FBF7EE" strokeWidth="4" />
+            <line x1="150" y1="290" x2="450" y2="290" stroke="#FBF7EE" strokeWidth="10" strokeLinecap="round" />
+            <polygon points="450,290 412,270 412,310" fill={accent} />
+          </g>
+        )}
+
+        {motif === "diya_fire" && (
+          <g transform={`translate(0, ${floatY * 0.3})`} stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
+            <path d="M300,130 C350,210 365,265 300,320 C235,265 250,210 300,130 Z" fill="#F59E0B" transform={`scale(${pulse})`} style={{transformOrigin: "300px 290px"}} />
+            <path d="M300,185 C325,230 330,270 300,305 C270,270 275,230 300,185 Z" fill="#FEF08A" />
+            <path d="M165,330 Q300,375 435,330 Q400,435 300,435 Q200,435 165,330 Z" fill={accent} />
+          </g>
+        )}
+
+        {motif === "mountain_river" && (
+          <g stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
+            <polygon points="80,430 230,170 380,430" fill="#D6C7AE" />
+            <polygon points="220,430 375,140 520,430" fill="#FBF7EE" />
+            <polygon points="375,140 335,215 375,205 415,215" fill="#FFFFFF" />
+            <path d="M70,445 Q185,415 300,445 T530,445 L530,500 L70,500 Z" fill="#0EA5E9" />
+          </g>
+        )}
+
+        {motif === "scroll_granth" && (
+          <g transform={`translate(0, ${floatY * 0.4})`} stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
+            <rect x="175" y="140" width="250" height="320" rx="14" fill="#FBF7EE" />
+            <rect x="155" y="125" width="290" height="34" rx="17" fill="#F59E0B" />
+            <rect x="155" y="440" width="290" height="34" rx="17" fill="#F59E0B" />
+            <line x1="220" y1="215" x2="380" y2="215" stroke={accent} strokeWidth="10" strokeLinecap="round" />
+            <line x1="220" y1="265" x2="380" y2="265" stroke="#18181B" strokeWidth="8" strokeLinecap="round" />
+            <line x1="220" y1="315" x2="350" y2="315" stroke="#18181B" strokeWidth="8" strokeLinecap="round" />
+            <line x1="220" y1="365" x2="370" y2="365" stroke="#18181B" strokeWidth="8" strokeLinecap="round" />
+          </g>
+        )}
+
+        {motif === "lotus" && (
+          <g transform={`translate(0, ${floatY * 0.5})`} stroke="#18181B" strokeWidth="5" strokeLinejoin="round">
+            <path d="M300,150 C350,235 350,335 300,395 C250,335 250,235 300,150 Z" fill={accent} />
+            <path d="M225,195 C270,255 280,340 265,395 C205,355 185,265 225,195 Z" fill="#F59E0B" />
+            <path d="M375,195 C330,255 320,340 335,395 C395,355 415,265 375,195 Z" fill="#F59E0B" />
+            <path d="M155,270 C215,305 245,355 245,400 C175,395 135,340 155,270 Z" fill="#FBF7EE" />
+            <path d="M445,270 C385,305 355,355 355,400 C425,395 465,340 445,270 Z" fill="#FBF7EE" />
+            <ellipse cx="300" cy="425" rx="165" ry="26" fill="#0F766E" />
+          </g>
+        )}
+
+        {motif === "sun_chakra" && (
+          <g stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
+            <g transform={`rotate(${spin} 300 290)`}>
+              {Array.from({length: 12}, (_, k) => (
+                <polygon
+                  key={k}
+                  points="300,105 282,165 318,165"
+                  fill="#F59E0B"
+                  transform={`rotate(${k * 30} 300 290)`}
+                />
+              ))}
+            </g>
+            <circle cx="300" cy="290" r="105" fill={accent} />
+            <circle cx="300" cy="290" r="65" fill="#FEF08A" />
+            <circle cx="300" cy="290" r="24" fill="#18181B" />
+          </g>
+        )}
+      </svg>
+    </div>
+  );
 };
 
 const EditorialPaperBackground: React.FC<{seed: number; sceneIdx: number}> = ({seed, sceneIdx}) => {
@@ -119,36 +265,6 @@ const FloatingParticles: React.FC<{frame: number; accent: string; seed: number}>
   );
 };
 
-const MediaBox: React.FC<{src: string; isVideo?: boolean; scale: number; filter?: string}> = ({
-  src,
-  isVideo,
-  scale,
-  filter,
-}) => (
-  <>
-    {isVideo ? (
-      <OffthreadVideo
-        src={src}
-        muted
-        style={{width: "100%", height: "100%", objectFit: "cover", transform: `scale(${scale})`, filter}}
-      />
-    ) : (
-      <Img
-        src={src}
-        style={{width: "100%", height: "100%", objectFit: "cover", transform: `scale(${scale})`, filter}}
-      />
-    )}
-    <AbsoluteFill
-      style={{
-        backgroundImage: "radial-gradient(rgba(0,0,0,0.14) 1px, transparent 1px)",
-        backgroundSize: "6px 6px",
-        opacity: 0.24,
-        pointerEvents: "none",
-      }}
-    />
-  </>
-);
-
 const SceneSlide: React.FC<{
   scene: VoxEditorialScene;
   index: number;
@@ -164,15 +280,12 @@ const SceneSlide: React.FC<{
   const accent = ACCENTS[(index + seed) % ACCENTS.length];
   const isLast = index === total - 1;
 
-  // Pick distinct layout per scene:
   // Any scene mentioning a place/state -> geo_map!
-  // Scene 0: hero_cutout | Last: pullback_cta | Others: cycle varied layouts
   let layout: string = scene.layout || LAYOUTS[(index + seed) % LAYOUTS.length];
   if (index === 0) layout = "hero_cutout";
   else if (scene.state || scene.place || (index === 1 && geo?.state)) layout = "geo_map";
   else if (isLast) layout = "pullback_cta";
 
-  // 7 distinct entrance motions
   const motionMode = (index * 3 + seed) % 7;
   const enter = spring({
     frame,
@@ -210,7 +323,6 @@ const SceneSlide: React.FC<{
     ty = interpolate(enter, [0, 1], [70, 0]);
   }
 
-  // 2.5D Parallax + Camera Shake + Embers / Light Leak
   const parallaxBgX = interpolate(frame, [0, durationInFrames], [0, isLast ? 0 : -18]);
   const parallaxFgX = interpolate(frame, [0, durationInFrames], [0, isLast ? 0 : 14]);
   const isClimax = layout === "dramatic_climax";
@@ -219,12 +331,14 @@ const SceneSlide: React.FC<{
   const shakeY = shakeActive ? Math.cos(frame * 3.4) * 9 : 0;
   const punchScale = shakeActive ? 1.04 : 1;
 
-  // Typewriter reveal for archive/date tag
   const typeText = `ARCHIVE #${(seed % 900) + 100} • MINDSPARK`;
-  const typedCount = Math.min(typeText.length, Math.floor(interpolate(frame, [2, 24], [0, typeText.length], {extrapolateLeft: "clamp", extrapolateRight: "clamp"})));
+  const typedCount = Math.min(
+    typeText.length,
+    Math.floor(interpolate(frame, [2, 24], [0, typeText.length], {extrapolateLeft: "clamp", extrapolateRight: "clamp"}))
+  );
   const typeCursor = frame % 14 < 7 ? "▌" : "";
 
-  const mediaScale = interpolate(frame, [0, durationInFrames], [1.0, 1.12], {extrapolateRight: "clamp"});
+  const mediaScale = interpolate(frame, [0, durationInFrames], [1.0, 1.08], {extrapolateRight: "clamp"});
   const highlightPct = interpolate(frame, [3, 18], [0, 100], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -238,9 +352,8 @@ const SceneSlide: React.FC<{
       ? Math.min(chunks.length - 1, Math.floor((frame / Math.max(1, durationInFrames)) * chunks.length))
       : 0;
   const activeCaption = chunks[chunkIdx] || "";
-  const srcUrl = staticFile(scene.mediaSrc);
+  const artQuery = `${heading} ${spoken}`;
 
-  // Build synthetic PFScene for MapItem when geo_map is active
   const mapScene: PFScene = {
     text: heading,
     narration: spoken,
@@ -317,7 +430,7 @@ const SceneSlide: React.FC<{
         </div>
       </div>
 
-      {/* MIDGROUND: Consistent 972x1020 stage box across all scenes */}
+      {/* MIDGROUND: Consistent 972x1020 stage box with pure SVG + MapItem */}
       <div
         style={{
           position: "relative",
@@ -334,25 +447,24 @@ const SceneSlide: React.FC<{
           <div style={{position: "relative", width: "100%", height: "100%"}}>
             <div style={{position: "absolute", inset: 0, transform: "translate(14px, 14px)", backgroundColor: accent}} />
             <div style={{position: "relative", width: "100%", height: "100%", border: "5px solid #18181B", overflow: "hidden", backgroundColor: "#bcd3cf"}}>
-              <MapItem s={mapScene} lf={frame} fps={fps} accent="#D92D20" accentDark="#991B1B" w={972} h={1080} />
-              {/* Polaroid Cutout Inset + Typewriter Location Tag */}
+              <MapItem s={mapScene} lf={frame} fps={fps} accent="#D92D20" accentDark="#991B1B" w={972} h={1020} />
               <div
                 style={{
                   position: "absolute",
                   right: 22,
                   bottom: 22,
-                  width: 320,
+                  width: 300,
                   backgroundColor: "#FFFFFF",
-                  padding: "12px 12px 36px 12px",
+                  padding: "12px 12px 32px 12px",
                   border: "4px solid #18181B",
                   boxShadow: "10px 10px 0px #18181B",
                   transform: `translateX(${parallaxFgX}px) rotate(2deg)`,
                 }}
               >
-                <div style={{width: "100%", height: 340, overflow: "hidden", border: "2px solid #18181B", position: "relative"}}>
-                  <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+                <div style={{width: "100%", height: 290, overflow: "hidden", border: "2px solid #18181B"}}>
+                  <SvgEditorialArt text={artQuery} index={index} accent={accent} frame={frame} scale={mediaScale} />
                 </div>
-                <div style={{marginTop: 8, fontSize: 17, fontWeight: 900, fontFamily: "monospace", color: "#18181B"}}>
+                <div style={{marginTop: 8, fontSize: 16, fontWeight: 900, fontFamily: "monospace", color: "#18181B"}}>
                   {typeText.slice(0, typedCount)}{typeCursor}
                 </div>
               </div>
@@ -375,7 +487,6 @@ const SceneSlide: React.FC<{
               gap: 16,
             }}
           >
-            {/* Masking Tape Strip */}
             <div
               style={{
                 position: "absolute",
@@ -388,7 +499,6 @@ const SceneSlide: React.FC<{
                 border: "1px solid rgba(24,24,27,0.25)",
               }}
             />
-            {/* Stamp */}
             <div
               style={{
                 position: "absolute",
@@ -407,7 +517,7 @@ const SceneSlide: React.FC<{
               गाथा
             </div>
             <div style={{flex: 1, position: "relative", border: "4px solid #18181B", overflow: "hidden"}}>
-              <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+              <SvgEditorialArt text={artQuery} index={index} accent={accent} frame={frame} scale={mediaScale} />
             </div>
           </div>
         )}
@@ -432,11 +542,10 @@ const SceneSlide: React.FC<{
               <span>{typeText.slice(0, typedCount)}{typeCursor}</span>
             </div>
             <div style={{flex: 1, position: "relative", border: "3px solid #18181B", overflow: "hidden"}}>
-              <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} filter="contrast(1.08) sepia(0.12)" />
-              {/* Spotlight Focus vignette */}
+              <SvgEditorialArt text={artQuery} index={index} accent={accent} frame={frame} scale={mediaScale} />
               <AbsoluteFill
                 style={{
-                  background: "radial-gradient(circle at 50% 45%, transparent 32%, rgba(0,0,0,0.48) 95%)",
+                  background: "radial-gradient(circle at 50% 45%, transparent 32%, rgba(0,0,0,0.45) 95%)",
                   pointerEvents: "none",
                 }}
               />
@@ -460,7 +569,6 @@ const SceneSlide: React.FC<{
               overflow: "hidden",
             }}
           >
-            {/* Animated Red Thread SVG connecting two pinned notes */}
             <svg width="100%" height="100%" style={{position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none"}}>
               <line
                 x1="180" y1="120" x2="760" y2="740"
@@ -471,8 +579,8 @@ const SceneSlide: React.FC<{
               <circle cx="760" cy="740" r="12" fill="#D92D20" stroke="#18181B" strokeWidth="3" />
             </svg>
             <div style={{position: "relative", width: "84%", height: "72%", margin: "18px auto 0 auto", border: "4px solid #18181B", backgroundColor: "#FFF", padding: 14, transform: "rotate(-1.5deg)", boxShadow: "8px 8px 0px rgba(0,0,0,0.3)"}}>
-              <div style={{width: "100%", height: "100%", position: "relative", overflow: "hidden"}}>
-                <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+              <div style={{width: "100%", height: "100%", overflow: "hidden"}}>
+                <SvgEditorialArt text={artQuery} index={index} accent={accent} frame={frame} scale={mediaScale} />
               </div>
             </div>
             <div style={{position: "absolute", bottom: 26, left: 32, backgroundColor: "#FEF08A", border: "3px solid #18181B", padding: "12px 18px", fontSize: 26, fontWeight: 900, transform: "rotate(2deg)", boxShadow: "6px 6px 0px #18181B", zIndex: 4}}>
@@ -483,18 +591,15 @@ const SceneSlide: React.FC<{
 
         {layout === "dramatic_climax" && (
           <div style={{position: "relative", width: "100%", height: "100%"}}>
-            {/* RGB Split / CRT Glitch offset layers */}
             <div style={{position: "absolute", inset: 0, transform: `translate(${shakeActive ? -10 : 10}px, 10px)`, backgroundColor: "#D92D20"}} />
             <div style={{position: "relative", width: "100%", height: "100%", border: "5px solid #18181B", overflow: "hidden", backgroundColor: "#000"}}>
-              <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale * 1.03} filter="contrast(1.16) saturate(1.15)" />
-              {/* CRT Scanlines */}
+              <SvgEditorialArt text={artQuery} index={index} accent={accent} frame={frame} scale={mediaScale * 1.03} />
               <AbsoluteFill
                 style={{
                   backgroundImage: "repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0px, rgba(0,0,0,0.22) 2px, transparent 2px, transparent 6px)",
                   pointerEvents: "none",
                 }}
               />
-              {/* Warm golden light flare */}
               <AbsoluteFill
                 style={{
                   background: "radial-gradient(circle at 20% 20%, rgba(245,158,11,0.32), transparent 55%)",
@@ -513,38 +618,17 @@ const SceneSlide: React.FC<{
               <span>MINDSPARK</span>
             </div>
             <div style={{flex: 1, position: "relative", border: "5px solid #18181B", boxShadow: "12px 12px 0px #18181B", overflow: "hidden"}}>
-              <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+              <SvgEditorialArt text={artQuery} index={index} accent={accent} frame={frame} scale={mediaScale} />
             </div>
           </div>
         )}
 
         {layout === "polaroid_stack" && (
           <div style={{position: "relative", width: "100%", height: "100%"}}>
-            {/* Rotated Back Card */}
-            <div
-              style={{
-                position: "absolute",
-                inset: 14,
-                backgroundColor: "#E7DFCF",
-                border: "4px solid #18181B",
-                transform: "rotate(-3.5deg)",
-              }}
-            />
-            {/* Front Polaroid Card */}
-            <div
-              style={{
-                position: "relative",
-                width: "100%",
-                height: "100%",
-                backgroundColor: "#FFFFFF",
-                border: "4px solid #18181B",
-                padding: "20px 20px 64px 20px",
-                boxShadow: "12px 12px 0px rgba(24,24,27,0.3)",
-                transform: "rotate(1.2deg)",
-              }}
-            >
-              <div style={{width: "100%", height: "100%", position: "relative", border: "3px solid #18181B", overflow: "hidden"}}>
-                <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+            <div style={{position: "absolute", inset: 14, backgroundColor: "#E7DFCF", border: "4px solid #18181B", transform: "rotate(-3.5deg)"}} />
+            <div style={{position: "relative", width: "100%", height: "100%", backgroundColor: "#FFFFFF", border: "4px solid #18181B", padding: "20px 20px 64px 20px", boxShadow: "12px 12px 0px rgba(24,24,27,0.3)", transform: "rotate(1.2deg)"}}>
+              <div style={{width: "100%", height: "100%", border: "3px solid #18181B", overflow: "hidden"}}>
+                <SvgEditorialArt text={artQuery} index={index} accent={accent} frame={frame} scale={mediaScale} />
               </div>
             </div>
           </div>
@@ -554,7 +638,7 @@ const SceneSlide: React.FC<{
           <div style={{position: "relative", width: "100%", height: "100%"}}>
             <div style={{position: "absolute", inset: 0, transform: "translate(16px, 16px)", backgroundColor: accent}} />
             <div style={{position: "relative", width: "100%", height: "100%", border: "5px solid #18181B", backgroundColor: "#18181B", overflow: "hidden"}}>
-              <MediaBox src={srcUrl} isVideo={scene.isVideo} scale={mediaScale} />
+              <SvgEditorialArt text={artQuery} index={index} accent={accent} frame={frame} scale={mediaScale} />
             </div>
           </div>
         )}
