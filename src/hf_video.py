@@ -26,20 +26,25 @@ HF_IMAGE_MODELS = [
     "stabilityai/stable-diffusion-xl-base-1.0",
 ]
 
+HF_I2V_MODELS = [
+    "Wan-AI/Wan2.1-I2V-14B-480P",
+    "Lightricks/LTX-Video",
+]
+
+HF_T2V_MODELS = [
+    "Wan-AI/Wan2.1-T2V-1.3B",
+    "Lightricks/LTX-Video",
+]
+
 
 def _get_hf_token(token: str | None = None) -> str:
-    tok = (
+    return (
         token
         or os.environ.get("HF_TOKEN")
         or os.environ.get("HUGGINGFACE_API_KEY")
         or os.environ.get("HUGGINGFACE_TOKEN")
         or ""
     ).strip()
-    if not tok:
-        raise RuntimeError(
-            "HF_TOKEN / HUGGINGFACE_API_KEY is not set; cannot generate HuggingFace AI images."
-        )
-    return tok
 
 
 def build_scene_prompt(topic_title: str, scene: dict, idx: int, total_scenes: int) -> str:
@@ -61,30 +66,130 @@ def build_scene_prompt(topic_title: str, scene: dict, idx: int, total_scenes: in
     return f"{shot} depicting: {context}. {STYLE_SUFFIX}"
 
 
+def _generate_via_gradio_space(prompt: str, out_path: Path, hf_token: str = "") -> Path:
+    """Fallback to public HuggingFace Gradio Space (works even without HF_TOKEN)."""
+    from gradio_client import Client
+    from PIL import Image
+
+    kwargs = {"token": hf_token} if hf_token else {}
+    client = Client("black-forest-labs/FLUX.1-schnell", **kwargs)
+    print(f"[HF-Video] Generating via public Space (FLUX.1-schnell): {prompt[:90]}...")
+    res = client.predict(
+        prompt=prompt,
+        seed=0,
+        randomize_seed=True,
+        width=768,
+        height=1344,
+        num_inference_steps=4,
+        api_name="/infer",
+    )
+    img_info = res[0] if isinstance(res, (tuple, list)) else res
+    src_file = img_info.get("path") if isinstance(img_info, dict) else str(img_info)
+    if not src_file or not Path(src_file).exists():
+        raise RuntimeError(f"Gradio Space did not return a valid image file: {res}")
+    with Image.open(src_file) as im:
+        im.save(str(out_path), format="PNG")
+    if out_path.exists() and out_path.stat().st_size > 10000:
+        return out_path
+    raise RuntimeError(f"Generated Space image too small ({out_path.stat().st_size} bytes)")
+
+
+def _generate_via_ai_horde(prompt: str, out_path: Path, timeout_s: int = 120) -> Path:
+    """Token-free open-generative fallback via AI Horde (384x640 9:16 vertical)."""
+    import base64
+    import time
+    import requests
+    from PIL import Image
+    import io
+
+    headers = {"apikey": "0000000000", "Client-Agent": "MindSpark:1.0:studio"}
+    payload = {
+        "prompt": prompt[:900],
+        "params": {"width": 384, "height": 640, "steps": 20, "n": 1},
+    }
+    print(f"[HF-Video] Generating via AI Horde (open-generative, no token): {prompt[:80]}...")
+    r = requests.post(
+        "https://aihorde.net/api/v2/generate/async",
+        headers=headers,
+        json=payload,
+        timeout=25,
+    )
+    if r.status_code not in (200, 202):
+        raise RuntimeError(f"AI Horde submit failed ({r.status_code}): {r.text[:200]}")
+    job_id = r.json()["id"]
+
+    deadline = time.time() + timeout_s
+    while time.time() < deadline:
+        time.sleep(3)
+        chk = requests.get(
+            f"https://aihorde.net/api/v2/generate/check/{job_id}",
+            headers=headers,
+            timeout=15,
+        )
+        if chk.ok and chk.json().get("done"):
+            break
+    else:
+        raise RuntimeError(f"AI Horde job {job_id} timed out after {timeout_s}s")
+
+    st = requests.get(
+        f"https://aihorde.net/api/v2/generate/status/{job_id}",
+        headers=headers,
+        timeout=20,
+    )
+    st.raise_for_status()
+    gens = st.json().get("generations") or []
+    if not gens:
+        raise RuntimeError(f"AI Horde returned no generations for {job_id}")
+    img_val = gens[0]["img"]
+    if img_val.startswith("http"):
+        img_bytes = requests.get(img_val, timeout=30).content
+    else:
+        img_bytes = base64.b64decode(img_val)
+    with Image.open(io.BytesIO(img_bytes)) as im:
+        im.convert("RGB").save(str(out_path), format="PNG")
+    if out_path.exists() and out_path.stat().st_size > 5000:
+        return out_path
+    raise RuntimeError("AI Horde generated image too small")
+
+
 def generate_scene_image(prompt: str, out_path: Path, token: str | None = None) -> Path:
-    """Generate a 9:16 vertical image using HuggingFace InferenceClient."""
+    """Generate a 9:16 vertical image via HF InferenceClient, public FLUX Space, or AI Horde."""
     tok = _get_hf_token(token)
-    client = InferenceClient(token=tok)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     last_err = None
-    for model in HF_IMAGE_MODELS:
-        try:
-            print(f"[HF-Video] Generating image ({model}): {prompt[:90]}...")
-            img = client.text_to_image(
-                prompt,
-                model=model,
-                width=768,
-                height=1344,
-            )
-            img.save(str(out_path), format="PNG")
-            if out_path.exists() and out_path.stat().st_size > 10000:
-                return out_path
-            raise RuntimeError(f"Generated image too small ({out_path.stat().st_size} bytes)")
-        except Exception as e:
-            last_err = e
-            print(f"[HF-Video] {model} failed: {e}")
-    raise RuntimeError(f"All HuggingFace image models failed: {last_err}")
+    if tok:
+        client = InferenceClient(token=tok)
+        for model in HF_IMAGE_MODELS:
+            try:
+                print(f"[HF-Video] Generating image ({model}): {prompt[:90]}...")
+                img = client.text_to_image(
+                    prompt,
+                    model=model,
+                    width=768,
+                    height=1344,
+                )
+                img.save(str(out_path), format="PNG")
+                if out_path.exists() and out_path.stat().st_size > 10000:
+                    return out_path
+                raise RuntimeError(f"Generated image too small ({out_path.stat().st_size} bytes)")
+            except Exception as e:
+                last_err = e
+                print(f"[HF-Video] {model} failed: {e}")
+
+    try:
+        return _generate_via_gradio_space(prompt, out_path, hf_token=tok)
+    except Exception as e:
+        last_err = e
+        print(f"[HF-Video] Public Space failed: {e}")
+
+    try:
+        return _generate_via_ai_horde(prompt, out_path)
+    except Exception as e:
+        last_err = e
+        print(f"[HF-Video] AI Horde failed: {e}")
+
+    raise RuntimeError(f"All HuggingFace / open-generative image generators failed: {last_err}")
 
 
 def _ass_time(sec: float) -> str:
@@ -148,34 +253,84 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     return ass_path
 
 
+def generate_scene_video(
+    prompt: str,
+    img_path: Path,
+    raw_vid_path: Path,
+    token: str | None = None,
+) -> Path | None:
+    """Try generating real AI video motion via HuggingFace InferenceClient (requires HF_TOKEN)."""
+    tok = _get_hf_token(token)
+    if not tok:
+        return None
+    client = InferenceClient(token=tok)
+    motion_prompt = (
+        f"Smooth cinematic camera movement, subtle character and cloth motion, "
+        f"flickering warm firelight and glowing atmosphere: {prompt[:300]}"
+    )
+
+    # 1. Try Image-to-Video if we have a reference image
+    if img_path.exists():
+        img_bytes = img_path.read_bytes()
+        for model in HF_I2V_MODELS:
+            try:
+                print(f"[HF-Video] Generating AI video motion (I2V: {model})...")
+                vid_bytes = client.image_to_video(
+                    img_bytes,
+                    prompt=motion_prompt,
+                    model=model,
+                )
+                if vid_bytes and len(vid_bytes) > 20000:
+                    raw_vid_path.write_bytes(vid_bytes)
+                    return raw_vid_path
+            except Exception as e:
+                print(f"[HF-Video] I2V {model} failed: {e}")
+
+    # 2. Try Text-to-Video directly
+    for model in HF_T2V_MODELS:
+        try:
+            print(f"[HF-Video] Generating AI video motion (T2V: {model})...")
+            vid_bytes = client.text_to_video(
+                motion_prompt,
+                model=model,
+            )
+            if vid_bytes and len(vid_bytes) > 20000:
+                raw_vid_path.write_bytes(vid_bytes)
+                return raw_vid_path
+        except Exception as e:
+            print(f"[HF-Video] T2V {model} failed: {e}")
+
+    return None
+
+
 def _ken_burns_filter(idx: int, frames: int) -> str:
-    """Return a smooth 30fps 1080x1920 zoompan filter alternating 4 camera motions."""
+    """Return a dynamic 30fps 1080x1920 dolly + breathing sway filter for image fallback."""
     mode = idx % 4
     if mode == 0:
-        # Smooth zoom in
-        z = "min(zoom+0.0012,1.15)"
-        x = "iw/2-(iw/zoom/2)"
-        y = "ih/2-(ih/zoom/2)"
+        # Dynamic push-in with subtle vertical breathing
+        z = "min(zoom+0.0022,1.22)"
+        x = "iw/2-(iw/zoom/2)+sin(on/18)*14"
+        y = "ih/2-(ih/zoom/2)+cos(on/24)*10"
     elif mode == 1:
-        # Smooth zoom out
-        z = "if(lte(on,1),1.15,max(1.0,zoom-0.0012))"
-        x = "iw/2-(iw/zoom/2)"
+        # Dynamic pull-out with subtle horizontal drift
+        z = "if(lte(on,1),1.22,max(1.02,zoom-0.0020))"
+        x = "iw/2-(iw/zoom/2)-sin(on/20)*14"
         y = "ih/2-(ih/zoom/2)"
     elif mode == 2:
-        # Gentle pan right while slightly zoomed
-        z = "1.12"
+        # Fast pan right + gentle zoom
+        z = "min(zoom+0.0010,1.16)"
         x = f"(iw-iw/zoom)*on/{max(frames, 1)}"
-        y = "ih/2-(ih/zoom/2)"
+        y = "ih/2-(ih/zoom/2)+sin(on/16)*12"
     else:
-        # Gentle pan left while slightly zoomed
-        z = "1.12"
+        # Fast pan left + gentle zoom
+        z = "min(zoom+0.0010,1.16)"
         x = f"(iw-iw/zoom)*(1-on/{max(frames, 1)})"
-        y = "ih/2-(ih/zoom/2)"
+        y = "ih/2-(ih/zoom/2)+cos(on/16)*12"
 
     return (
         f"scale=1620:2880:flags=lanczos,"
         f"zoompan=z='{z}':x='{x}':y='{y}':d={frames}:s=1080x1920:fps=30,"
-        f"eq=contrast=1.04:saturation=1.08,format=yuv420p"
+        f"eq=contrast=1.05:saturation=1.10,format=yuv420p"
     )
 
 
@@ -197,25 +352,48 @@ def render_hf_video(
     total_scenes = len(scenes)
     for i, sc in enumerate(scenes):
         img_path = img_dir / f"scene_{i}.png"
+        raw_vid_path = clip_dir / f"raw_{i}.mp4"
+        prompt = build_scene_prompt(topic_title, sc, i, total_scenes)
+
         if not img_path.exists():
-            prompt = build_scene_prompt(topic_title, sc, i, total_scenes)
-            generate_scene_image(prompt, img_path, token=token)
+            try:
+                generate_scene_image(prompt, img_path, token=token)
+            except Exception as img_e:
+                print(f"[HF-Video] Scene {i} image failed ({img_e}), trying direct T2V...")
 
         dur = max(1.0, float(sc.get("durationSec") or sc.get("voiceSec") or sc.get("sec") or 5.0))
         frames = max(30, int(round(dur * 30)))
         clip_path = clip_dir / f"clip_{i}.mp4"
-        vf = _ken_burns_filter(i, frames)
-        subprocess.run(
-            [
-                "ffmpeg", "-y", "-loglevel", "error",
-                "-loop", "1", "-i", str(img_path),
-                "-vf", vf,
-                "-t", f"{dur:.3f}",
-                "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
-                str(clip_path),
-            ],
-            check=True,
-        )
+
+        ai_vid = generate_scene_video(prompt, img_path, raw_vid_path, token=token)
+        if ai_vid and ai_vid.exists():
+            # Fit real AI video clip to 1080x1920 30fps and exact scene duration
+            subprocess.run(
+                [
+                    "ffmpeg", "-y", "-loglevel", "error",
+                    "-stream_loop", "-1", "-i", str(ai_vid),
+                    "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p",
+                    "-t", f"{dur:.3f}", "-an",
+                    "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
+                    str(clip_path),
+                ],
+                check=True,
+            )
+        else:
+            if not img_path.exists():
+                raise RuntimeError(f"Neither AI video nor AI image succeeded for scene {i}")
+            vf = _ken_burns_filter(i, frames)
+            subprocess.run(
+                [
+                    "ffmpeg", "-y", "-loglevel", "error",
+                    "-loop", "1", "-i", str(img_path),
+                    "-vf", vf,
+                    "-t", f"{dur:.3f}",
+                    "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
+                    str(clip_path),
+                ],
+                check=True,
+            )
         clip_paths.append(clip_path)
 
     concat_file = work_dir / "concat.txt"
