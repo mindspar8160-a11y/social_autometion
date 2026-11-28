@@ -37,18 +37,22 @@ def pick_myth_topic(forced=None):
         return {"title": "श्रीकृष्ण और अर्जुन: कुरुक्षेत्र का रहस्य", "topic": "krishna_arjuna",
                 "summary": "कुरुक्षेत्र में गीता ज्ञान और विराट रूप।"}
 
+    # Keep channel consistently Hindi-only when picking automatically (avoid Gujarati language split)
+    _is_gujarati = lambda t: bool(re.search(r"[\u0A80-\u0AFF]", t.get("title", "")))
+    hindi_topics = [t for t in topics if not _is_gujarati(t)] or topics
+
     hist = [h for h in jload(ROOT / "data" / "myth_history.json", []) if isinstance(h, dict)]
     used = {canon(h.get("topic_id")) for h in hist if h.get("topic_id")}
     used_titles = {h.get("topic_title") for h in hist if h.get("topic_title")}
 
-    left = [t for t in topics if canon(t.get("topic")) not in used and t.get("title") not in used_titles]
+    left = [t for t in hindi_topics if canon(t.get("topic")) not in used and t.get("title") not in used_titles]
     if left:
         return random.choice(left)
 
     # Sab kahaniyan ek baar ho chuki: naya round, par haal ki kahaniyan nahi dohrani.
-    n_stories = len({canon(t.get("topic")) for t in topics})
+    n_stories = len({canon(t.get("topic")) for t in hindi_topics})
     recent_n = max(1, n_stories // 2)
     recent = {canon(h.get("topic_id")) for h in hist[-recent_n:] if h.get("topic_id")}
-    left = [t for t in topics if canon(t.get("topic")) not in recent]
+    left = [t for t in hindi_topics if canon(t.get("topic")) not in recent]
     print(f"[Myth] Naya round: pichli {recent_n} kahaniyan chhod kar {len(left)} topics me se chun rahe hain")
-    return random.choice(left or topics)
+    return random.choice(left or hindi_topics)

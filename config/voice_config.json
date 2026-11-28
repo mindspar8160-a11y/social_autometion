@@ -7,7 +7,7 @@
   "provider": "voicestudio",
   "selected_voice_id": "voicestudio_sanatan_design",
   "selected_voice_name": "VoiceStudio OmniVoice (Sanatan Divine Storyteller)",
-  "voice": "male, indian accent, middle-aged, low pitch",
+  "voice": "hi-IN-MadhurNeural",
   "instruct": "male, indian accent, middle-aged, low pitch",
   "voices": {
     "voicestudio": "male, indian accent, middle-aged, low pitch",
@@ -23,24 +23,24 @@
   "language_code": "hi-IN",
   "fallback_voice": "hi-IN-MadhurNeural",
   "speed": 1.0,
-  "rate": "+0%",
-  "pitch": "+0Hz",
-  "volume": "+10%",
-  "rate_dialogue": "+0%",
-  "pitch_dialogue": "+0Hz",
+  "rate": "+4%",
+  "pitch": "+8Hz",
+  "volume": "+0%",
+  "rate_dialogue": "+4%",
+  "pitch_dialogue": "+8Hz",
   "monthly_char_limit": 950000,
   "cache": true,
   "normalize": true,
   "tempo": 1.0,
   "lead": 0.05,
   "tail": 0.2,
-  "tail_last": 2.5,
+  "tail_last": 1.5,
   "squeeze_pauses": 0.0,
-  "filter_profile": "clean_natural_broadcast",
-  "filter_chain": "loudnorm=I=-16:TP=-1.5:LRA=11",
+  "filter_profile": "4c_gold_cool_master",
+  "filter_chain": "highpass=f=130,equalizer=f=280:width_type=o:width=1.0:g=-3.8,equalizer=f=3600:width_type=o:width=1.0:g=2.4,acompressor=threshold=-14dB:ratio=2.5:attack=15:release=120,loudnorm=I=-14:TP=-1.0:LRA=8",
   "lofi": {
     "enabled": false,
     "volume": 0.18
   },
-  "description": "Deep, fast-paced, punchy Hindi storytelling voice using Edge-TTS hi-IN-MadhurNeural with Smart Silence Squeezer and broadcast master filter."
+  "description": "Finalized 4C Gold Cool Master: Edge-TTS hi-IN-MadhurNeural (+8Hz pitch, +4% rate) with 280Hz mud cut, 3.6kHz presence boost, broadcast compression, and -14 LUFS loudness."
 }

@@ -5,11 +5,17 @@ from common import ROOT
 
 BGM_DIR = ROOT / "data" / "audio" / "bgm"
 
+PREFERRED_BGM = "modern-classical-calm-discovery-152248.mp3"
+
 def pick_random_bgm(bgm_dir=None):
-    """Picks a random motivational background track from data/audio/bgm/."""
+    """Picks the preferred calm divine BGM if present, otherwise a random track from data/audio/bgm/."""
     target_dir = Path(bgm_dir) if bgm_dir else BGM_DIR
     if not target_dir.exists():
         return None
+    preferred = target_dir / PREFERRED_BGM
+    if preferred.exists() and preferred.stat().st_size > 10000:
+        print(f"[Audio] Selected finalized divine BGM: {preferred.name}")
+        return preferred
     tracks = [p for p in target_dir.glob("*.mp3") if p.stat().st_size > 10000]
     if not tracks:
         return None
@@ -18,12 +24,12 @@ def pick_random_bgm(bgm_dir=None):
     return selected
 
 def mix(voice, total, out, bgm_file=None):
-    """Mixes voice with background music ducked at -21dB (calm, clear voice priority) with smooth fade."""
+    """Mixes voice with calm divine BGM (lowpass 4.5kHz, ducked cleanly under voice)."""
     if bgm_file is None or not Path(bgm_file).exists():
         bgm_file = pick_random_bgm()
 
     if bgm_file and Path(bgm_file).exists():
-        fc = (f"[1:a]volume=-21dB,afade=t=in:d=1.5,afade=t=out:st={max(0, total - 2):.2f}:d=2[m];"
+        fc = (f"[1:a]volume=0.14,lowpass=f=4500,afade=t=in:d=1.2,afade=t=out:st={max(0, total - 1.5):.2f}:d=1.5[m];"
               "[0:a][m]amix=inputs=2:duration=first:normalize=0[a]")
         cmd = [
             "ffmpeg", "-y", "-loglevel", "error",

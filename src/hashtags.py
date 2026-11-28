@@ -17,7 +17,7 @@ BASE = [
 # trigger words (Hindi / Hinglish / English)  ->  hashtags
 THEMES = [
     (["शक्तिपीठ", "shaktipeeth", "shakti peeth", "सती"], ["#Shaktipeeth", "#ShaktiPeeth", "#MaaSati", "#DeviMaa"]),
-    (["देवी", "माता", "दुर्गा", "devi", "durga", "mata", "भवानी", "आई "], ["#DeviMaa", "#MataRani", "#Navratri", "#Durga"]),
+    (["देवी", "माता सती", "माँ दुर्गा", "devi", "mata rani", "भवानी", "आई "], ["#DeviMaa", "#MataRani", "#Navratri", "#Durga"]),
     (["काली", "kali"], ["#MaaKali", "#KaliMaa"]),
     (["शिव", "महादेव", "shiva", "mahadev", "भोलेनाथ", "ज्योतिर्लिंग"], ["#Mahadev", "#HarHarMahadev", "#Shiva", "#Jyotirlinga"]),
     (["कृष्ण", "krishna", "द्वारका", "राधा", "कान्हा"], ["#Krishna", "#JaiShriKrishna", "#Radhe"]),
@@ -88,8 +88,10 @@ def apply_to_meta(meta, title, story_text="", geo=None):
     tags = build_hashtags(title, story_text, geo)
     topic = [t for t in tags if t not in BASE]
     base_title = _strip_tags(meta.get("title") or f"{title} | MindSpark")
-    base_title = base_title[:65].rstrip(" |-")
-    head_tags = " ".join(["#Shorts", "#Viral"] + topic[:2])
+    if len(base_title) > 72:
+        base_title = base_title[:72].rsplit(" ", 1)[0]
+    base_title = base_title.rstrip(" |-:")
+    head_tags = " ".join(["#Shorts"] + topic[:2])
     meta["title"] = f"{base_title} {head_tags}"[:100]
     desc = _strip_tags(meta.get("description") or "").strip()
     # High-density viral hashtags in description
