@@ -465,6 +465,22 @@ def _render_via_vox_remotion(
             entry["state"] = sc["state"]
         if sc.get("place"):
             entry["place"] = sc["place"]
+        if not entry.get("state") and not entry.get("place"):
+            try:
+                import geo_places
+                sc_txt = f"{entry['heading']} {entry['tts_text']} {entry['narration']}"
+                sc_geo = geo_places.find_place(sc_txt)
+                if sc_geo:
+                    if sc_geo.get("state"):
+                        entry["state"] = sc_geo["state"]
+                    if sc_geo.get("lat") and sc_geo.get("lon"):
+                        entry["place"] = {
+                            "name": sc_geo.get("name") or sc_geo.get("state") or "",
+                            "lat": sc_geo["lat"],
+                            "lon": sc_geo["lon"],
+                        }
+            except Exception:
+                pass
         vox_scenes.append(entry)
 
     props_path = work_dir / "vox_props.json"

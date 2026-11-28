@@ -1,40 +1,8 @@
 import React from "react";
 import {Composition, CalculateMetadataFunction} from "remotion";
-import {Main, Plan} from "./Video";
-import demo from "../../data/demo_plan.json";
-import {CharacterDemoVertical} from "./components/Character";
-import {PuppetStory, DEMO_SCENES, totalFrames} from "./components/PuppetKit";
-import {PuppetWarStory, PUPPET_WAR_STORY_FRAMES} from "./components/PuppetWarStory";
-import {PaperFilm, totalFramesPF} from "./cinematic/PaperFilm";
 import {VoxEditorial, totalFramesVoxEditorial, VoxEditorialProps} from "./vox/VoxEditorial";
-import {CinematicArc, totalFramesCA} from "./cinematic/CinematicArc";
-import {LibraryPreview} from "./cinematic/paper/library/LibraryPreview";
-import {PaperScene3DDemo} from "./cinematic/paper/demo/PaperScene3DDemo";
-import type {PFProps} from "./cinematic/types";
-import pfDemo from "../../data/demo_paperfilm.json";
-import {MythShort, EXAMPLE_SCENES, totalFrames as mythTotalFrames, Scene as MythScene} from "./myth/mindspark-myth-engine";
 
 const FPS = 30;
-const calc: CalculateMetadataFunction<Plan> = ({props}) => ({
-  durationInFrames: Math.max(30, props.scenes.reduce((a, s) => a + Math.round(s.durationSec * FPS), 0)),
-  width: 1080,
-  height: 1920,
-  fps: FPS,
-});
-
-const mythCalc: CalculateMetadataFunction<{scenes: MythScene[]; seed: number}> = ({props}) => ({
-  durationInFrames: mythTotalFrames(props.scenes || EXAMPLE_SCENES, FPS),
-  width: 1080,
-  height: 1920,
-  fps: FPS,
-});
-
-const pfCalc: CalculateMetadataFunction<PFProps> = ({props}) => ({
-  durationInFrames: totalFramesPF(props.scenes, FPS),
-  width: 1080,
-  height: 1920,
-  fps: FPS,
-});
 
 const voxEditorialCalc: CalculateMetadataFunction<VoxEditorialProps> = ({props}) => ({
   durationInFrames: totalFramesVoxEditorial(props.scenes || [], FPS),
@@ -43,98 +11,8 @@ const voxEditorialCalc: CalculateMetadataFunction<VoxEditorialProps> = ({props})
   fps: FPS,
 });
 
-const caCalc: CalculateMetadataFunction<PFProps> = ({props}) => ({
-  durationInFrames: totalFramesCA(props.scenes, FPS),
-  width: 1080,
-  height: 1920,
-  fps: FPS,
-});
-
 export const Root: React.FC = () => (
   <>
-    <Composition
-      id="Main"
-      component={Main}
-      durationInFrames={300}
-      fps={FPS}
-      width={1080}
-      height={1920}
-      defaultProps={demo as unknown as Plan}
-      calculateMetadata={calc}
-    />
-    <Composition
-      id="CharacterDemo"
-      component={CharacterDemoVertical}
-      durationInFrames={300}
-      fps={FPS}
-      width={1080}
-      height={1920}
-    />
-    <Composition
-      id="PuppetStory"
-      component={PuppetStory}
-      durationInFrames={totalFrames(DEMO_SCENES)}
-      fps={FPS}
-      width={1080}
-      height={1920}
-    />
-    <Composition
-      id="PuppetWarStory"
-      component={PuppetWarStory}
-      durationInFrames={PUPPET_WAR_STORY_FRAMES}
-      fps={FPS}
-      width={1080}
-      height={1920}
-    />
-    <Composition
-      id="MythShort"
-      component={MythShort}
-      durationInFrames={mythTotalFrames(EXAMPLE_SCENES, FPS)}
-      fps={FPS}
-      width={1080}
-      height={1920}
-      defaultProps={{
-        scenes: EXAMPLE_SCENES,
-        seed: 12345,
-      }}
-      calculateMetadata={mythCalc}
-    />
-    <Composition
-      id="PaperFilm"
-      component={PaperFilm}
-      durationInFrames={totalFramesPF((pfDemo as unknown as PFProps).scenes, FPS)}
-      fps={FPS}
-      width={1080}
-      height={1920}
-      defaultProps={pfDemo as unknown as PFProps}
-      calculateMetadata={pfCalc}
-    />
-    <Composition
-      id="CinematicArc"
-      component={CinematicArc}
-      durationInFrames={totalFramesCA((pfDemo as unknown as PFProps).scenes, FPS)}
-      fps={FPS}
-      width={1080}
-      height={1920}
-      defaultProps={pfDemo as unknown as PFProps}
-      calculateMetadata={caCalc}
-    />
-    <Composition
-      id="LibraryPreview"
-      component={LibraryPreview}
-      durationInFrames={240}
-      fps={FPS}
-      width={1080}
-      height={1920}
-    />
-    <Composition
-      id="PaperScene3DDemo"
-      component={PaperScene3DDemo}
-      durationInFrames={150}
-      fps={FPS}
-      width={1080}
-      height={1920}
-    />
     <Composition
       id="VoxEditorial"
       component={VoxEditorial}

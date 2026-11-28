@@ -165,10 +165,11 @@ const SceneSlide: React.FC<{
   const isLast = index === total - 1;
 
   // Pick distinct layout per scene:
-  // Scene 0: hero_cutout | Scene 1 (if geo): geo_map | Last: pullback_cta | Others: cycle varied layouts
+  // Any scene mentioning a place/state -> geo_map!
+  // Scene 0: hero_cutout | Last: pullback_cta | Others: cycle varied layouts
   let layout: string = scene.layout || LAYOUTS[(index + seed) % LAYOUTS.length];
   if (index === 0) layout = "hero_cutout";
-  else if (index === 1 && geo?.state) layout = "geo_map";
+  else if (scene.state || scene.place || (index === 1 && geo?.state)) layout = "geo_map";
   else if (isLast) layout = "pullback_cta";
 
   // 7 distinct entrance motions
@@ -316,13 +317,15 @@ const SceneSlide: React.FC<{
         </div>
       </div>
 
-      {/* MIDGROUND: 7+ Distinct High-Retention Motion Graphics Layouts */}
+      {/* MIDGROUND: Consistent 972x1020 stage box across all scenes */}
       <div
         style={{
           position: "relative",
-          flex: 1,
+          width: "100%",
+          height: 1020,
+          flexShrink: 0,
           marginTop: 6,
-          marginBottom: 20,
+          marginBottom: 18,
           transform: `translate(${tx + shakeX + parallaxBgX * 0.3}px, ${ty + shakeY}px) rotate(${rot}deg) scale(${boxScale * punchScale})`,
           zIndex: 2,
         }}
