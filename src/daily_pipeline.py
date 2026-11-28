@@ -333,9 +333,7 @@ def run_hf_ai_pipeline(a, voice_cfg, custom_script=None):
         plan = paperfilm_plan.make_standalone_45s_plan(topic, seed=seed)
 
     scenes = plan["scenes"]
-    # Keep Shorts tight & high-retention (5-6 scenes -> ~28-36s)
-    if len(scenes) > 6:
-        scenes = scenes[:5] + [scenes[-1]]
+    # Keep ALL scenes so the full story completes cleanly without cutting off the middle
 
     # Ensure the final scene always has a Subscribe CTA
     last_sc = scenes[-1]
@@ -353,14 +351,26 @@ def run_hf_ai_pipeline(a, voice_cfg, custom_script=None):
     work.mkdir(parents=True, exist_ok=True)
     out.mkdir(parents=True, exist_ok=True)
 
-    print(f"🎙️ Voice via {voice_cfg.get('provider', 'edge-tts')} (4C Cool Master)...")
+    print(f"🎙️ Voice via {voice_cfg.get('provider', 'voicestudio')} (Emotional Storytelling + 4C Master)...")
     voice = tts.narrate(scenes, work, voice_cfg)
+    paperfilm_plan.resolve_hits(scenes)
     total = sum(sc["durationSec"] for sc in scenes)
     audio.mix(voice, total, work / "audio.mp3")
 
+    story_text = " ".join(f"{sc.get('tts_text', '')} {sc.get('narration', '')}" for sc in scenes)
+    geo = paperfilm_plan._detect_geo(topic, story_text)
+    ht = hashtags.build_hashtags(topic.get("title", ""), story_text, geo)
+    chips = hashtags.chip_tags(ht)
+
     final = out / "final.mp4"
-    print(f"🖼️ Generating {len(scenes)} HuggingFace AI scenes + Ken Burns + Devanagari subs...")
-    hf_video.render_hf_video(scenes, work, work / "audio.mp3", final, topic_title=topic.get("title", ""))
+    print(f"🖼️ Generating {len(scenes)} scenes (VoxEditorial + PaperCut + Map + AI Motion)...")
+    hf_video.render_hf_video(
+        scenes, work, work / "audio.mp3", final,
+        topic_title=topic.get("title", ""),
+        geo=geo,
+        hashtags=chips,
+        seed=seed,
+    )
     print(f"📦 Final HF_AI video: {final.stat().st_size / 1048576:.1f} MB ({total:.1f}s)")
 
     w, h = verify_resolution(final)

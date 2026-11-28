@@ -832,6 +832,10 @@ def _synth_voicestudio(text, cfg, out):
         print("[VoiceStudio] OmniVoice model ready.")
 
     instruct = cfg.get("instruct") or cfg.get("style") or "male, indian accent, middle-aged, low pitch"
+    emotion_hint = f"{cfg.get('emotion', '')} {cfg.get('delivery', '')} {cfg.get('style', '')}".lower()
+    lang = cfg.get("language") or "hi"
+    speed = float(cfg.get("speed", 1.0))
+
     valid_items = {
         "american accent", "australian accent", "british accent", "canadian accent",
         "child", "chinese accent", "elderly", "female", "high pitch", "indian accent",
@@ -842,10 +846,22 @@ def _synth_voicestudio(text, cfg, out):
     tokens = [i.strip().lower() for i in instruct.split(",") if i.strip().lower() in valid_items]
     if not tokens:
         tokens = ["male", "indian accent", "middle-aged", "low pitch"]
-    final_instruct = ", ".join(tokens)
 
-    lang = cfg.get("language") or "hi"
-    speed = float(cfg.get("speed", 1.0))
+    # Emotion-driven pitch / delivery / pace modulation for storytelling
+    if any(k in emotion_hint for k in ("whisper", "mystery", "secret", "suspense", "rahasya")):
+        tokens = ["male", "indian accent", "middle-aged", "low pitch", "whisper"]
+        speed = min(1.15, max(0.85, speed * 0.96))
+    elif any(k in emotion_hint for k in ("battle", "intense", "war", "angry", "urgent", "action", "dramatic")):
+        tokens = ["male", "indian accent", "young adult", "moderate pitch"]
+        speed = min(1.18, max(0.88, speed * 1.07))
+    elif any(k in emotion_hint for k in ("awe", "solemn", "sorrow", "sad", "sacred", "devotion", "emotional")):
+        tokens = ["male", "indian accent", "middle-aged", "very low pitch"]
+        speed = min(1.12, max(0.85, speed * 0.94))
+    elif any(k in emotion_hint for k in ("triumph", "heroic", "joy", "inspiring", "victory")):
+        tokens = ["male", "indian accent", "young adult", "moderate pitch"]
+        speed = min(1.15, max(0.90, speed * 1.03))
+
+    final_instruct = ", ".join(tokens)
 
     tmp_wav = Path(out).with_suffix(".vs.wav")
     audios = _VOICESTUDIO_MODEL.generate(
@@ -887,7 +903,7 @@ def _run_cached(provider, text, cfg, out):
     if provider not in ("gemini_tts", "gemini"):
         text = strip_tags(text)                 # Edge/Chirp/ElevenLabs tags ko bol dete hain
     models = "|".join(cfg.get("gemini_models") or []) if provider in ("gemini_tts", "gemini") else ""
-    sig = f"{provider}|{cfg.get('voice')}|{cfg.get('style')}|{models}|{cfg.get('speed')}|{cfg.get('rate')}|{cfg.get('pitch')}|{text}"
+    sig = f"{provider}|{cfg.get('voice')}|{cfg.get('style')}|{cfg.get('emotion','')}|{models}|{cfg.get('speed')}|{cfg.get('rate')}|{cfg.get('pitch')}|{text}"
     path = CACHE_DIR / (hashlib.sha1(sig.encode("utf-8")).hexdigest() + ".mp3")
     _STATE["cached"] = False
     if use_cache and path.exists():

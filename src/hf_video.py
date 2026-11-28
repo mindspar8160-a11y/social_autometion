@@ -427,6 +427,9 @@ def _render_via_vox_remotion(
     audio_path: Path,
     out_mp4: Path,
     topic_title: str,
+    geo: dict | None = None,
+    hashtags: list[str] | None = None,
+    seed: int = 1234,
 ) -> bool:
     """Render 3-layer Vox Editorial Motion Graphics via Remotion VoxEditorial composition."""
     import json
@@ -447,7 +450,7 @@ def _render_via_vox_remotion(
         dest_name = f"scene_{i}{ext}"
         shutil.copyfile(mpath, pub_media_dir / dest_name)
         dur = max(1.0, float(sc.get("durationSec") or sc.get("voiceSec") or sc.get("sec") or 5.0))
-        vox_scenes.append({
+        entry = {
             "heading": sc.get("heading") or sc.get("title") or topic_title,
             "title": sc.get("title") or "",
             "narration": sc.get("narration") or "",
@@ -455,11 +458,28 @@ def _render_via_vox_remotion(
             "durationSec": dur,
             "mediaSrc": f"hf_media/{run_key}/{dest_name}",
             "isVideo": bool(is_vid),
-        })
+        }
+        if sc.get("words"):
+            entry["words"] = sc["words"]
+        if sc.get("state"):
+            entry["state"] = sc["state"]
+        if sc.get("place"):
+            entry["place"] = sc["place"]
+        vox_scenes.append(entry)
 
     props_path = work_dir / "vox_props.json"
     props_path.write_text(
-        json.dumps({"topicTitle": topic_title, "scenes": vox_scenes}, ensure_ascii=False, indent=2),
+        json.dumps(
+            {
+                "topicTitle": topic_title,
+                "scenes": vox_scenes,
+                "seed": seed,
+                "geo": geo,
+                "hashtags": hashtags or [],
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
         encoding="utf-8",
     )
 
@@ -506,6 +526,9 @@ def render_hf_video(
     out_mp4: Path,
     topic_title: str = "",
     token: str | None = None,
+    geo: dict | None = None,
+    hashtags: list[str] | None = None,
+    seed: int = 1234,
 ) -> Path:
     """Generate scene images/video via HuggingFace/AI Horde, then render via VoxEditorial Remotion (or FFmpeg fallback)."""
     img_dir = work_dir / "hf_images"
@@ -538,7 +561,10 @@ def render_hf_video(
         else:
             raise RuntimeError(f"Neither AI video nor AI image succeeded for scene {i}")
 
-    if _render_via_vox_remotion(scenes, media_entries, work_dir, audio_path, out_mp4, topic_title):
+    if _render_via_vox_remotion(
+        scenes, media_entries, work_dir, audio_path, out_mp4, topic_title,
+        geo=geo, hashtags=hashtags, seed=seed,
+    ):
         return out_mp4
 
     for i, (sc, (mpath, is_vid)) in enumerate(zip(scenes, media_entries)):
