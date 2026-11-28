@@ -87,3 +87,4 @@
 | 81 | 2026-11-27 | 2026-11-27_130716_pf_shakti_peeth_bhramari_trisrota | Unknown | Productivity & Wisdom | https://youtu.be/7As7amK6YNA |
 | 82 | 2026-11-27 | 2026-11-27_155811_pf_puri_jagannath_mysteries | Unknown | Productivity & Wisdom | https://youtu.be/byOOEVgwgYM |
 | 83 | 2026-11-28 | 2026-11-28_035329_pf_veer_tejaji_vachan | Unknown | Productivity & Wisdom | https://youtu.be/iuoIz2vnqwk |
+| 84 | 2026-11-28 | 2026-11-28_075401_pf_rani_durgavati_gondwana | Unknown | Productivity & Wisdom | https://youtu.be/2GjaFIuXK6Q |
