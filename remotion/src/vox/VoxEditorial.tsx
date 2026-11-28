@@ -91,48 +91,139 @@ const SvgEditorialArt: React.FC<{
   frame: number;
   scale?: number;
 }> = ({text, index, accent, frame, scale = 1}) => {
+  const {durationInFrames} = useVideoConfig();
   const motif = pickSvgMotif(text, index);
+
+  // 1. Slow push-in + 2. Multi-layer Parallax
+  const pushIn = interpolate(frame, [0, Math.max(1, durationInFrames)], [1.0, 1.12], {extrapolateRight: "clamp"});
+  const farX = interpolate(frame, [0, Math.max(1, durationInFrames)], [0, -14]);
+  const midX = interpolate(frame, [0, Math.max(1, durationInFrames)], [0, -28]);
+  const nearX = interpolate(frame, [0, Math.max(1, durationInFrames)], [0, -48]);
   const pulse = 1 + Math.sin(frame / 10) * 0.04;
   const spin = (frame * 1.4) % 360;
-  const floatY = Math.sin(frame / 12) * 8;
+  const floatY = Math.sin(frame / 12) * 5;
+  const cloudDrift = (frame * 0.7) % 120;
+  const treeSway = Math.sin(frame / 16) * 1.8;
 
   return (
     <div
       style={{
         width: "100%",
         height: "100%",
-        background: "linear-gradient(160deg, #1E1B18 0%, #2C241E 55%, #18181B 100%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         position: "relative",
         overflow: "hidden",
+        // 4. Color grade
+        filter: "contrast(1.06) saturate(1.12) sepia(0.08)",
       }}
     >
+      {/* LAYER 1: Sky + Sun + Clouds + Distant Hills with Depth Blur & Slow Far Parallax */}
       <svg
         viewBox="0 0 600 600"
-        style={{width: "92%", height: "92%", transform: `scale(${scale})`}}
+        preserveAspectRatio="xMidYMid slice"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          transform: `scale(${pushIn * 1.04}) translateX(${farX}px)`,
+          // 3. Depth blur on far background
+          filter: "blur(2.2px)",
+        }}
       >
-        {/* Ambient radial sun/mandala halo */}
-        <circle cx="300" cy="290" r={195 * pulse} fill={accent} opacity={0.18} />
-        <circle cx="300" cy="290" r={140} fill="none" stroke="#F59E0B" strokeWidth="3" strokeDasharray="12 10" transform={`rotate(${spin} 300 290)`} opacity={0.55} />
+        <defs>
+          <linearGradient id={`sky_${index}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#FDE68A" />
+            <stop offset="45%" stopColor="#FDBA74" />
+            <stop offset="100%" stopColor="#FEF3C7" />
+          </linearGradient>
+          <radialGradient id={`sun_${index}`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FFFBEB" />
+            <stop offset="55%" stopColor="#F59E0B" />
+            <stop offset="100%" stopColor="rgba(245,158,11,0)" />
+          </radialGradient>
+        </defs>
+        <rect x="-40" y="-40" width="680" height="680" fill={`url(#sky_${index})`} />
+        {/* Sun + Halo */}
+        <circle cx="430" cy="155" r={115 * pulse} fill={`url(#sun_${index})`} opacity={0.85} />
+        <circle cx="430" cy="155" r="46" fill="#FFFBEB" opacity={0.95} />
+        {/* Drifting Clouds */}
+        <g transform={`translate(${cloudDrift - 60}, 0)`} fill="#FFFBEB" opacity={0.7}>
+          <ellipse cx="140" cy="115" rx="68" ry="22" />
+          <ellipse cx="175" cy="108" rx="45" ry="18" />
+          <ellipse cx="370" cy="88" rx="58" ry="18" />
+        </g>
+        {/* Distant Mountains / Horizon */}
+        <path d="M-40,420 L95,295 L225,380 L365,270 L520,390 L660,310 L660,640 L-40,640 Z" fill="#D6B88C" opacity={0.65} />
+        <path d="M-40,455 Q150,430 300,455 T640,455 L640,640 L-40,640 Z" fill="#C49A6C" opacity={0.5} />
+      </svg>
+
+      {/* LAYER 2: Midground Architectural SVG Subject (Sharp Focus, Mid Parallax + Slow Push-in) */}
+      <svg
+        viewBox="0 0 600 600"
+        style={{
+          position: "relative",
+          width: "100%",
+          height: "100%",
+          transform: `scale(${scale * pushIn}) translateX(${midX}px)`,
+        }}
+      >
+        {/* Ground shadow base */}
+        <ellipse cx="300" cy="482" rx="235" ry="20" fill="rgba(41,37,36,0.22)" />
 
         {motif === "temple" && (
-          <g transform={`translate(0, ${floatY * 0.4})`} stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
-            <rect x="130" y="450" width="340" height="45" fill="#E7DFCF" />
-            <rect x="160" y="410" width="280" height="40" fill="#FBF7EE" />
-            <polygon points="200,410 300,140 400,410" fill="#F59E0B" />
-            <polygon points="235,410 300,210 365,410" fill="#FBF7EE" />
-            <path d="M270,410 L270,320 A30,30 0 0 1 330,320 L330,410 Z" fill="#18181B" />
-            <circle cx="300" cy="122" r="18" fill="#FBBF24" />
-            <line x1="300" y1="65" x2="300" y2="105" stroke="#FBBF24" strokeWidth="6" />
-            <polygon points="300,68 355,84 300,100" fill={accent} />
+          <g transform={`translate(0, ${floatY * 0.25})`} stroke="#4A3520" strokeWidth="2.6" strokeLinejoin="round">
+            {/* Golden Nagara Shikhara (Rear Tall Tower) */}
+            <path d="M315,305 L348,132 C356,118 394,118 402,132 L435,305 Z" fill="#F5B041" />
+            {/* Shikhara ribs & vertical tiers */}
+            <path d="M335,305 L358,142 M375,305 L375,124 M415,305 L392,142" stroke="#9A6B21" strokeWidth="2" fill="none" />
+            {[170, 205, 240, 275].map((yy, k) => (
+              <rect key={k} x={352 - k * 10} y={yy} width={46 + k * 20} height="16" rx="3" fill="#F8C471" />
+            ))}
+            {/* Amalaka, Kalash & Saffron Flag */}
+            <ellipse cx="375" cy="120" rx="20" ry="7" fill="#D4AC0D" />
+            <circle cx="375" cy="108" r="7" fill="#FDE047" />
+            <line x1="375" y1="62" x2="375" y2="104" stroke="#78350F" strokeWidth="3.5" />
+            <path d="M375,65 Q412,72 426,64 Q408,84 375,86 Z" fill="#EA580C" />
+
+            {/* Sandstone Mandapa Domes (Stepped Piramidal Roofs like ref_style) */}
+            <polygon points="85,335 155,275 225,335" fill="#F3E2C7" />
+            <polygon points="180,335 280,235 380,335" fill="#F7E9D2" />
+            <polygon points="365,335 450,265 535,335" fill="#EFE0C6" />
+            {/* Dome Kalash finials */}
+            <circle cx="155" cy="268" r="6" fill="#D4AC0D" />
+            <circle cx="280" cy="227" r="9" fill="#D4AC0D" />
+            <circle cx="450" cy="258" r="6" fill="#D4AC0D" />
+
+            {/* Frieze & Cornice Band */}
+            <rect x="78" y="335" width="464" height="24" rx="3" fill="#EBD5B3" />
+            {Array.from({length: 22}, (_, k) => (
+              <line key={k} x1={94 + k * 20} y1="339" x2={94 + k * 20} y2="355" stroke="#8C6D46" strokeWidth="1.5" />
+            ))}
+
+            {/* Carved Sandstone Pillars & Scalloped Arches */}
+            <rect x="92" y="359" width="436" height="106" fill="#3B2818" opacity={0.85} />
+            {[105, 165, 225, 295, 365, 435, 495].map((px, k) => (
+              <g key={k}>
+                <rect x={px - 10} y="359" width="20" height="106" fill="#F3E2C7" />
+                <rect x={px - 14} y="359" width="28" height="12" fill="#E5CBA4" />
+                <rect x={px - 14} y="453" width="28" height="12" fill="#E5CBA4" />
+                {k < 6 && (
+                  <path
+                    d={`M${px + 10},371 Q${px + 30},396 ${px + 50},371`}
+                    fill="none"
+                    stroke="#F3E2C7"
+                    strokeWidth="6"
+                  />
+                )}
+              </g>
+            ))}
+            {/* Temple Plinth / Base Steps */}
+            <rect x="72" y="465" width="476" height="16" fill="#E5CBA4" />
           </g>
         )}
 
         {motif === "warrior" && (
           <g transform={`translate(0, ${floatY * 0.5})`} stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
-            {/* Crossed Swords & Shield */}
             <line x1="160" y1="430" x2="440" y2="150" stroke="#E5E7EB" strokeWidth="18" strokeLinecap="round" />
             <line x1="440" y1="430" x2="160" y2="150" stroke="#E5E7EB" strokeWidth="18" strokeLinecap="round" />
             <circle cx="300" cy="295" r="105" fill={accent} />
@@ -159,7 +250,7 @@ const SvgEditorialArt: React.FC<{
         )}
 
         {motif === "mountain_river" && (
-          <g stroke="#18181B" strokeWidth="6" strokeLinejoin="round">
+          <g stroke="#18181B" strokeWidth="5" strokeLinejoin="round">
             <polygon points="80,430 230,170 380,430" fill="#D6C7AE" />
             <polygon points="220,430 375,140 520,430" fill="#FBF7EE" />
             <polygon points="375,140 335,215 375,205 415,215" fill="#FFFFFF" />
@@ -208,6 +299,51 @@ const SvgEditorialArt: React.FC<{
           </g>
         )}
       </svg>
+
+      {/* LAYER 3: Foreground Trees Silhouette (Fastest Near Parallax + Sway) */}
+      <svg
+        viewBox="0 0 600 600"
+        preserveAspectRatio="xMidYMid slice"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          transform: `scale(${pushIn}) translateX(${nearX}px)`,
+          pointerEvents: "none",
+        }}
+      >
+        <g transform={`rotate(${treeSway} 40 520)`} fill="#2D4A22" stroke="#18181B" strokeWidth="2.5">
+          <rect x="28" y="410" width="16" height="120" fill="#5C4033" />
+          <circle cx="36" cy="395" r="46" />
+          <circle cx="62" cy="415" r="32" />
+        </g>
+        <g transform={`rotate(${-treeSway * 0.9} 565 520)`} fill="#253F1C" stroke="#18181B" strokeWidth="2.5">
+          <rect x="556" y="420" width="16" height="110" fill="#5C4033" />
+          <circle cx="564" cy="402" r="44" />
+          <circle cx="538" cy="422" r="30" />
+        </g>
+      </svg>
+
+      {/* LAYER 5: Vignette */}
+      <AbsoluteFill
+        style={{
+          background: "radial-gradient(circle at 50% 48%, transparent 48%, rgba(15,12,10,0.52) 100%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* LAYER 6: Film Grain (SVG Turbulence Noise) */}
+      <svg style={{position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.14, mixBlendMode: "overlay", pointerEvents: "none"}}>
+        <filter id={`grain_${index}_${frame % 6}`}>
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed={(frame % 12) + index * 7} />
+        </filter>
+        <rect width="100%" height="100%" filter={`url(#grain_${index}_${frame % 6})`} />
+      </svg>
+
+      {/* LAYER 7: Cinematic Letterbox Bars */}
+      <div style={{position: "absolute", top: 0, left: 0, right: 0, height: 28, backgroundColor: "#09090B", pointerEvents: "none"}} />
+      <div style={{position: "absolute", bottom: 0, left: 0, right: 0, height: 28, backgroundColor: "#09090B", pointerEvents: "none"}} />
     </div>
   );
 };
