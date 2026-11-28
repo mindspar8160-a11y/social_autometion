@@ -6,6 +6,7 @@ import {CharacterDemoVertical} from "./components/Character";
 import {PuppetStory, DEMO_SCENES, totalFrames} from "./components/PuppetKit";
 import {PuppetWarStory, PUPPET_WAR_STORY_FRAMES} from "./components/PuppetWarStory";
 import {PaperFilm, totalFramesPF} from "./cinematic/PaperFilm";
+import {VoxEditorial, totalFramesVoxEditorial, VoxEditorialProps} from "./vox/VoxEditorial";
 import {CinematicArc, totalFramesCA} from "./cinematic/CinematicArc";
 import {LibraryPreview} from "./cinematic/paper/library/LibraryPreview";
 import {PaperScene3DDemo} from "./cinematic/paper/demo/PaperScene3DDemo";
@@ -30,6 +31,13 @@ const mythCalc: CalculateMetadataFunction<{scenes: MythScene[]; seed: number}> =
 
 const pfCalc: CalculateMetadataFunction<PFProps> = ({props}) => ({
   durationInFrames: totalFramesPF(props.scenes, FPS),
+  width: 1080,
+  height: 1920,
+  fps: FPS,
+});
+
+const voxEditorialCalc: CalculateMetadataFunction<VoxEditorialProps> = ({props}) => ({
+  durationInFrames: totalFramesVoxEditorial(props.scenes || [], FPS),
   width: 1080,
   height: 1920,
   fps: FPS,
@@ -126,6 +134,19 @@ export const Root: React.FC = () => (
       fps={FPS}
       width={1080}
       height={1920}
+    />
+    <Composition
+      id="VoxEditorial"
+      component={VoxEditorial}
+      durationInFrames={300}
+      fps={FPS}
+      width={1080}
+      height={1920}
+      defaultProps={{
+        topicTitle: "MindSpark Editorial",
+        scenes: [],
+      }}
+      calculateMetadata={voxEditorialCalc}
     />
   </>
 );

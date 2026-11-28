@@ -420,6 +420,85 @@ def _ken_burns_filter(idx: int, frames: int) -> str:
     )
 
 
+def _render_via_vox_remotion(
+    scenes: list[dict],
+    media_entries: list[tuple[Path, bool]],
+    work_dir: Path,
+    audio_path: Path,
+    out_mp4: Path,
+    topic_title: str,
+) -> bool:
+    """Render 3-layer Vox Editorial Motion Graphics via Remotion VoxEditorial composition."""
+    import json
+    import shutil
+
+    root = Path(__file__).resolve().parent.parent
+    remotion_dir = root / "remotion"
+    if not remotion_dir.exists():
+        return False
+
+    run_key = work_dir.name
+    pub_media_dir = remotion_dir / "public" / "hf_media" / run_key
+    pub_media_dir.mkdir(parents=True, exist_ok=True)
+
+    vox_scenes = []
+    for i, (sc, (mpath, is_vid)) in enumerate(zip(scenes, media_entries)):
+        ext = mpath.suffix or (".mp4" if is_vid else ".png")
+        dest_name = f"scene_{i}{ext}"
+        shutil.copyfile(mpath, pub_media_dir / dest_name)
+        dur = max(1.0, float(sc.get("durationSec") or sc.get("voiceSec") or sc.get("sec") or 5.0))
+        vox_scenes.append({
+            "heading": sc.get("heading") or sc.get("title") or topic_title,
+            "title": sc.get("title") or "",
+            "narration": sc.get("narration") or "",
+            "tts_text": sc.get("tts_text") or sc.get("narration") or "",
+            "durationSec": dur,
+            "mediaSrc": f"hf_media/{run_key}/{dest_name}",
+            "isVideo": bool(is_vid),
+        })
+
+    props_path = work_dir / "vox_props.json"
+    props_path.write_text(
+        json.dumps({"topicTitle": topic_title, "scenes": vox_scenes}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    rendered_mp4 = work_dir / "vox_rendered.mp4"
+    npx = shutil.which("npx.cmd") or shutil.which("npx") or "npx.cmd"
+    try:
+        print("🎬 Rendering 3-layer VoxEditorial Motion Graphics via Remotion...")
+        subprocess.run(
+            [
+                npx, "remotion", "render", "src/index.ts", "VoxEditorial", str(rendered_mp4),
+                f"--props={props_path.resolve().as_posix()}",
+                "--concurrency=1",
+                "--gl=angle",
+            ],
+            cwd=remotion_dir,
+            check=True,
+        )
+        subprocess.run(
+            [
+                "ffmpeg", "-y", "-loglevel", "error",
+                "-i", str(rendered_mp4),
+                "-i", str(audio_path),
+                "-map", "0:v", "-map", "1:a",
+                "-c:v", "libx264", "-preset", "medium", "-b:v", "3500k",
+                "-maxrate", "4500k", "-bufsize", "7000k",
+                "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+                "-c:a", "aac", "-b:a", "128k", "-shortest",
+                str(out_mp4),
+            ],
+            check=True,
+        )
+        return out_mp4.exists() and out_mp4.stat().st_size > 50000
+    except Exception as e:
+        print(f"[HF-Video] VoxEditorial Remotion render failed ({e}), falling back to FFmpeg...")
+        return False
+    finally:
+        shutil.rmtree(pub_media_dir, ignore_errors=True)
+
+
 def render_hf_video(
     scenes: list[dict],
     work_dir: Path,
@@ -428,12 +507,13 @@ def render_hf_video(
     topic_title: str = "",
     token: str | None = None,
 ) -> Path:
-    """Generate scene images via HuggingFace, animate with Ken Burns, burn subtitles, mux audio."""
+    """Generate scene images/video via HuggingFace/AI Horde, then render via VoxEditorial Remotion (or FFmpeg fallback)."""
     img_dir = work_dir / "hf_images"
     clip_dir = work_dir / "hf_clips"
     img_dir.mkdir(parents=True, exist_ok=True)
     clip_dir.mkdir(parents=True, exist_ok=True)
 
+    media_entries: list[tuple[Path, bool]] = []
     clip_paths: list[Path] = []
     total_scenes = len(scenes)
     for i, sc in enumerate(scenes):
@@ -448,16 +528,28 @@ def render_hf_video(
                 print(f"[HF-Video] Scene {i} image failed ({img_e}), trying direct T2V...")
 
         dur = max(1.0, float(sc.get("durationSec") or sc.get("voiceSec") or sc.get("sec") or 5.0))
-        frames = max(30, int(round(dur * 30)))
         clip_path = clip_dir / f"clip_{i}.mp4"
 
         ai_vid = generate_scene_video(prompt, img_path, raw_vid_path, token=token)
         if ai_vid and ai_vid.exists():
-            # Fit real AI video clip to 1080x1920 30fps and exact scene duration
+            media_entries.append((ai_vid, True))
+        elif img_path.exists():
+            media_entries.append((img_path, False))
+        else:
+            raise RuntimeError(f"Neither AI video nor AI image succeeded for scene {i}")
+
+    if _render_via_vox_remotion(scenes, media_entries, work_dir, audio_path, out_mp4, topic_title):
+        return out_mp4
+
+    for i, (sc, (mpath, is_vid)) in enumerate(zip(scenes, media_entries)):
+        dur = max(1.0, float(sc.get("durationSec") or sc.get("voiceSec") or sc.get("sec") or 5.0))
+        frames = max(30, int(round(dur * 30)))
+        clip_path = clip_dir / f"clip_{i}.mp4"
+        if is_vid:
             subprocess.run(
                 [
                     "ffmpeg", "-y", "-loglevel", "error",
-                    "-stream_loop", "-1", "-i", str(ai_vid),
+                    "-stream_loop", "-1", "-i", str(mpath),
                     "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,format=yuv420p",
                     "-t", f"{dur:.3f}", "-an",
                     "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
@@ -466,13 +558,11 @@ def render_hf_video(
                 check=True,
             )
         else:
-            if not img_path.exists():
-                raise RuntimeError(f"Neither AI video nor AI image succeeded for scene {i}")
             vf = _ken_burns_filter(i, frames)
             subprocess.run(
                 [
                     "ffmpeg", "-y", "-loglevel", "error",
-                    "-loop", "1", "-i", str(img_path),
+                    "-loop", "1", "-i", str(mpath),
                     "-vf", vf,
                     "-t", f"{dur:.3f}",
                     "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
